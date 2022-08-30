@@ -14,9 +14,13 @@ import sys
 import asyncio
 import traceback
 
+from commands import say
+
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
-GUILD = os.getenv('DISCORD_GUILD')
+TEST_ID = os.getenv('TEST_ID')
+MADEON_ID = os.getenv('MADEON_ID')
+PORTER_ID = os.getenv('PORTER_ID')
 
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix="!!", intents=intents, max_messages=10000)
