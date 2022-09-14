@@ -2,3 +2,5 @@
 allimports.py
 __pycache__
 .vscode
+database.db
+discord.log
