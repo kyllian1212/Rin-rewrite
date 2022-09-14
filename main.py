@@ -16,6 +16,7 @@ import asyncio
 import traceback
 
 from cogs import botcommands
+from cogs import botlisteners
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -26,6 +27,8 @@ PORTER_ID = os.getenv('PORTER_ID')
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix="!!", intents=intents, max_messages=10000, help_command=None)
 
+VERSION = "alpha"
+
 @bot.event
 async def on_ready():
     await bot.wait_until_ready()
@@ -33,6 +36,8 @@ async def on_ready():
     for filename in os.listdir("./cogs"):
         if filename.endswith(".py"):
             await bot.load_extension(f"cogs.{filename[:-3]}")
+
+    bot.tree.add_command()
 
 if __name__ == "__main__":
     try:

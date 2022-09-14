@@ -1,3 +1,4 @@
 .env
 allimports.py
 __pycache__
+.vscode
