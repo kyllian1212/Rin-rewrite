@@ -17,9 +17,6 @@ import asyncio
 import traceback
 import logging
 
-from cogs import botadmincommands
-from cogs import botlisteners
-
 from db import db
 
 load_dotenv()
@@ -41,14 +38,21 @@ async def on_ready():
     try:
         db.build_database()
     except Exception as err:
-        print("database file not found! it probably hasn't been created automatically for some reason. please contact the bot owner. exiting...")
+        print(str(err))
+        print("please contact the bot owner. exiting...")
+        print("------------------------------------")
+        print(traceback.format_exc()) #debug
         os._exit(-1)
 
     bot.synced = False
 
-    for filename in os.listdir("./cogs"):
+    for filename in os.listdir("./cogs/admin"):
         if filename.endswith(".py"):
-            await bot.load_extension(f"cogs.{filename[:-3]}")
+            await bot.load_extension(f"cogs.admin.{filename[:-3]}")
+
+    for filename in os.listdir("./cogs/listeners"):
+        if filename.endswith(".py"):
+            await bot.load_extension(f"cogs.listeners.{filename[:-3]}")
 
     if not bot.synced:
         await bot.tree.sync(guild = discord.Object(id = 849034525861740571)) #remove guild value for global slash command (takes longer to synchronize)

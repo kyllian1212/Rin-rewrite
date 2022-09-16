@@ -1,8 +1,6 @@
 import discord
 from discord.ext import commands
 
-from main import MADEON_ID
-
 class BotListenersCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot

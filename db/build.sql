@@ -17,5 +17,12 @@ CREATE TABLE IF NOT EXISTS bot_song_library(
     artist VARCHAR(200),
     song_title VARCHAR(200),
     album VARCHAR(200),
-    length_in_seconds int
+    length_in_seconds INT,
+    song_order INT DEFAULT -1
+);
+
+CREATE TABLE IF NOT EXISTS bot_word_blacklist(
+    id INT PRIMARY KEY,
+    server_id INT,
+    word VARCHAR(50)
 );
