@@ -13,10 +13,15 @@ class SetLogChannelCog(commands.Cog):
     @app_commands.checks.has_permissions(administrator=True) #sort out error next time
     async def set_log_channel(self, interaction: discord.Interaction, channel: discord.TextChannel):
         try:
-            db.update_db("INSERT INTO bot_log_channel VALUES(?,?)", interaction.guild_id, channel.id)
+            log_channel_set = db.fetchone("SELECT log_channel_id FROM bot_log_channel WHERE server_id = ?", interaction.guild_id)
+            if log_channel_set == None:
+                db.update_db("INSERT INTO bot_log_channel VALUES(?,?)", interaction.guild_id, channel.id)
+            else:
+                db.update_db("UPDATE bot_log_channel SET log_channel_id = ? WHERE server_id = ?", channel.id, interaction.guild_id)
         except:
+            interaction.response.send_message(embed=discord.Embed(title="there was an error setting or updating the log channel. please try again or contact the bot owner if you see this again", color=0xff0000), ephemeral=True)
             raise
-        await interaction.response.send_message(content="test", ephemeral=True)
+        await interaction.response.send_message(embed=discord.Embed(title="log channel successfully set to #" + channel.name, color=0x00aeff), ephemeral=True)
 
 async def setup(bot):
     await bot.add_cog(SetLogChannelCog(bot), guilds = [discord.Object(id = 849034525861740571)])

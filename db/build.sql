@@ -3,13 +3,13 @@ CREATE TABLE IF NOT EXISTS bot_version(
 );
 
 CREATE TABLE IF NOT EXISTS bot_log_channel(
-    server_id INT PRIMARY KEY,
-    log_channel_id INT
+    server_id TEXT PRIMARY KEY,
+    log_channel_id TEXT
 );
 
 CREATE TABLE IF NOT EXISTS bot_archive_role(
-    server_id INT PRIMARY KEY,
-    archive_role_id INT
+    server_id TEXT PRIMARY KEY,
+    archive_role_id TEXT
 );
 
 CREATE TABLE IF NOT EXISTS bot_song_library(
@@ -23,6 +23,6 @@ CREATE TABLE IF NOT EXISTS bot_song_library(
 
 CREATE TABLE IF NOT EXISTS bot_word_blacklist(
     id INT PRIMARY KEY,
-    server_id INT,
+    server_id TEXT,
     word VARCHAR(50)
 );

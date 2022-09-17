@@ -28,8 +28,9 @@ the changelog for previous versions of the bot is available here: https://github
 * **/set_log_channel:** will set which channel the reported messages will go to in the server you're in.
 * the report function deleting messages will now depend on if you have the "Administrator" or "Manage Messages" permissions instead of depending on a specific role.
 * changed the reaction listener from `on_reaction_add` to `on_raw_reaction_add`, which means every message, no matter when it has been sent, is now able to be reported.
-* added message creation date/time to the report
-* the displayed report date/time should now adapt depending on which timezone you're in
+* displayed user roles in a reported message are now mentions (which means it should adapt in the report if a role that person has is renamed or color changed in the future)
+* added message creation date/time to the report (its unix timestamped so it should display correctly depending on which timezone you're in)
+* the reported date/time cannot be timestamped so i added the timezone in
 
 ## **default song library**
 * added 3 songs in the default song library:

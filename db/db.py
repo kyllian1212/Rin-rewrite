@@ -34,7 +34,10 @@ def drop_all_tables():
 
 def fetchone(command, *values):
     cur.execute(command, tuple(values))
-    return cur.fetchone()
+    result = cur.fetchone()
+    if result == None:
+        return None
+    return result[0]
 
 def fetchall(command, *values):
     cur.execute(command, tuple(values))
