@@ -8,7 +8,7 @@ BUILD_PATH="db/build.sql"
 con = sqlite3.connect(DATABASE_PATH, check_same_thread=False)
 cur = con.cursor()
 
-def build_database(): #not async
+def build_database(): 
     if os.path.exists(DATABASE_PATH):
         try:
             cur.execute("SELECT name FROM sqlite_master WHERE type='table';")
@@ -25,7 +25,7 @@ def build_database(): #not async
     else:
         raise Exception("database file not found! it probably hasn't been created automatically for some reason.")
 
-def drop_all_tables(): #still not async
+def drop_all_tables(): 
     print("dropping all tables...")
     cur.execute("SELECT name FROM sqlite_master where type='table'")
     for table in cur.fetchall():

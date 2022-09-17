@@ -1,3 +1,4 @@
+from distutils.log import error
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -9,15 +10,23 @@ class RebuildDatabaseCog(commands.Cog):
         self.bot = bot
 
     @app_commands.command(name="rebuild_database", description="Deletes the entire database and rebuilds it")
+    @app_commands.checks.has_permissions(administrator=True)
     async def rebuild_database(self, interaction: discord.Interaction):
-        view = RebuildDatabaseButtons()
-        await interaction.response.send_message(
-            embed=discord.Embed(
-                title="are you sure you want to rebuild the database?", 
-                description="this will cause the admin configuration of every server as well as the song library to be entirely destroyed, make sure to have a backup!! this cannot be undone", 
-                color=0xff0000),
-            ephemeral=True,
-            view=view)
+        if (interaction.user.id == 171000921927581696):
+            view = RebuildDatabaseButtons()
+            await interaction.response.send_message(
+                embed=discord.Embed(
+                    title="are you sure you want to rebuild the database?", 
+                    description="this will cause the admin configuration of every server as well as the song library to be entirely destroyed, make sure to have a backup!! this cannot be undone", 
+                    color=0xff0000),
+                ephemeral=True,
+                view=view)
+        else:
+            await interaction.response.send_message(
+                embed=discord.Embed(
+                    title="only the bot owner can run this command!", 
+                    color=0xff0000),
+                ephemeral=True)
 
 class RebuildDatabaseButtons(discord.ui.View):
     def __init__(self, *, timeout=60):
