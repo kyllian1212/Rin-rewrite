@@ -18,8 +18,12 @@ class TimeoutKickBanCog(commands.Cog):
     @app_commands.checks.has_permissions(administrator=True, moderate_members=True) #sort out error next time
     async def timeout(self, interaction: discord.Interaction, member: discord.Member, timeout_length_days: int = 0, timeout_length_hours: int = 0, timeout_length_minutes: int = 0, reason: str = None, dm: bool = False):
         try:
-            
-                await interaction.response.send_message(embed=discord.Embed(title="channel #" + interaction.channel.name + " successfully archived!", color=0x00aeff), ephemeral=True)
+            if timeout_length_minutes + timeout_length_hours + timeout_length_minutes == 0:
+                await interaction.response.send_message(embed=discord.Embed(title="you cannot timeout someone for 0 minutes", color=0xff0000), ephemeral=True)
+            else:
+                timeout = timedelta(days=timeout_length_days, minutes=timeout_length_minutes, hours=timeout_length_hours)
+                await member.timeout(timeout, reason=reason)
+                await interaction.response.send_message(embed=discord.Embed(description="<@" + str(member.id) + "> successfully timed out!", color=0x00aeff), ephemeral=True)
         except:
             await interaction.response.send_message(embed=discord.Embed(title="there was an error timing out the person. please try again or contact the bot owner if you see this again", description="(please note that it is not possible to timeout someone for more than 28 days due to an API limitation)", color=0xff0000), ephemeral=True)
             raise

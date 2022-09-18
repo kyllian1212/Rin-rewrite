@@ -21,7 +21,7 @@ class SetArchiveRoleCog(commands.Cog):
         except:
             await interaction.response.send_message(embed=discord.Embed(title="there was an error setting or updating the archive role. please try again or contact the bot owner if you see this again", color=0xff0000), ephemeral=True)
             raise
-        await interaction.response.send_message(embed=discord.Embed(title="log channel successfully set to @" + role.name, color=0x00aeff), ephemeral=True)
+        await interaction.response.send_message(embed=discord.Embed(description="archive role successfully set to <@&" + str(role.id) + ">!", color=0x00aeff), ephemeral=True)
 
 async def setup(bot):
     await bot.add_cog(SetArchiveRoleCog(bot), guilds = [discord.Object(id = 849034525861740571)])

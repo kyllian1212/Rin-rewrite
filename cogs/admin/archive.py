@@ -48,7 +48,7 @@ class ArchiveCog(commands.Cog):
                 await channel.set_permissions(target=archive_role, overwrite=permission_overwrite)
                 await channel.move(beginning=True, category=category, sync_permissions=False, reason="Archive")
 
-                await interaction.response.send_message(embed=discord.Embed(title="channel #" + interaction.channel.name + " successfully archived!", color=0x00aeff), ephemeral=True)
+                await interaction.response.send_message(embed=discord.Embed(description="channel <#" + str(interaction.channel.id) + "> successfully archived!", color=0x00aeff), ephemeral=True)
         except:
             await interaction.response.send_message(embed=discord.Embed(title="there was an error archiving the channel. please try again or contact the bot owner if you see this again", description="(make sure to check the channel permissions just incase the bot has done something wrong)", color=0xff0000), ephemeral=True)
             raise
@@ -70,7 +70,7 @@ class ArchiveCog(commands.Cog):
                 await channel.set_permissions(target=archive_role, overwrite=None)
                 await channel.move(end=True, category=category, sync_permissions=False, reason="Unarchive")
 
-                await interaction.response.send_message(embed=discord.Embed(title="channel #" + interaction.channel.name + " successfully unarchived!", color=0x00aeff), ephemeral=True)
+                await interaction.response.send_message(embed=discord.Embed(description="channel <#" + str(interaction.channel.id) + "> successfully unarchived!", color=0x00aeff), ephemeral=True)
         except:
             await interaction.response.send_message(embed=discord.Embed(title="there was an error unarchiving the channel. please try again or contact the bot owner if you see this again", description="(make sure to check the channel permissions just incase the bot has done something wrong)", color=0xff0000), ephemeral=True)
             raise
