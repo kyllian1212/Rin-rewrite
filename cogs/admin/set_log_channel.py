@@ -19,7 +19,7 @@ class SetLogChannelCog(commands.Cog):
             else:
                 db.update_db("UPDATE bot_log_channel SET log_channel_id = ? WHERE server_id = ?", channel.id, interaction.guild_id)
         except:
-            interaction.response.send_message(embed=discord.Embed(title="there was an error setting or updating the log channel. please try again or contact the bot owner if you see this again", color=0xff0000), ephemeral=True)
+            await interaction.response.send_message(embed=discord.Embed(title="there was an error setting or updating the log channel. please try again or contact the bot owner if you see this again", color=0xff0000), ephemeral=True)
             raise
         await interaction.response.send_message(embed=discord.Embed(title="log channel successfully set to #" + channel.name, color=0x00aeff), ephemeral=True)
 
