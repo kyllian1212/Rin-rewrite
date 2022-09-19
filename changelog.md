@@ -23,6 +23,7 @@ the changelog for previous versions of the bot is available here: https://github
 * **/add_song_to_presence_queue**: you can now add songs to the "presence queue"! its the song that will be displayed as Rin's presence (Listening to `song`). she will have a default list of songs from now on that she'll go through randomly, and whenever someone adds songs to the queue she'll switch to those after the previous one is finished until there are no more songs in the queue. this is currently only possible with spotify links but i'll look into having other streaming platforms be supported
 * **/rebuild_database**: this one is less important but if there's any issue with the bot's database or an update, this will destroy the entire database and rebuild it from scratch (which means all data in the database will be erased)
 * maybe the pronouns stuff for this version too we'll see (placeholder)
+* **/roll**: you are now able to roll any number and any dice you want instead of just a 1d6 dice
 
 ## **reporting messages**
 * **/set_log_channel:** will set which channel the reported messages will go to in the server you're in.
@@ -38,5 +39,5 @@ the changelog for previous versions of the bot is available here: https://github
   * Love You Back by Madeon
   * Everything Goes On by Porter Robinson
 
-## **other cool things**
+## **other cool changes**
 * added a temporary countdown for second sky 2022 (this is specifically for PRD)
