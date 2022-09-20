@@ -46,9 +46,9 @@ async def on_ready():
 
     bot.synced = False
 
-    for filename in os.listdir("./cogs/admin"):
+    for filename in os.listdir("./cogs/commands"):
         if filename.endswith(".py"):
-            await bot.load_extension(f"cogs.admin.{filename[:-3]}")
+            await bot.load_extension(f"cogs.commands.{filename[:-3]}")
 
     for filename in os.listdir("./cogs/listeners"):
         if filename.endswith(".py"):
@@ -57,6 +57,9 @@ async def on_ready():
     if not bot.synced:
         await bot.tree.sync(guild = discord.Object(id = 849034525861740571)) #remove guild value for global slash command (takes longer to synchronize)
         bot.synced = True
+    
+    if not bot.user.name == "Rin | " + VERSION and not bot.user.id == 849410467507601459:
+        await bot.user.edit(username="Rin | " + VERSION)
 
 if __name__ == "__main__":
     try:
