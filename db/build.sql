@@ -12,7 +12,16 @@ CREATE TABLE IF NOT EXISTS bot_archive_role(
     archive_role_id TEXT
 );
 
-CREATE TABLE IF NOT EXISTS bot_song_library(
+CREATE TABLE IF NOT EXISTS bot_default_song_library(
+    id INT PRIMARY KEY,
+    artist VARCHAR(200),
+    song_title VARCHAR(200),
+    album VARCHAR(200),
+    length_in_seconds INT,
+    song_order INT DEFAULT -1
+);
+
+CREATE TABLE IF NOT EXISTS bot_user_song_library(
     id INT PRIMARY KEY,
     artist VARCHAR(200),
     song_title VARCHAR(200),
