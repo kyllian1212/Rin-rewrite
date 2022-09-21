@@ -13,7 +13,7 @@ class SetArchiveRoleCog(commands.Cog):
     @app_commands.checks.has_permissions(administrator=True) #sort out error next time
     async def set_archive_role(self, interaction: discord.Interaction, role: discord.Role):
         try:
-            archive_role_set = db.fetchone("SELECT archive_role_id FROM bot_archive_role WHERE server_id = ?", interaction.guild_id)
+            archive_role_set = db.fetchone_singlecolumn(0, "SELECT archive_role_id FROM bot_archive_role WHERE server_id = ?", interaction.guild_id)
             if archive_role_set == None:
                 db.update_db("INSERT INTO bot_archive_role VALUES(?,?)", interaction.guild_id, role.id)
             else:

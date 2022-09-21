@@ -39,7 +39,8 @@ the changelog for previous versions of the bot is available here: https://github
 * the reported date/time cannot be timestamped so i added the timezone in
 
 ## **default song library**
-* added 3 songs in the default song library:
+* added 4 songs in the default song library:
   * The Prince by Madeon
   * Love You Back by Madeon
+  * Gonna Be Good by Madeon (length not exact because it's not out yet)
   * Everything Goes On by Porter Robinson

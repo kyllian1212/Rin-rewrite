@@ -53,6 +53,10 @@ async def on_ready():
     for filename in os.listdir("./cogs/listeners"):
         if filename.endswith(".py"):
             await bot.load_extension(f"cogs.listeners.{filename[:-3]}")
+    
+    for filename in os.listdir("./cogs/tasks"):
+        if filename.endswith(".py"):
+            await bot.load_extension(f"cogs.tasks.{filename[:-3]}")
 
     if not bot.synced:
         await bot.tree.sync(guild = discord.Object(id = 849034525861740571)) #remove guild value for global slash command (takes longer to synchronize)

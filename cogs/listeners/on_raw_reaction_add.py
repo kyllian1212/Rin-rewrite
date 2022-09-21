@@ -13,7 +13,7 @@ class OnRawReactionAddCog(commands.Cog):
     async def on_raw_reaction_add(self, payload):
         channel = await self.bot.fetch_channel(payload.channel_id)
         reacted_message = await channel.fetch_message(payload.message_id)
-        log_channel_id = db.fetchone("SELECT log_channel_id FROM bot_log_channel WHERE server_id = ?", payload.guild_id)
+        log_channel_id = db.fetchone_singlecolumn(0, "SELECT log_channel_id FROM bot_log_channel WHERE server_id = ?", payload.guild_id)
         description = ""
 
         if log_channel_id == None:

@@ -14,7 +14,7 @@ class ArchiveCog(commands.Cog):
     @app_commands.checks.has_permissions(administrator=True, manage_channels=True) #sort out error next time
     async def archive(self, interaction: discord.Interaction, category: discord.CategoryChannel):
         try:
-            archive_role_id = db.fetchone("SELECT archive_role_id FROM bot_archive_role WHERE server_id = ?", interaction.guild_id)
+            archive_role_id = db.fetchone_singlecolumn(0, "SELECT archive_role_id FROM bot_archive_role WHERE server_id = ?", interaction.guild_id)
 
             if archive_role_id == None:
                 await interaction.response.send_message(embed=discord.Embed(title="there are no archive role set for this server", description="please set an archive role with the /set_archive_role command", color=0xff0000), ephemeral=True)
@@ -58,7 +58,7 @@ class ArchiveCog(commands.Cog):
     @app_commands.checks.has_permissions(administrator=True, manage_channels=True) #sort out error next time
     async def unarchive(self, interaction: discord.Interaction, category: discord.CategoryChannel):
         try:
-            archive_role_id = db.fetchone("SELECT archive_role_id FROM bot_archive_role WHERE server_id = ?", interaction.guild_id)
+            archive_role_id = db.fetchone_singlecolumn(0, "SELECT archive_role_id FROM bot_archive_role WHERE server_id = ?", interaction.guild_id)
 
             if archive_role_id == None:
                 await interaction.response.send_message(embed=discord.Embed(title="there are no archive role set for this server", description="please set an archive role with the /set_archive_role command", color=0xff0000), ephemeral=True)

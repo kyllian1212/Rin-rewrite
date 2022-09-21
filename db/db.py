@@ -4,10 +4,12 @@ import logging
 
 DATABASE_PATH="db/database.db"
 BUILD_PATH="db/build.sql"
+SONG_LIBRARY_PATH="db/default_song_library.sql"
 
 con = sqlite3.connect(DATABASE_PATH, check_same_thread=False)
 cur = con.cursor()
 
+# -- init + clear database functions --
 def build_database(): 
     if os.path.exists(DATABASE_PATH):
         try:
@@ -18,6 +20,7 @@ def build_database():
                     sql_script = sql_build_file.read()
 
                 con.executescript(sql_script)
+                create_song_library()
                 print("database built successfully!")
         except:
             drop_all_tables()
@@ -32,12 +35,40 @@ def drop_all_tables():
         cur.execute("DROP TABLE " + table[0]) #string formatting because placeholders can only be used to substitute values
     print("all tables dropped successfully")
 
-def fetchone(command, *values):
+# -- song library functions --
+def create_song_library():
+    try:
+        cur.execute("SELECT * FROM bot_default_song_library")
+        if cur.fetchone() == None:
+            with open(SONG_LIBRARY_PATH, 'r') as sql_song_library_file:
+                sql_script = sql_song_library_file.read()
+            
+            con.executescript(sql_script)
+    except:
+        raise Exception("error")
+
+def clear_song_library():
+    try:
+        cur.execute("SELECT * FROM bot_default_song_library")
+        if not cur.fetchone() == None:
+            update_db("DELETE FROM bot_default_song_library")
+    except:
+        raise Exception("error")
+
+# -- db access functions -- #
+def fetchone_singlecolumn(column, command, *values):
     cur.execute(command, tuple(values))
     result = cur.fetchone()
     if result == None:
         return None
-    return result[0]
+    return result[column]
+
+def fetchone_fullrow(command, *values):
+    cur.execute(command, tuple(values))
+    result = cur.fetchone()
+    if result == None:
+        return None
+    return result
 
 def fetchall(command, *values):
     cur.execute(command, tuple(values))

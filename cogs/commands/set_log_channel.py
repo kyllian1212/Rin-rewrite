@@ -13,7 +13,7 @@ class SetLogChannelCog(commands.Cog):
     @app_commands.checks.has_permissions(administrator=True) #sort out error next time
     async def set_log_channel(self, interaction: discord.Interaction, channel: discord.TextChannel):
         try:
-            log_channel_set = db.fetchone("SELECT log_channel_id FROM bot_log_channel WHERE server_id = ?", interaction.guild_id)
+            log_channel_set = db.fetchone_singlecolumn(0, "SELECT log_channel_id FROM bot_log_channel WHERE server_id = ?", interaction.guild_id)
             if log_channel_set == None:
                 db.update_db("INSERT INTO bot_log_channel VALUES(?,?)", interaction.guild_id, channel.id)
             else:
