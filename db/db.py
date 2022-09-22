@@ -52,6 +52,10 @@ def clear_song_library():
         cur.execute("SELECT * FROM bot_default_song_library")
         if not cur.fetchone() == None:
             update_db("DELETE FROM bot_default_song_library")
+        
+        cur.execute("SELECT * FROM bot_user_song_library")
+        if not cur.fetchone() == None:
+            update_db("DELETE FROM bot_user_song_library")
     except:
         raise Exception("error")
 

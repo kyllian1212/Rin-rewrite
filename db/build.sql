@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS bot_archive_role(
 );
 
 CREATE TABLE IF NOT EXISTS bot_default_song_library(
-    id INT PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     artist VARCHAR(200),
     song_title VARCHAR(200),
     album VARCHAR(200),
@@ -22,7 +22,8 @@ CREATE TABLE IF NOT EXISTS bot_default_song_library(
 );
 
 CREATE TABLE IF NOT EXISTS bot_user_song_library(
-    id INT PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
+    user_id TEXT,
     artist VARCHAR(200),
     song_title VARCHAR(200),
     album VARCHAR(200),
@@ -30,8 +31,18 @@ CREATE TABLE IF NOT EXISTS bot_user_song_library(
     song_order INT DEFAULT -1
 );
 
+CREATE TABLE IF NOT EXISTS bot_user_song_library_archive(
+    id INTEGER PRIMARY KEY,
+    user_id TEXT,
+    artist VARCHAR(200),
+    song_title VARCHAR(200),
+    album VARCHAR(200),
+    length_in_seconds INT,
+    played_timestamp DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS bot_word_blacklist(
-    id INT PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     server_id TEXT,
     word VARCHAR(50)
 );

@@ -2,6 +2,8 @@ from distutils.log import error
 import discord
 from discord import app_commands
 from discord.ext import commands
+import os
+import traceback
 
 from main import db
 
@@ -34,20 +36,33 @@ class RebuildDatabaseButtons(discord.ui.View):
 
     @discord.ui.button(label="rebuild database", style=discord.ButtonStyle.danger)
     async def rebuild_database_button(self, interaction:discord.Interaction, button:discord.ui.Button):
+        error = False
         button.disabled = True
-        await interaction.response.edit_message(embed=discord.Embed(
-                title="rebuilding database...", 
-                description="this might take some time.", 
-                color=0xff0000),
-            view = self)
 
-        db.drop_all_tables()
-        db.build_database()
+        try:
+            await interaction.response.edit_message(embed=discord.Embed(
+                    title="rebuilding database...", 
+                    description="this might take some time.", 
+                    color=0xff0000),
+                view = self)
 
-        await interaction.edit_original_response(embed=discord.Embed(
-                title="database rebuilt successfully!", 
-                color=0xff0000),
-            view = self)
+            db.drop_all_tables()
+            db.build_database()
+
+            await interaction.edit_original_response(embed=discord.Embed(
+                    title="database rebuilt successfully!", 
+                    color=0xff0000),
+                view = self)
+        except Exception as err:
+            error = True
+            await interaction.edit_original_response(embed=discord.Embed(
+                    title="Fatal error while rebuilding database.", description="Bot will clear all tables and shutdown for safety, please restart the bot to reattempt to build the database.", 
+                    color=0xff0000),
+                view = self)
+            if error == True:
+                print(traceback.format_exc())
+                os._exit(-1)
+            
 
 async def setup(bot):
     await bot.add_cog(RebuildDatabaseCog(bot), guilds = [discord.Object(id = 849034525861740571)])

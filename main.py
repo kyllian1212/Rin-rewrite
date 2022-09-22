@@ -16,6 +16,8 @@ import sys
 import asyncio
 import traceback
 import logging
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
 
 from db import db
 
@@ -24,6 +26,12 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 TEST_ID = os.getenv('TEST_ID')
 MADEON_ID = os.getenv('MADEON_ID')
 PORTER_ID = os.getenv('PORTER_ID')
+
+SPOTIPY_CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
+SPOTIPY_CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
+
+auth_manager = SpotifyClientCredentials(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET)
+sp = spotipy.Spotify(auth_manager=auth_manager)
 
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix="!!", intents=intents, max_messages=10000, help_command=None)
