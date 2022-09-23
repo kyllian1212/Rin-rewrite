@@ -27,8 +27,7 @@ CREATE TABLE IF NOT EXISTS bot_user_song_library(
     artist VARCHAR(200),
     song_title VARCHAR(200),
     album VARCHAR(200),
-    length_in_seconds INT,
-    song_order INT DEFAULT -1
+    length_in_seconds INT
 );
 
 CREATE TABLE IF NOT EXISTS bot_user_song_library_archive(

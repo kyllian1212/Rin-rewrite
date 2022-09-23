@@ -19,4 +19,4 @@ class SayCog(commands.Cog):
         await ctx.channel.send(arg, tts=True)
 
 async def setup(bot):
-    await bot.add_cog(SayCog(bot), guilds = [discord.Object(id = 849034525861740571)])
+    await bot.add_cog(SayCog(bot))

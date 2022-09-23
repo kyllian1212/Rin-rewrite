@@ -1,4 +1,5 @@
 import discord
+import templates.embeds as embeds
 from discord import app_commands
 from discord.ext import commands
 
@@ -22,6 +23,11 @@ class SetArchiveRoleCog(commands.Cog):
             await interaction.response.send_message(embed=discord.Embed(title="there was an error setting or updating the archive role. please try again or contact the bot owner if you see this again", color=0xff0000), ephemeral=True)
             raise
         await interaction.response.send_message(embed=discord.Embed(description="archive role successfully set to <@&" + str(role.id) + ">!", color=0x00aeff), ephemeral=True)
+    
+    @set_archive_role.error
+    async def error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
+        if isinstance(error, app_commands.MissingPermissions):
+            await embeds.missing_permissions(interaction)
 
 async def setup(bot):
-    await bot.add_cog(SetArchiveRoleCog(bot), guilds = [discord.Object(id = 849034525861740571)])
+    await bot.add_cog(SetArchiveRoleCog(bot))

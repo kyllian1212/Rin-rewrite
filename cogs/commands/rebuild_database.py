@@ -1,5 +1,6 @@
 from distutils.log import error
 import discord
+import templates.embeds as embeds
 from discord import app_commands
 from discord.ext import commands
 import os
@@ -29,6 +30,11 @@ class RebuildDatabaseCog(commands.Cog):
                     title="only the bot owner can run this command!", 
                     color=0xff0000),
                 ephemeral=True)
+
+    @rebuild_database.error
+    async def error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
+        if isinstance(error, app_commands.MissingPermissions):
+            await embeds.missing_permissions(interaction)
 
 class RebuildDatabaseButtons(discord.ui.View):
     def __init__(self, *, timeout=60):
@@ -65,4 +71,4 @@ class RebuildDatabaseButtons(discord.ui.View):
             
 
 async def setup(bot):
-    await bot.add_cog(RebuildDatabaseCog(bot), guilds = [discord.Object(id = 849034525861740571)])
+    await bot.add_cog(RebuildDatabaseCog(bot))

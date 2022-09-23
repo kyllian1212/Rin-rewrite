@@ -47,4 +47,4 @@ class FunCog(commands.Cog):
         await interaction.response.send_message(embed=dad_message_embed)
 
 async def setup(bot):
-    await bot.add_cog(FunCog(bot), guilds = [discord.Object(id = 849034525861740571)])
+    await bot.add_cog(FunCog(bot))

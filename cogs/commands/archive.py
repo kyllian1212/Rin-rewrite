@@ -1,5 +1,6 @@
 from os import remove
 import discord
+import templates.embeds as embeds
 from discord import app_commands
 from discord.ext import commands
 
@@ -75,5 +76,11 @@ class ArchiveCog(commands.Cog):
             await interaction.response.send_message(embed=discord.Embed(title="there was an error unarchiving the channel. please try again or contact the bot owner if you see this again", description="(make sure to check the channel permissions just incase the bot has done something wrong)", color=0xff0000), ephemeral=True)
             raise
 
+    @archive.error
+    @unarchive.error
+    async def error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
+        if isinstance(error, app_commands.MissingPermissions):
+            await embeds.missing_permissions(interaction)
+
 async def setup(bot):
-    await bot.add_cog(ArchiveCog(bot), guilds = [discord.Object(id = 849034525861740571)])
+    await bot.add_cog(ArchiveCog(bot))

@@ -1,4 +1,5 @@
 from dis import disco
+from distutils.log import error
 from os import remove
 import string
 from xml.dom.minidom import ReadOnlySequentialNamedNodeMap
@@ -8,6 +9,7 @@ from discord.ext import commands
 from datetime import datetime
 from datetime import timedelta
 import asyncio
+import templates.embeds as embeds
 
 from main import db
 
@@ -125,6 +127,13 @@ class ModerationCog(commands.Cog):
         except:
             await interaction.response.send_message(embed=discord.Embed(title="there was an error banning the person. please try again or contact the bot owner if you see this again", color=0xff0000), ephemeral=True)
             raise
+    
+    @timeout.error
+    @kick.error
+    @ban.error
+    async def error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
+        if isinstance(error, app_commands.MissingPermissions):
+            await embeds.missing_permissions(interaction)
 
 class DMErrorTimeoutButton(discord.ui.View):
     def __init__(self, *, timeout=300, user_timeout_length: timedelta, member: discord.Member, reason: string):
@@ -174,4 +183,4 @@ class DMErrorBanButton(discord.ui.View):
             raise
 
 async def setup(bot):
-    await bot.add_cog(ModerationCog(bot), guilds = [discord.Object(id = 849034525861740571)])
+    await bot.add_cog(ModerationCog(bot))
