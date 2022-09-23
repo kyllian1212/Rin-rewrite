@@ -68,7 +68,7 @@ async def on_ready():
 
     if not bot.synced:
         await bot.tree.sync() #remove guild value for global slash command (takes longer to synchronize)
-        await bot.tree.copy_global_to(guild = discord.Object(id = 849034525861740571))
+        bot.tree.copy_global_to(guild = discord.Object(id = 849034525861740571))
         bot.synced = True
     
     if not bot.user.name == "Rin | " + VERSION and not bot.user.id == 849410467507601459:
