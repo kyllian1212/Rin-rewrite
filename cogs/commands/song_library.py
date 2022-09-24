@@ -18,22 +18,23 @@ class SongLibraryCog(commands.Cog):
     async def rebuild_song_library(self, interaction: discord.Interaction):
         try:
             await interaction.response.send_message(embed=discord.Embed(
-                    title="rebuilding song library...", 
-                    description="this might take some time.", 
+                    title="Rebuilding song library...", 
+                    description="This might take some time.", 
                     color=0xff0000), ephemeral=True)
             db.clear_song_library()
             db.create_song_library()
             await interaction.edit_original_response(embed=discord.Embed(
-                    title="song library rebuilt successfully!", 
+                    title="Song library rebuilt successfully!", 
                     color=0xff0000))
         except:
             await interaction.edit_original_response(embed=discord.Embed(
-                    title="An error has occured while rebuilding the song library", 
+                    title="An error has occured while rebuilding the song library.",
+                    description="Please try again (or contact bot owner if this occurs again)" 
                     color=0xff0000))
             raise
 
     @app_commands.command(name="add_song_to_presence_queue", description="Adds a song in the presence queue for Rin to listen to")
-    @app_commands.describe(url="URL of the song (currently Spotify only, and single tracks only. No full albums or playlists links)")
+    @app_commands.describe(url="URL of the song (Spotify only, single tracks only. No full albums or playlists links)")
     async def add_song_to_presence_queue(self, interaction: discord.Interaction, url: str):
         user_id = interaction.user.id
         check_number_of_user_queued_songs = db.fetchone_singlecolumn(0, "SELECT count(user_id) FROM bot_user_song_library WHERE user_id = ? GROUP BY user_id", user_id)

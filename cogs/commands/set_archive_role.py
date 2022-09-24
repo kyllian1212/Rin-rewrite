@@ -20,9 +20,9 @@ class SetArchiveRoleCog(commands.Cog):
             else:
                 db.update_db("UPDATE bot_archive_role SET archive_role_id = ? WHERE server_id = ?", role.id, interaction.guild_id)
         except:
-            await interaction.response.send_message(embed=discord.Embed(title="there was an error setting or updating the archive role. please try again or contact the bot owner if you see this again", color=0xff0000), ephemeral=True)
+            await interaction.response.send_message(embed=discord.Embed(title="There was an error setting or updating the archive role. Please try again or contact the bot owner if you see this again", color=0xff0000), ephemeral=True)
             raise
-        await interaction.response.send_message(embed=discord.Embed(description="archive role successfully set to <@&" + str(role.id) + ">!", color=0x00aeff), ephemeral=True)
+        await interaction.response.send_message(embed=discord.Embed(description="Archive role successfully set to <@&" + str(role.id) + ">!", color=0x00aeff), ephemeral=True)
     
     @set_archive_role.error
     async def error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):

@@ -24,7 +24,7 @@ class ModerationCog(commands.Cog):
     async def timeout(self, interaction: discord.Interaction, member: discord.Member, timeout_length_days: int = 0, timeout_length_hours: int = 0, timeout_length_minutes: int = 0, reason: str = None, dm: bool = False):
         try:
             if timeout_length_minutes + timeout_length_hours + timeout_length_minutes == 0:
-                await interaction.response.send_message(embed=discord.Embed(title="you cannot timeout someone for 0 minutes", color=0xff0000), ephemeral=True)
+                await interaction.response.send_message(embed=discord.Embed(title="You cannot timeout someone for 0 minutes", color=0xff0000), ephemeral=True)
             else:
                 timeout = timedelta(days=timeout_length_days, minutes=timeout_length_minutes, hours=timeout_length_hours)
                 dm_block = False
@@ -44,15 +44,15 @@ class ModerationCog(commands.Cog):
                         view = DMErrorTimeoutButton(user_timeout_length=timeout, member=member, reason=reason)
                         extra = ""
                         if not reason == None:
-                            extra = "\n\nif you want to dm manually, here's the reason that was given: ```" + reason + "```"
-                        await interaction.response.send_message(embed=discord.Embed(title="this member cannot be DM'd", description="this member either has dms disabled for unknown people, or has the bot blocked (less likely). do you want to timeout anyways without dming?" + extra, color=0xff0000), ephemeral=True, view=view)
+                            extra = "\n\nIf you want to DM manually, here's the reason that was given: ```" + reason + "```"
+                        await interaction.response.send_message(embed=discord.Embed(title="This member cannot be DM'd", description="This member either has DMs disabled for unknown people, or has the bot blocked (less likely). Do you want to timeout anyways without DMing?" + extra, color=0xff0000), ephemeral=True, view=view)
                         dm_block = True
 
                 if dm_block == False:
                     await member.timeout(timeout, reason=reason)
                     await interaction.response.send_message(embed=discord.Embed(description="<@" + str(member.id) + "> successfully timed out!", color=0x00aeff), ephemeral=True)
         except:
-            await interaction.response.send_message(embed=discord.Embed(title="there was an error timing out the person. please try again or contact the bot owner if you see this again", description="(please note that it is not possible to timeout someone for more than 28 days due to an API limitation)", color=0xff0000), ephemeral=True)
+            await interaction.response.send_message(embed=discord.Embed(title="There was an error timing out the person. Please try again or contact the bot owner if you see this again", description="(Please note that it is not possible to timeout someone for more than 28 days due to an API limitation)", color=0xff0000), ephemeral=True)
             raise
     
     #kick
@@ -79,15 +79,15 @@ class ModerationCog(commands.Cog):
                     view = DMErrorKickButton(member=member, reason=reason)
                     extra = ""
                     if not reason == None:
-                        extra = "\n\nif you want to dm manually, here's the reason that was given: ```" + reason + "```"
-                    await interaction.response.send_message(embed=discord.Embed(title="this member cannot be DM'd", description="this member either has dms disabled for unknown people, or has the bot blocked (less likely). do you want to timeout anyways without dming?" + extra, color=0xff0000), ephemeral=True, view=view)
+                        extra = "\n\nIf you want to DM manually, here's the reason that was given: ```" + reason + "```"
+                    await interaction.response.send_message(embed=discord.Embed(title="This member cannot be DM'd", description="This member either has DMs disabled for unknown people, or has the bot blocked (less likely). Do you want to timeout anyways without DMing?" + extra, color=0xff0000), ephemeral=True, view=view)
                     dm_block = True
 
             if dm_block == False:
                 await member.kick(reason=reason)
                 await interaction.response.send_message(embed=discord.Embed(description="<@" + str(member.id) + "> successfully kicked!", color=0x00aeff), ephemeral=True)
         except:
-            await interaction.response.send_message(embed=discord.Embed(title="there was an error kicking the person. please try again or contact the bot owner if you see this again", color=0xff0000), ephemeral=True)
+            await interaction.response.send_message(embed=discord.Embed(title="There was an error kicking the person. Please try again or contact the bot owner if you see this again", color=0xff0000), ephemeral=True)
             raise
 
     #ban
@@ -99,7 +99,7 @@ class ModerationCog(commands.Cog):
             dm_block = False
 
             if delete_message_days > 7 or delete_message_days < 0:
-                await interaction.response.send_message(embed=discord.Embed(title="you cannot delete message for less than 0 days or more than 7 days", color=0xff0000), ephemeral=True)
+                await interaction.response.send_message(embed=discord.Embed(title="You cannot delete messages for less than 0 days or more than 7 days", color=0xff0000), ephemeral=True)
             else:
                 if dm == True:
                     try:
@@ -117,15 +117,15 @@ class ModerationCog(commands.Cog):
                         view = DMErrorBanButton(member=member, reason=reason, delete_message_days=delete_message_days)
                         extra = ""
                         if not reason == None:
-                            extra = "\n\nif you want to dm manually, here's the reason that was given: ```" + reason + "```"
-                        await interaction.response.send_message(embed=discord.Embed(title="this member cannot be DM'd", description="this member either has dms disabled for unknown people, or has the bot blocked (less likely). do you want to timeout anyways without dming?" + extra, color=0xff0000), ephemeral=True, view=view)
+                            extra = "\n\nIf you want to dm manually, here's the reason that was given: ```" + reason + "```"
+                        await interaction.response.send_message(embed=discord.Embed(title="This member cannot be DM'd", description="This member either has DMs disabled for unknown people, or has the bot blocked (less likely). Do you want to timeout anyways without DMing?" + extra, color=0xff0000), ephemeral=True, view=view)
                         dm_block = True
 
                 if dm_block == False:
                     await member.ban(delete_message_days=delete_message_days, reason=reason)
                     await interaction.response.send_message(embed=discord.Embed(description="<@" + str(member.id) + "> successfully banned!", color=0x00aeff), ephemeral=True)
         except:
-            await interaction.response.send_message(embed=discord.Embed(title="there was an error banning the person. please try again or contact the bot owner if you see this again", color=0xff0000), ephemeral=True)
+            await interaction.response.send_message(embed=discord.Embed(title="There was an error banning the person. Please try again or contact the bot owner if you see this again", color=0xff0000), ephemeral=True)
             raise
     
     @timeout.error
@@ -142,7 +142,7 @@ class DMErrorTimeoutButton(discord.ui.View):
         self.member = member
         self.reason = reason
 
-    @discord.ui.button(label="timeout anyways", style=discord.ButtonStyle.green)
+    @discord.ui.button(label="Timeout anyways", style=discord.ButtonStyle.green)
     async def timeout_anyways_button(self, interaction:discord.Interaction, button:discord.ui.Button):
         button.disabled = True
         try:
@@ -157,7 +157,7 @@ class DMErrorKickButton(discord.ui.View):
         self.member = member
         self.reason = reason
 
-    @discord.ui.button(label="kick anyways", style=discord.ButtonStyle.green)
+    @discord.ui.button(label="Kick anyways", style=discord.ButtonStyle.green)
     async def kick_anyways_button(self, interaction:discord.Interaction, button:discord.ui.Button):
         button.disabled = True
         try:
@@ -173,7 +173,7 @@ class DMErrorBanButton(discord.ui.View):
         self.reason = reason
         self.delete_message_days = delete_message_days
 
-    @discord.ui.button(label="ban anyways", style=discord.ButtonStyle.green)
+    @discord.ui.button(label="Ban anyways", style=discord.ButtonStyle.green)
     async def kick_anyways_button(self, interaction:discord.Interaction, button:discord.ui.Button):
         button.disabled = True
         try:

@@ -18,7 +18,7 @@ class ArchiveCog(commands.Cog):
             archive_role_id = db.fetchone_singlecolumn(0, "SELECT archive_role_id FROM bot_archive_role WHERE server_id = ?", interaction.guild_id)
 
             if archive_role_id == None:
-                await interaction.response.send_message(embed=discord.Embed(title="there are no archive role set for this server", description="please set an archive role with the /set_archive_role command", color=0xff0000), ephemeral=True)
+                await interaction.response.send_message(embed=discord.Embed(title="There are no archive role set for this server", description="Please set an archive role with the /set_archive_role command", color=0xff0000), ephemeral=True)
             else:
                 archive_role = interaction.guild.get_role(int(archive_role_id))
                 channel = interaction.channel
@@ -49,9 +49,9 @@ class ArchiveCog(commands.Cog):
                 await channel.set_permissions(target=archive_role, overwrite=permission_overwrite)
                 await channel.move(beginning=True, category=category, sync_permissions=False, reason="Archive")
 
-                await interaction.response.send_message(embed=discord.Embed(description="channel <#" + str(interaction.channel.id) + "> successfully archived!", color=0x00aeff), ephemeral=True)
+                await interaction.response.send_message(embed=discord.Embed(description="Channel <#" + str(interaction.channel.id) + "> successfully archived!", color=0x00aeff), ephemeral=True)
         except:
-            await interaction.response.send_message(embed=discord.Embed(title="there was an error archiving the channel. please try again or contact the bot owner if you see this again", description="(make sure to check the channel permissions just incase the bot has done something wrong)", color=0xff0000), ephemeral=True)
+            await interaction.response.send_message(embed=discord.Embed(title="There was an error archiving the channel. Please try again or contact the bot owner if you see this again", description="(Make sure to check the channel permissions just incase the bot has done something wrong)", color=0xff0000), ephemeral=True)
             raise
     
     @app_commands.command(name="unarchive", description="Unarchives this channel and puts it in the category of your choice")
@@ -62,7 +62,7 @@ class ArchiveCog(commands.Cog):
             archive_role_id = db.fetchone_singlecolumn(0, "SELECT archive_role_id FROM bot_archive_role WHERE server_id = ?", interaction.guild_id)
 
             if archive_role_id == None:
-                await interaction.response.send_message(embed=discord.Embed(title="there are no archive role set for this server", description="please set an archive role with the /set_archive_role command", color=0xff0000), ephemeral=True)
+                await interaction.response.send_message(embed=discord.Embed(title="There are no archive role set for this server", description="Please set an archive role with the /set_archive_role command", color=0xff0000), ephemeral=True)
             else:
                 archive_role = interaction.guild.get_role(int(archive_role_id))
                 channel = interaction.channel
@@ -71,9 +71,9 @@ class ArchiveCog(commands.Cog):
                 await channel.set_permissions(target=archive_role, overwrite=None)
                 await channel.move(end=True, category=category, sync_permissions=False, reason="Unarchive")
 
-                await interaction.response.send_message(embed=discord.Embed(description="channel <#" + str(interaction.channel.id) + "> successfully unarchived!", color=0x00aeff), ephemeral=True)
+                await interaction.response.send_message(embed=discord.Embed(description="Channel <#" + str(interaction.channel.id) + "> successfully unarchived!", color=0x00aeff), ephemeral=True)
         except:
-            await interaction.response.send_message(embed=discord.Embed(title="there was an error unarchiving the channel. please try again or contact the bot owner if you see this again", description="(make sure to check the channel permissions just incase the bot has done something wrong)", color=0xff0000), ephemeral=True)
+            await interaction.response.send_message(embed=discord.Embed(title="There was an error unarchiving the channel. Please try again or contact the bot owner if you see this again", description="(Make sure to check the channel permissions just incase the bot has done something wrong)", color=0xff0000), ephemeral=True)
             raise
 
     @archive.error

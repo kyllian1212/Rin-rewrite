@@ -19,15 +19,15 @@ class RebuildDatabaseCog(commands.Cog):
             view = RebuildDatabaseButtons()
             await interaction.response.send_message(
                 embed=discord.Embed(
-                    title="are you sure you want to rebuild the database?", 
-                    description="this will cause the admin configuration of every server as well as the song library to be entirely destroyed, make sure to have a backup!! this cannot be undone", 
+                    title="Are you sure you want to rebuild the database?", 
+                    description="This will cause the admin configuration of every server as well as the song library to be entirely destroyed, make sure to have a backup!! This cannot be undone", 
                     color=0xff0000),
                 ephemeral=True,
                 view=view)
         else:
             await interaction.response.send_message(
                 embed=discord.Embed(
-                    title="only the bot owner can run this command!", 
+                    title="Only the bot owner can run this command!", 
                     color=0xff0000),
                 ephemeral=True)
 
@@ -40,15 +40,15 @@ class RebuildDatabaseButtons(discord.ui.View):
     def __init__(self, *, timeout=60):
         super().__init__(timeout=timeout)
 
-    @discord.ui.button(label="rebuild database", style=discord.ButtonStyle.danger)
+    @discord.ui.button(label="Rebuild database", style=discord.ButtonStyle.danger)
     async def rebuild_database_button(self, interaction:discord.Interaction, button:discord.ui.Button):
         error = False
         button.disabled = True
 
         try:
             await interaction.response.edit_message(embed=discord.Embed(
-                    title="rebuilding database...", 
-                    description="this might take some time.", 
+                    title="Rebuilding database...", 
+                    description="This might take some time.", 
                     color=0xff0000),
                 view = self)
 
@@ -56,7 +56,7 @@ class RebuildDatabaseButtons(discord.ui.View):
             db.build_database()
 
             await interaction.edit_original_response(embed=discord.Embed(
-                    title="database rebuilt successfully!", 
+                    title="Database rebuilt successfully!", 
                     color=0xff0000),
                 view = self)
         except Exception as err:
