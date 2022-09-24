@@ -29,7 +29,7 @@ class SongLibraryCog(commands.Cog):
         except:
             await interaction.edit_original_response(embed=discord.Embed(
                     title="An error has occured while rebuilding the song library.",
-                    description="Please try again (or contact bot owner if this occurs again)" 
+                    description="Please try again (or contact bot owner if this occurs again)",
                     color=0xff0000))
             raise
 
