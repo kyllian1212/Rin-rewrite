@@ -42,11 +42,14 @@ the changelog for previous versions of the bot is available here: https://github
 * the reported date/time cannot be timestamped so i added the timezone in
 
 ## **default song library**
-* added 4 songs in the default song library:
+* added 5 songs in the default song library:
   * The Prince by Madeon
   * Love You Back by Madeon
   * Gonna Be Good by Madeon (length not exact because it's not out yet)
+  * Shepherdess by Porter Robinson
   * Everything Goes On by Porter Robinson
+* fixed Particle Arts length (was 2:58 instead of 3:54 idk why)
+* same thing for EON BREAK (also 2:58 instead of 3:40 wtf)
 
 ## **features planned for future versions (v1.1.0 etc.)**
 those are features that were low in priority to get them out this month, or that i wasn't able to figure out how to do yet:

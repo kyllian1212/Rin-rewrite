@@ -24,9 +24,13 @@ class SongPresenceCog(commands.Cog):
             await asyncio.sleep(user_selected_song[5])
         else:
             number_of_songs = db.fetchone_singlecolumn(0, "SELECT count(*) FROM bot_default_song_library")
-            default_selected_song = db.fetchone_fullrow("SELECT * FROM bot_default_song_library WHERE id = ?", random.randint(1, number_of_songs))
-            await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=str(default_selected_song[2]) + " by " + str(default_selected_song[1])))
-            await asyncio.sleep(default_selected_song[4])
+            if not number_of_songs == 0:
+                default_selected_song = db.fetchone_fullrow("SELECT * FROM bot_default_song_library WHERE id = ?", random.randint(1, number_of_songs))
+                await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=str(default_selected_song[2]) + " by " + str(default_selected_song[1])))
+                await asyncio.sleep(default_selected_song[4])
+            else:
+                await self.bot.change_presence(activity=None)
+                await asyncio.sleep(10)
 
     @presence_task.before_loop
     async def before_presence(self):

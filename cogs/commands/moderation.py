@@ -109,7 +109,7 @@ class ModerationCog(commands.Cog):
                             title = "You have been banned from " + interaction.guild.name + "!"
                             description = "No reason has been given; you have either broken too many rules or done something really bad."
                         else:
-                            title = "You have been Banned from " + interaction.guild.name + " for the following reason:"
+                            title = "You have been banned from " + interaction.guild.name + " for the following reason:"
                             description = "```" + reason + "```\n"
                         await member.send(embed=discord.Embed(title=title, description=description, color=0xff0000))
                         await asyncio.sleep(0.5) #small sleep period to make sure the dm is sent before kicking

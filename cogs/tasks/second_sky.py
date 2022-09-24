@@ -57,7 +57,7 @@ class SecondSkyCountdownCog(commands.Cog):
             "18:00:00", "19:00:00", "20:00:00",
             "21:00:00", "22:00:00", "23:00:00"
         ]
-        if diffch < 10000000000000000000000:
+        if diffch < 24:
             if current_time in NURTURE_TIME_DICT:
                 await SecondSkyCountdownCog.days_to_second_sky_auto(self)
                 await asyncio.sleep(1.5)
