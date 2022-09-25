@@ -18,25 +18,25 @@ class FunCog(commands.Cog):
             await interaction.response.send_message(content="50/50 choice: **NO**")
     
     @app_commands.command(name="roll", description="Rolls a dice (1d6 by default)")
-    @app_commands.describe(number_of_dice="Min. 1 / Max. 100", number_of_sides="Min. 1 / Max. 100")
-    async def roll(self, interaction: discord.Interaction, number_of_dice: int = 1, number_of_sides: int = 6):
-        if not 0 < number_of_dice < 101 or not 0 < number_of_sides < 101:
+    @app_commands.describe(number_of_dices="Min. 1 / Max. 100", number_of_sides="Min. 1 / Max. 100")
+    async def roll(self, interaction: discord.Interaction, number_of_dices: int = 1, number_of_sides: int = 6):
+        if not 0 < number_of_dices < 101 or not 0 < number_of_sides < 101:
             await interaction.response.send_message(content="You cannot roll less than 1 dices and more than 100 dices, and the dices cannot have less than 1 side and more than 100 sides!", ephemeral=True)
         else:
             number_of_rolls = 0
             result = ""
             total = 0
-            while number_of_rolls < number_of_dice:
+            while number_of_rolls < number_of_dices:
                 if number_of_rolls >= 1:
                     result = result + " / "
                 random_variable = random.randint(1, number_of_sides)
                 result = result + str(random_variable)
                 total = total + random_variable
                 number_of_rolls += 1
-            if number_of_dice == 1:
-                await interaction.response.send_message("**" + str(number_of_dice) + "d" + str(number_of_sides) + " roll result: **" + str(result))
+            if number_of_dices == 1:
+                await interaction.response.send_message("**" + str(number_of_dices) + "d" + str(number_of_sides) + " roll result: **" + str(result))
             else:
-                await interaction.response.send_message("**" + str(number_of_dice) + "d" + str(number_of_sides) + " roll result: **" + str(result) + "\n**Total: **" + str(total))
+                await interaction.response.send_message("**" + str(number_of_dices) + "d" + str(number_of_sides) + " roll result: **" + str(result) + "\n**Total: **" + str(total))
         
     @app_commands.command(name="october18", description="Rin")
     async def october18(self, interaction: discord.Integration):
