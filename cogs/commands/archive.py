@@ -12,7 +12,7 @@ class ArchiveCog(commands.Cog):
 
     @app_commands.command(name="archive", description="Archives this channel and puts it in the category of your choice")
     @app_commands.describe(category='The category in which the channel will be moved to')
-    @app_commands.checks.has_permissions(administrator=True, manage_channels=True) #sort out error next time
+    @app_commands.checks.has_permissions(administrator=True, manage_channels=True) 
     async def archive(self, interaction: discord.Interaction, category: discord.CategoryChannel):
         try:
             archive_role_id = db.fetchone_singlecolumn(0, "SELECT archive_role_id FROM bot_archive_role WHERE server_id = ?", interaction.guild_id)
@@ -56,7 +56,7 @@ class ArchiveCog(commands.Cog):
     
     @app_commands.command(name="unarchive", description="Unarchives this channel and puts it in the category of your choice")
     @app_commands.describe(category='The category in which the channel will be moved to')
-    @app_commands.checks.has_permissions(administrator=True, manage_channels=True) #sort out error next time
+    @app_commands.checks.has_permissions(administrator=True, manage_channels=True)
     async def unarchive(self, interaction: discord.Interaction, category: discord.CategoryChannel):
         try:
             archive_role_id = db.fetchone_singlecolumn(0, "SELECT archive_role_id FROM bot_archive_role WHERE server_id = ?", interaction.guild_id)

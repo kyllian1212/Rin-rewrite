@@ -11,7 +11,7 @@ class SetArchiveRoleCog(commands.Cog):
 
     @app_commands.command(name="set_archive_role", description="Sets the role for which members will be able to see archived channels")
     @app_commands.describe(role='The role for archived channels')
-    @app_commands.checks.has_permissions(administrator=True) #sort out error next time
+    @app_commands.checks.has_permissions(administrator=True) 
     async def set_archive_role(self, interaction: discord.Interaction, role: discord.Role):
         try:
             archive_role_set = db.fetchone_singlecolumn(0, "SELECT archive_role_id FROM bot_archive_role WHERE server_id = ?", interaction.guild_id)

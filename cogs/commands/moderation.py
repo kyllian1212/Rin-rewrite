@@ -20,7 +20,7 @@ class ModerationCog(commands.Cog):
     #timeout
     @app_commands.command(name="rin_timeout", description="Times out a member (for up to 28 days) and DMs them (or not)")
     @app_commands.describe(member="The member that will be timed out", reason="The reason why the member has been timed out (no reason by default)", dm="Sets if the user will be DM'd about the timeout or not (No by default)")
-    @app_commands.checks.has_permissions(administrator=True, moderate_members=True) #sort out error next time
+    @app_commands.checks.has_permissions(administrator=True, moderate_members=True) 
     async def timeout(self, interaction: discord.Interaction, member: discord.Member, timeout_length_days: int = 0, timeout_length_hours: int = 0, timeout_length_minutes: int = 0, reason: str = None, dm: bool = False):
         try:
             if timeout_length_minutes + timeout_length_hours + timeout_length_minutes == 0:
@@ -58,7 +58,7 @@ class ModerationCog(commands.Cog):
     #kick
     @app_commands.command(name="rin_kick", description="Kicks a member and DMs them (or not)")
     @app_commands.describe(member="The member that will be kicked", reason="The reason why the member has been kicked (no reason by default)", dm="Sets if the user will be DM'd about the timeout or not (No by default)")
-    @app_commands.checks.has_permissions(administrator=True, kick_members=True) #sort out error next time
+    @app_commands.checks.has_permissions(administrator=True, kick_members=True)
     async def kick(self, interaction: discord.Interaction, member: discord.Member, reason: str = None, dm: bool = False):
         try:
             dm_block = False
@@ -93,7 +93,7 @@ class ModerationCog(commands.Cog):
     #ban
     @app_commands.command(name="rin_ban", description="Bans a member and DMs them (or not)")
     @app_commands.describe(member="The member that will be banned", reason="The reason why the member has been banned (no reason by default)", dm="Sets if the user will be DM'd about the timeout or not (No by default)", delete_message_days="Sets that messages less than x days will be deleted (by default 0 (none), max 7)")
-    @app_commands.checks.has_permissions(administrator=True, ban_members=True) #sort out error next time
+    @app_commands.checks.has_permissions(administrator=True, ban_members=True) 
     async def ban(self, interaction: discord.Interaction, member: discord.Member, delete_message_days: int = 0, reason: str = None, dm: bool = False):
         try:
             dm_block = False

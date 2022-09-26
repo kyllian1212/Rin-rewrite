@@ -11,7 +11,7 @@ class SetLogChannelCog(commands.Cog):
 
     @app_commands.command(name="set_log_channel", description="Sets the channel in which reported messages will go to")
     @app_commands.describe(channel='The channel in which reported messages will go to')
-    @app_commands.checks.has_permissions(administrator=True) #sort out error next time
+    @app_commands.checks.has_permissions(administrator=True) 
     async def set_log_channel(self, interaction: discord.Interaction, channel: discord.TextChannel):
         try:
             log_channel_set = db.fetchone_singlecolumn(0, "SELECT log_channel_id FROM bot_log_channel WHERE server_id = ?", interaction.guild_id)
