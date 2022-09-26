@@ -14,7 +14,7 @@ class InfoCog(commands.Cog):
     async def info(self, interaction: discord.Interaction):
         now = str(datetime.now().astimezone().strftime("%d/%m/%Y - %H:%M:%S (UTC%z)"))
         kyllian_user = self.bot.get_user(171000921927581696)
-        info_message_embed = discord.Embed(title="Rin • Bot by " + str(kyllian_user.name) + "#" + str(kyllian_user.discriminator), description="**bot version:** *" + VERSION + "*", url="https://github.com/kyllian1212/Rin", color=0x00aeff)
+        info_message_embed = discord.Embed(title="Rin • Bot by " + str(kyllian_user.name) + "#" + str(kyllian_user.discriminator), description="**bot version:** *" + VERSION + "*", url="https://github.com/kyllian1212/Rin-rewrite", color=0x00aeff)
         info_message_embed.set_thumbnail(url=kyllian_user.avatar.url)
         info_message_embed.set_footer(text=now + "  •  source code available by clicking the link above", icon_url=self.bot.user.avatar.url)
         await interaction.response.send_message(embed=info_message_embed)
