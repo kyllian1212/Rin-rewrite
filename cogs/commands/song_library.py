@@ -57,15 +57,18 @@ class SongLibraryCog(commands.Cog):
                 song_title = sp.track(url)['name']
                 album = sp.track(url)['album']['name']
                 length_in_seconds = int(sp.track(url)['duration_ms']/1000)
-                
-                db.update_db("INSERT INTO bot_user_song_library(user_id, artist, song_title, album, length_in_seconds) VALUES (?, ?, ?, ?, ?)", user_id, artists, song_title, album, length_in_seconds)
-                
-                successful_embed = discord.Embed(title="Song successfully added to queue!", color=0x00aeff)
-                successful_embed.set_thumbnail(url=album_art_url)
-                successful_embed.add_field(name="Song title", value=song_title, inline=True)
-                successful_embed.add_field(name="Artist(s)", value=artists, inline=True)
-                successful_embed.add_field(name="Album", value=album, inline=False)
-                await interaction.response.send_message(embed=successful_embed)
+
+                if (length_in_seconds > 900):
+                    await interaction.response.send_message(embed=discord.Embed(title="You cannot put songs that are longer than 15 minutes!", color=0xff0000), ephemeral=True)
+                else:      
+                    db.update_db("INSERT INTO bot_user_song_library(user_id, artist, song_title, album, length_in_seconds) VALUES (?, ?, ?, ?, ?)", user_id, artists, song_title, album, length_in_seconds)
+                    
+                    successful_embed = discord.Embed(title="Song successfully added to queue!", color=0x00aeff)
+                    successful_embed.set_thumbnail(url=album_art_url)
+                    successful_embed.add_field(name="Song title", value=song_title, inline=True)
+                    successful_embed.add_field(name="Artist(s)", value=artists, inline=True)
+                    successful_embed.add_field(name="Album", value=album, inline=False)
+                    await interaction.response.send_message(embed=successful_embed)
             except spotipy.exceptions.SpotifyException as err:
                 description = ""
                 match err.http_status:
