@@ -1,5 +1,7 @@
+from datetime import datetime
 from distutils.log import error
 from operator import inv
+from time import time
 import discord
 import templates.embeds as embeds
 from discord import app_commands
@@ -108,7 +110,8 @@ class SongLibraryCog(commands.Cog):
         if not songs_in_queue == []:
             queue_embed=discord.Embed(title=title, color=0x00aeff)
             for song in songs_in_queue:
-                queue_embed.add_field(name="Song " + str(song[0]), value="<@" + song[1] + "> **" + song[3] + "** by " + song[2], inline=False)
+                timestamp = str(int(datetime.strptime(str(song[6]), "%Y-%m-%d %H:%M:%S").timestamp()))
+                queue_embed.add_field(name="Song " + str(song[0]), value="**" + song[3] + "** by " + song[2] + "\nAdded by <@" + song[1] + "> on <t:" + timestamp + ":D> - <t:" + timestamp + ":T>", inline=False)
             await interaction.response.send_message(embed=queue_embed, ephemeral=True, view=view)
         else:
             await interaction.response.send_message(embed=discord.Embed(title="Currently no songs in queue", color=0x00aeff), ephemeral=True)
@@ -176,7 +179,8 @@ class NextPreviousButtons(discord.ui.View):
             
         queue_embed=discord.Embed(title=title, color=0x00aeff)
         for song in songs_in_queue:
-            queue_embed.add_field(name="Song " + str(song[0]), value="<@" + song[1] + "> **" + song[3] + "** by " + song[2], inline=False)
+            timestamp = str(int(datetime.strptime(str(song[6]), "%Y-%m-%d %H:%M:%S").timestamp()))
+            queue_embed.add_field(name="Song " + str(song[0]), value="**" + song[3] + "** by " + song[2] + "\nAdded by <@" + song[1] + "> on <t:" + timestamp + ":D> - <t:" + timestamp + ":T>", inline=False)
         await interaction.response.edit_message(embed=queue_embed, view=self)
     
     @discord.ui.button(style=discord.ButtonStyle.blurple, emoji='➡️')
@@ -200,7 +204,8 @@ class NextPreviousButtons(discord.ui.View):
 
         queue_embed=discord.Embed(title=title, color=0x00aeff)
         for song in songs_in_queue:
-            queue_embed.add_field(name="Song " + str(song[0]), value="<@" + song[1] + "> **" + song[3] + "** by " + song[2], inline=False)
+            timestamp = str(int(datetime.strptime(str(song[6]), "%Y-%m-%d %H:%M:%S").timestamp()))
+            queue_embed.add_field(name="Song " + str(song[0]), value="**" + song[3] + "** by " + song[2] + "\nAdded by <@" + song[1] + "> on <t:" + timestamp + ":D> - <t:" + timestamp + ":T>", inline=False)
         await interaction.response.edit_message(embed=queue_embed, view=self)
             
 
