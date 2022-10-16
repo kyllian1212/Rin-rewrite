@@ -1,5 +1,7 @@
+from datetime import datetime
 from distutils.log import error
 from operator import inv
+from time import time
 import discord
 import templates.embeds as embeds
 from discord import app_commands
@@ -57,15 +59,18 @@ class SongLibraryCog(commands.Cog):
                 song_title = sp.track(url)['name']
                 album = sp.track(url)['album']['name']
                 length_in_seconds = int(sp.track(url)['duration_ms']/1000)
-                
-                db.update_db("INSERT INTO bot_user_song_library(user_id, artist, song_title, album, length_in_seconds) VALUES (?, ?, ?, ?, ?)", user_id, artists, song_title, album, length_in_seconds)
-                
-                successful_embed = discord.Embed(title="Song successfully added to queue!", color=0x00aeff)
-                successful_embed.set_thumbnail(url=album_art_url)
-                successful_embed.add_field(name="Song title", value=song_title, inline=True)
-                successful_embed.add_field(name="Artist(s)", value=artists, inline=True)
-                successful_embed.add_field(name="Album", value=album, inline=False)
-                await interaction.response.send_message(embed=successful_embed)
+
+                if (length_in_seconds > 900):
+                    await interaction.response.send_message(embed=discord.Embed(title="You cannot put songs that are longer than 15 minutes!", color=0xff0000), ephemeral=True)
+                else:      
+                    db.update_db("INSERT INTO bot_user_song_library(user_id, artist, song_title, album, length_in_seconds) VALUES (?, ?, ?, ?, ?)", user_id, artists, song_title, album, length_in_seconds)
+                    
+                    successful_embed = discord.Embed(title="Song successfully added to queue!", color=0x00aeff)
+                    successful_embed.set_thumbnail(url=album_art_url)
+                    successful_embed.add_field(name="Song title", value=song_title, inline=True)
+                    successful_embed.add_field(name="Artist(s)", value=artists, inline=True)
+                    successful_embed.add_field(name="Album", value=album, inline=False)
+                    await interaction.response.send_message(embed=successful_embed)
             except spotipy.exceptions.SpotifyException as err:
                 description = ""
                 match err.http_status:
@@ -104,8 +109,13 @@ class SongLibraryCog(commands.Cog):
         
         if not songs_in_queue == []:
             queue_embed=discord.Embed(title=title, color=0x00aeff)
-            for song in songs_in_queue:
-                queue_embed.add_field(name="Song " + str(song[0]), value="<@" + song[1] + "> **" + song[3] + "** by " + song[2], inline=False)
+            if archive == True:
+                for song in songs_in_queue:
+                    timestamp = str(int(datetime.strptime(str(song[6]), "%Y-%m-%d %H:%M:%S").timestamp()))
+                    queue_embed.add_field(name="Song " + str(song[0]), value="**" + song[3] + "** by " + song[2] + "\nAdded by <@" + song[1] + "> on <t:" + timestamp + ":D> - <t:" + timestamp + ":T>", inline=False)
+            else:
+                for song in songs_in_queue:
+                    queue_embed.add_field(name="Song " + str(song[0]), value="**" + song[3] + "** by " + song[2] + "\nAdded by <@" + song[1] + ">", inline=False)
             await interaction.response.send_message(embed=queue_embed, ephemeral=True, view=view)
         else:
             await interaction.response.send_message(embed=discord.Embed(title="Currently no songs in queue", color=0x00aeff), ephemeral=True)
@@ -172,8 +182,13 @@ class NextPreviousButtons(discord.ui.View):
             title = "Songs in queue:"
             
         queue_embed=discord.Embed(title=title, color=0x00aeff)
-        for song in songs_in_queue:
-            queue_embed.add_field(name="Song " + str(song[0]), value="<@" + song[1] + "> **" + song[3] + "** by " + song[2], inline=False)
+        if self.archive == True:
+            for song in songs_in_queue:
+                timestamp = str(int(datetime.strptime(str(song[6]), "%Y-%m-%d %H:%M:%S").timestamp()))
+                queue_embed.add_field(name="Song " + str(song[0]), value="**" + song[3] + "** by " + song[2] + "\nAdded by <@" + song[1] + "> on <t:" + timestamp + ":D> - <t:" + timestamp + ":T>", inline=False)
+        else:
+            for song in songs_in_queue:
+                queue_embed.add_field(name="Song " + str(song[0]), value="**" + song[3] + "** by " + song[2] + "\nAdded by <@" + song[1] + ">", inline=False)
         await interaction.response.edit_message(embed=queue_embed, view=self)
     
     @discord.ui.button(style=discord.ButtonStyle.blurple, emoji='➡️')
@@ -196,8 +211,13 @@ class NextPreviousButtons(discord.ui.View):
             title = "Songs in queue:"
 
         queue_embed=discord.Embed(title=title, color=0x00aeff)
-        for song in songs_in_queue:
-            queue_embed.add_field(name="Song " + str(song[0]), value="<@" + song[1] + "> **" + song[3] + "** by " + song[2], inline=False)
+        if self.archive == True:
+            for song in songs_in_queue:
+                timestamp = str(int(datetime.strptime(str(song[6]), "%Y-%m-%d %H:%M:%S").timestamp()))
+                queue_embed.add_field(name="Song " + str(song[0]), value="**" + song[3] + "** by " + song[2] + "\nAdded by <@" + song[1] + "> on <t:" + timestamp + ":D> - <t:" + timestamp + ":T>", inline=False)
+        else:
+            for song in songs_in_queue:
+                queue_embed.add_field(name="Song " + str(song[0]), value="**" + song[3] + "** by " + song[2] + "\nAdded by <@" + song[1] + ">", inline=False)
         await interaction.response.edit_message(embed=queue_embed, view=self)
             
 
