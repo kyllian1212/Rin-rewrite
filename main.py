@@ -36,7 +36,7 @@ sp = spotipy.Spotify(auth_manager=auth_manager)
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix="!!", intents=intents, max_messages=10000, help_command=None)
 
-VERSION = "v1.0.1"
+VERSION = "v1.0.2"
 
 @bot.event
 async def on_ready():

@@ -35,7 +35,7 @@ class SecondSkyCountdownCog(commands.Cog):
             secondsky_message_embed = discord.Embed(title="There are " + str(diffh) + " hours (" + str(diffm) + " minutes, " + str(diffs) + " seconds) left before Second Sky 2022 begins", color=0x00aeff)
         elif diffh >= 100:
             secondsky_message_embed = discord.Embed(title="There are " + str(diffd) + " days (" + str(diffh) + " hours, " + str(diffm) + " minutes, " + str(diffs) + " seconds) left before Second Sky 2022 begins", color=0x00aeff)
-        secondsky_message_embed.set_thumbnail(url="https://aegwebprod.blob.core.windows.net/content/background_images/261/s0LLCS44vACTLzQ3QXANyjDeDQ3G3orMGvtFPim5.jpg")
+        secondsky_message_embed.set_thumbnail(url="https://pbs.twimg.com/media/FfcjwkZUAAIgQz1?format=jpg&name=4096x4096")
         secondsky_message_embed.set_footer(text=str(now.strftime("%d/%m/%Y - %H:%M:%S")))
         await self.bot.get_guild(186610204023062528).get_channel(552216044068929655).send(embed=secondsky_message_embed) #will send in prd's #second-sky channel
 
