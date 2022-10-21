@@ -112,7 +112,7 @@ class SongLibraryCog(commands.Cog):
             if archive == True:
                 for song in songs_in_queue:
                     timestamp = str(int(datetime.strptime(str(song[6]), "%Y-%m-%d %H:%M:%S").timestamp()))
-                    queue_embed.add_field(name="Song " + str(song[0]), value="**" + song[3] + "** by " + song[2] + "\nAdded by <@" + song[1] + "> on <t:" + timestamp + ":D> - <t:" + timestamp + ":T>", inline=False)
+                    queue_embed.add_field(name="Song " + str(song[0]), value="**" + song[3] + "** by " + song[2] + "\nAdded by <@" + song[1] + ">\nPlayed on <t:" + timestamp + ":D> - <t:" + timestamp + ":T>", inline=False)
             else:
                 for song in songs_in_queue:
                     queue_embed.add_field(name="Song " + str(song[0]), value="**" + song[3] + "** by " + song[2] + "\nAdded by <@" + song[1] + ">", inline=False)
@@ -185,7 +185,7 @@ class NextPreviousButtons(discord.ui.View):
         if self.archive == True:
             for song in songs_in_queue:
                 timestamp = str(int(datetime.strptime(str(song[6]), "%Y-%m-%d %H:%M:%S").timestamp()))
-                queue_embed.add_field(name="Song " + str(song[0]), value="**" + song[3] + "** by " + song[2] + "\nAdded by <@" + song[1] + "> on <t:" + timestamp + ":D> - <t:" + timestamp + ":T>", inline=False)
+                queue_embed.add_field(name="Song " + str(song[0]), value="**" + song[3] + "** by " + song[2] + "\nAdded by <@" + song[1] + ">\nPlayed on <t:" + timestamp + ":D> - <t:" + timestamp + ":T>", inline=False)
         else:
             for song in songs_in_queue:
                 queue_embed.add_field(name="Song " + str(song[0]), value="**" + song[3] + "** by " + song[2] + "\nAdded by <@" + song[1] + ">", inline=False)
@@ -214,7 +214,7 @@ class NextPreviousButtons(discord.ui.View):
         if self.archive == True:
             for song in songs_in_queue:
                 timestamp = str(int(datetime.strptime(str(song[6]), "%Y-%m-%d %H:%M:%S").timestamp()))
-                queue_embed.add_field(name="Song " + str(song[0]), value="**" + song[3] + "** by " + song[2] + "\nAdded by <@" + song[1] + "> on <t:" + timestamp + ":D> - <t:" + timestamp + ":T>", inline=False)
+                queue_embed.add_field(name="Song " + str(song[0]), value="**" + song[3] + "** by " + song[2] + "\nAdded by <@" + song[1] + ">\nPlayed on <t:" + timestamp + ":D> - <t:" + timestamp + ":T>", inline=False)
         else:
             for song in songs_in_queue:
                 queue_embed.add_field(name="Song " + str(song[0]), value="**" + song[3] + "** by " + song[2] + "\nAdded by <@" + song[1] + ">", inline=False)
