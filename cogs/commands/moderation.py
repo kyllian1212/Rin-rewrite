@@ -52,12 +52,12 @@ class ModerationCog(commands.Cog):
                     await member.timeout(timeout, reason=reason)
                     await interaction.response.send_message(embed=discord.Embed(description="<@" + str(member.id) + "> successfully timed out!", color=0x00aeff), ephemeral=True)
         except:
-            await interaction.response.send_message(embed=discord.Embed(title="There was an error timing out the person. Please try again or contact the bot owner if you see this again", description="(Please note that it is not possible to timeout someone for more than 28 days due to an API limitation)", color=0xff0000), ephemeral=True)
+            await interaction.response.send_message(embed=discord.Embed(title="There was an error timing out the person. Please try again or contact the bot owner if you see this again", description="Maybe the Rin role is under a role that the user you want to time out has? Please note that it is not possible to timeout someone for more than 28 days due to an API limitation.", color=0xff0000), ephemeral=True)
             raise
     
     #kick
     @app_commands.command(name="rin_kick", description="Kicks a member and DMs them (or not)")
-    @app_commands.describe(member="The member that will be kicked", reason="The reason why the member has been kicked (no reason by default)", dm="Sets if the user will be DM'd about the timeout or not (No by default)")
+    @app_commands.describe(member="The member that will be kicked", reason="The reason why the member has been kicked (no reason by default)", dm="Sets if the user will be DM'd about the kick or not (No by default)")
     @app_commands.checks.has_permissions(administrator=True, kick_members=True)
     async def kick(self, interaction: discord.Interaction, member: discord.Member, reason: str = None, dm: bool = False):
         try:
@@ -87,12 +87,12 @@ class ModerationCog(commands.Cog):
                 await member.kick(reason=reason)
                 await interaction.response.send_message(embed=discord.Embed(description="<@" + str(member.id) + "> successfully kicked!", color=0x00aeff), ephemeral=True)
         except:
-            await interaction.response.send_message(embed=discord.Embed(title="There was an error kicking the person. Please try again or contact the bot owner if you see this again", color=0xff0000), ephemeral=True)
+            await interaction.response.send_message(embed=discord.Embed(title="There was an error kicking the person. Please try again or contact the bot owner if you see this again", description="Maybe the Rin role is under a role that the user you want to kick has?", color=0xff0000), ephemeral=True)
             raise
 
     #ban
     @app_commands.command(name="rin_ban", description="Bans a member and DMs them (or not)")
-    @app_commands.describe(member="The member that will be banned", reason="The reason why the member has been banned (no reason by default)", dm="Sets if the user will be DM'd about the timeout or not (No by default)", delete_message_days="Sets that messages less than x days will be deleted (by default 0 (none), max 7)")
+    @app_commands.describe(member="The member that will be banned", reason="The reason why the member has been banned (no reason by default)", dm="Sets if the user will be DM'd about the ban or not (No by default)", delete_message_days="Sets that messages less than x days will be deleted (by default 0 (none), max 7)")
     @app_commands.checks.has_permissions(administrator=True, ban_members=True) 
     async def ban(self, interaction: discord.Interaction, member: discord.Member, delete_message_days: int = 0, reason: str = None, dm: bool = False):
         try:
@@ -125,7 +125,7 @@ class ModerationCog(commands.Cog):
                     await member.ban(delete_message_days=delete_message_days, reason=reason)
                     await interaction.response.send_message(embed=discord.Embed(description="<@" + str(member.id) + "> successfully banned!", color=0x00aeff), ephemeral=True)
         except:
-            await interaction.response.send_message(embed=discord.Embed(title="There was an error banning the person. Please try again or contact the bot owner if you see this again", color=0xff0000), ephemeral=True)
+            await interaction.response.send_message(embed=discord.Embed(title="There was an error banning the person. Please try again or contact the bot owner if you see this again", description="Maybe the Rin role is under a role that the user you want to ban has?", color=0xff0000), ephemeral=True)
             raise
     
     @timeout.error

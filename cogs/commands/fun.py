@@ -45,6 +45,10 @@ class FunCog(commands.Cog):
         dad_message_embed.add_field(name="Message", value="There was just so little time left after you were born. \nI don't know how much love I managed to pour into raising you after your mother died... \nBut your smile kept me going. (^_^) \n\nI would like to have come with you, but I couldn't. \nI wanted you to forget everything and move on... \nI knew you'd be alright. But you'll get lonely, and remember. \n\nI know you'll grow strong, and read this letter some day. \nI really wish we could have spent more time together. I'm sorry. \nYou were so young back then, too young to understand what they meant. So let me repeat... \n\nMy final words to you.", inline=False)
         dad_message_embed.set_footer(text="19/10/2016 - 04:00:00 (JST)")
         await interaction.response.send_message(embed=dad_message_embed)
+    
+    @app_commands.command(name="irene", description="irene")
+    async def october18(self, interaction: discord.Integration):
+        await interaction.response.send_message(content="https://media.discordapp.net/attachments/186610204023062528/1036707347881525360/IMG_4366.jpg")
 
 async def setup(bot):
     await bot.add_cog(FunCog(bot))
