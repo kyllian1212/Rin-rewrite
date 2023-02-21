@@ -12,6 +12,7 @@ from main import VERSION
 class VcCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.song_queue = {}
         self.song_playing = False
         self.file_now_playing = None
         self.current_song_timestamp = 0
