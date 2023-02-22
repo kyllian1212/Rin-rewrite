@@ -17,7 +17,7 @@ class VcCheckCog(commands.Cog):
         bot_voice_client = discord.utils.get(self.bot.voice_clients, guild=interaction.guild)
         if bot_voice_client.source == None or self.song_playing == False:
             print("file is NOT playing")
-            self.now_playing = None
+            self.file_now_playing = None
             self.current_song_timestamp = 0
         elif bot_voice_client.is_paused():
             print("file is paused")
