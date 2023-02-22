@@ -26,7 +26,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 TEST_ID = os.getenv('TEST_ID')
 MADEON_ID = os.getenv('MADEON_ID')
 PORTER_ID = os.getenv('PORTER_ID')
-
+VERSION = os.getenv('VERSION')
 SPOTIPY_CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
 SPOTIPY_CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
 
@@ -35,8 +35,6 @@ sp = spotipy.Spotify(auth_manager=auth_manager)
 
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix="!!", intents=intents, max_messages=10000, help_command=None)
-
-VERSION = "v1.0.5"
 
 @bot.event
 async def on_ready():
