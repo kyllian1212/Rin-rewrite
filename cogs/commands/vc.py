@@ -35,8 +35,8 @@ class VcCog(commands.Cog):
         await interaction.response.send_message(embed=discord.Embed(description=f"Successfully disconnected from <#{str(voice_channel.id)}>!", color=0x00aeff), ephemeral=True)
     
     @app_commands.command(name="play", description="Plays a file or link in the voice channel you are currently in, or adds it to the queue if its not ")
-    @app_commands.describe(link="a link to an audio or video file. needs to be an actual file", v="show all metadata")
-    async def play(self, interaction: discord.Interaction, attachment: Optional[discord.Attachment], link: Optional[str], v: Optional[str] ):
+    @app_commands.describe(link="a link to an audio or video file. needs to be an actual file", verbose="show all metadata")
+    async def play(self, interaction: discord.Interaction, attachment: Optional[discord.Attachment], link: Optional[str], verbose: Optional[bool] ):
         #needs a file extension check, a queue system, and some other checks i cant remember on top of my head at the time i commit this
         voice_channel = interaction.user.voice.channel
         bot_voice_client = discord.utils.get(self.bot.voice_clients, guild=interaction.guild)
@@ -87,7 +87,7 @@ class VcCog(commands.Cog):
             
             if metadata.get('TITLE'):
                 title = f"{metadata.get('ARTIST').strip()} - {metadata.get('TITLE').strip()}"
-                if v:
+                if verbose:
                     desc = f"{metaout()} file name: `{fname}`"
                     qdesc= desc
                 else: 
