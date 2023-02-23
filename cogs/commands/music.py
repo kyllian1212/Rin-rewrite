@@ -59,18 +59,33 @@ class MusicCog(commands.Cog):
                 bot_voice_client.play(discord.FFmpegOpusAudio(source=file))
                 
             os.system(f'ffmpeg -y -i {file} -f ffmetadata metadata.txt')
-            myvars = {}
+            metadata = {}
             with open("metadata.txt",'r') as myfile:
                 lines = myfile.readlines()[1:]
-            myvars = dict(s.split('=',1) for s in lines)
-        
+            
+            #convert lines to key-pair dic
+            metalist = []
+            for i in lines:
+                key,value= i.split('=',1)
+                key = key.upper().strip()
+                value = value.strip()
+                metalist.append([key,value])        
+            
+            metadata = dict(metalist)
+               
             dirname, fname = os.path.split(file)
-            if myvars.get('TITLE'):
-                title =  myvars.get('ARTIST').strip() + ' - ' + myvars.get('TITLE').strip()
-                desc = myvars.get('ALBUM').strip()
+            
+            def ifkey(key):
+                if key:
+                    return(key.title() + ": `" + metadata.get(key).strip() + "`\n ")
+            
+            if metadata.get('TITLE'):
+                title =  metadata.get('ARTIST').strip() + ' - ' + metadata.get('TITLE').strip()
+                desc = ifkey('ALBUM') + ifkey('TRACK') +ifkey('DATE')+ "file name: `" + fname + "`"
             else: 
-                title = ''
-            await interaction.response.send_message(embed=discord.Embed(title = title, description= "album: " + myvars.get('ALBUM') + "filename: ` "+ fname + "`" +"\n", color=0x00aeff))
+                title = fname
+                desc = None
+            await interaction.response.send_message(embed=discord.Embed(title = "now playing: " + title, description= desc, color=0x00aeff))
     
     @app_commands.command(name="seek", description="seeks")
     async def seek(self, interaction: discord.Integration):
