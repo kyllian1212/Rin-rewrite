@@ -55,7 +55,6 @@ class VcCog(commands.Cog):
             await interaction.response.send_message(embed=discord.Embed(description="no media uploaded"), ephemeral=True)
             filecheck = 2
     
-        #i know what to fix in this whole if/elif but waiting for tox commit
         if filecheck == 0: 
             #get metadata
             os.system(f'ffmpeg -y -i {file} -f ffmetadata metadata.txt')
@@ -97,7 +96,8 @@ class VcCog(commands.Cog):
                 title = fname
                 desc = ''
                 qdesc = ''
-#actually play stuff            
+            
+            #actually play stuff            
             if bot_voice_client == None or bot_voice_client.is_playing() == False:
                 if bot_voice_client == None:
                     vc = await voice_channel.connect()
@@ -156,10 +156,9 @@ class VcCog(commands.Cog):
             # print("file is NOT playing")
             self.file_now_playing = None
             self.current_song_timestamp = 0
-            # if len(self.song_queue) == 0:
-            #      print("there is nothing in that list")
-            # else:
-            #      print("there is something in that list")
+            if len(self.song_queue) > 1:
+                del self.song_queue[0]
+                await self.play(interaction, None, self.song_queue[0])
         elif bot_voice_client.is_paused():
             # print("file is paused")
             h = 0
