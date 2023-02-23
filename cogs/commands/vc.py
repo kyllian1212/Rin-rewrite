@@ -23,7 +23,7 @@ class VcCog(commands.Cog):
         voice_channel = interaction.user.voice.channel
         await voice_channel.connect()
         self.vccheck_task.start(interaction)
-        await interaction.response.send_message(embed=discord.Embed(description="Successfully connected to <#" + str(voice_channel.id) + ">!", color=0x00aeff), ephemeral=True)
+        await interaction.response.send_message(embed=discord.Embed(description=f"Successfully connected to <#{str(voice_channel.id)}>!", color=0x00aeff), ephemeral=True)
     
     @app_commands.command(name="disconnect", description="Disconnects the bot from the voice channel it is currently in")
     async def disconnect(self, interaction: discord.Interaction):
@@ -32,7 +32,7 @@ class VcCog(commands.Cog):
         bot_voice_client = discord.utils.get(self.bot.voice_clients, guild=interaction.guild)
         self.vccheck_task.cancel()
         await bot_voice_client.disconnect()
-        await interaction.response.send_message(embed=discord.Embed(description="Successfully disconnected from <#" + str(voice_channel.id) + ">!", color=0x00aeff), ephemeral=True)
+        await interaction.response.send_message(embed=discord.Embed(description=f"Successfully disconnected from <#{str(voice_channel.id)}>!", color=0x00aeff), ephemeral=True)
     
     @app_commands.command(name="play", description="Plays a file or link in the voice channel you are currently in, or adds it to the queue if its not ")
     @app_commands.describe(link="a link to an audio or video file. needs to be an actual file", v="show all metadata")
@@ -77,7 +77,7 @@ class VcCog(commands.Cog):
             
             def ifkey(key):
                 if key:
-                    return(key.title() + ": `" + metadata.get(key).strip() + "`\n ")
+                    return(f"{key.title()}: `{metadata.get(key).strip()}`\n ")
             
             def metaout():
                 outstr = ""
@@ -86,16 +86,17 @@ class VcCog(commands.Cog):
                 return outstr
             
             if metadata.get('TITLE'):
-                title = metadata.get('ARTIST').strip() + ' - ' + metadata.get('TITLE').strip()
+                title = f"{metadata.get('ARTIST').strip()} - {metadata.get('TITLE').strip()}"
                 if v:
-                    desc = metaout() + "file name: `" + fname + "`"
+                    desc = f"{metaout()} file name: `{fname}`"
                     qdesc= desc
                 else: 
-                    desc = ifkey('ALBUM') + ifkey('TRACK') +ifkey('DATE')+ "file name: `" + fname + "`"
+                    desc = f"{ifkey('ALBUM')} {ifkey('TRACK')} {ifkey('DATE')} file name: `{fname}`"
                     qdesc = ""
             else: 
-                title = ''
+                title = fname
                 desc = ''
+                qdesc = ''
 #actually play stuff            
             if bot_voice_client == None or bot_voice_client.is_playing() == False:
                 if bot_voice_client == None:
@@ -108,10 +109,10 @@ class VcCog(commands.Cog):
                 
                 self.file_now_playing = file
                 
-                await interaction.response.send_message(embed=discord.Embed(title = title, description= desc +"\n", color=0x00aeff))
+                await interaction.response.send_message(embed=discord.Embed(title =f"now playing `{title}`", description= desc +"\n", color=0x00aeff))
             elif bot_voice_client.is_playing() == True:
                 self.song_queue.append(file)
-                await interaction.response.send_message(embed=discord.Embed(title=f"added `{title}` to queue",description= qdesc, color=0x00aeff))
+                await interaction.response.send_message(embed=discord.Embed(title=f"added `{title}` to queue", description= qdesc, color=0x00aeff))
     
     @app_commands.command(name="seek", description="Sets the play position to the specified timestamp")
     @app_commands.describe(timestamp="(in seconds)")
