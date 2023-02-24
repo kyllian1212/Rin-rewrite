@@ -138,14 +138,13 @@ class VcCog(commands.Cog):
         bot_voice_client = discord.utils.get(self.bot.voice_clients, guild=interaction.guild)
         bot_voice_client.stop()
         await interaction.response.send_message(embed=discord.Embed(description="File stopped.", color=0x00aeff))
-        #do stuff to go to next song in queue here
 
     @app_commands.command(name="stop", description="Stops playing and clears the queue")
     async def stop(self, interaction: discord.Interaction):
         bot_voice_client = discord.utils.get(self.bot.voice_clients, guild=interaction.guild)
+        self.song_queue.clear()
         bot_voice_client.stop()
         await interaction.response.send_message(embed=discord.Embed(description="File stopped and queue cleared.", color=0x00aeff))
-        #do stuff to clear queue here
 
     #constantly checks the vc instance
     #not sure if discord.utilis.get does an api request (i assume it does), might be an issue if too many requests are made but its only on 2 servers rn so idc
