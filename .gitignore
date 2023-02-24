@@ -6,3 +6,4 @@ __pycache__
 database.db
 discord.log
 metadata.txt
+time.txt
