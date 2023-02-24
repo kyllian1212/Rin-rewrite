@@ -1,5 +1,6 @@
 import discord
 import os
+from datetime import timedelta
 from discord import app_commands
 from discord.ext import commands, tasks
 from datetime import datetime
@@ -14,7 +15,6 @@ class VcCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.song_queue = []
-        self.file_now_playing = None
         self.current_song_timestamp = 0
 
     @app_commands.command(name="connect", description="Connects the bot to the voice channel you are currently in")
@@ -41,7 +41,8 @@ class VcCog(commands.Cog):
         voice_channel = interaction.user.voice.channel
         bot_voice_client = discord.utils.get(self.bot.voice_clients, guild=interaction.guild)
         #check if only one file/attachment is attached
-        file = "0"
+        filecheck = "0"
+        file = None
         if attachment and link:
             await interaction.response.send_message(embed=discord.Embed(description="please do not upload an attachment and link at the same"), ephemeral=True)
             filecheck = 1
@@ -55,7 +56,12 @@ class VcCog(commands.Cog):
             await interaction.response.send_message(embed=discord.Embed(description="no media uploaded"), ephemeral=True)
             filecheck = 2
     
-        if filecheck == 0: 
+        if filecheck == 0:
+            #get song len
+            os.system(f'ffprobe -i {file} -show_entries format=duration -of csv="p=0" > time.txt')
+            with open("time.txt",'r') as myfile:
+                time_sec = float(str(myfile.readlines()[0]).strip())
+            print(f"song is {time_sec} secs long") 
             #get metadata
             os.system(f'ffmpeg -y -i {file} -f ffmetadata metadata.txt')
             metadata = {}
@@ -63,14 +69,14 @@ class VcCog(commands.Cog):
                 lines = myfile.readlines()[1:]
             
             #convert lines to key-pair dic
-            metalist = []
+            metabuild = []
             for i in lines:
                 key,value= i.split('=',1)
                 key = key.upper().strip()
                 value = value.strip()
-                metalist.append([key,value])        
+                metabuild.append([key,value])        
             
-            metadata = dict(metalist)
+            metadata = dict(metabuild)
             
             dirname, fname = os.path.split(file)
             
@@ -87,38 +93,44 @@ class VcCog(commands.Cog):
             if metadata.get('TITLE'):
                 title = f"{metadata.get('ARTIST').strip()} - {metadata.get('TITLE').strip()}"
                 if verbose:
-                    desc = f"{metaout()} file name: `{fname}`"
+                    desc = f" {metaout()} file name: `{fname}`"
                     qdesc= desc
                 else: 
-                    desc = f"{ifkey('ALBUM')} {ifkey('TRACK')} {ifkey('DATE')} file name: `{fname}`"
+                    desc = f"{ifkey('ALBUM')} \n {ifkey('TRACK')} {ifkey('DATE')} file name: `{fname}`"
                     qdesc = ""
             else: 
                 title = fname
                 desc = ''
                 qdesc = ''
             
+            #make song dict
+            
+            qbuild = { "file": file, "metadata": metadata, "title": title, "desc": desc, "qdesc": qdesc, "user": interaction.user, "time_sec" :time_sec}
+            
+            
             #actually play stuff            
             if bot_voice_client == None or bot_voice_client.is_playing() == False:
                 if bot_voice_client == None:
                     vc = await voice_channel.connect()
-                    vc.play(discord.FFmpegOpusAudio(source=file))
+                    self.song_queue.append(qbuild)
+                    vc.play(discord.FFmpegOpusAudio(source=self.song_queue[0].get("file")))
                     self.vccheck_task.start(interaction)
                     print(vc.source)
                 else:
-                    bot_voice_client.play(discord.FFmpegOpusAudio(source=file))
+                    self.song_queue.append(qbuild)
+                    bot_voice_client.play(discord.FFmpegOpusAudio(source=self.song_queue[0].get("file")))
                 
-                self.file_now_playing = file
                 
-                await interaction.response.send_message(embed=discord.Embed(title =f"now playing `{title}`", description= desc +"\n", color=0x00aeff))
+                await interaction.response.send_message(embed=discord.Embed(title =f"now playing `{title}`", description= desc +"\n", color=0x00aeff).set_footer(text = f"requested by {self.song_queue[0].get('user')}", icon_url = self.song_queue[0].get('user').avatar.url))
             elif bot_voice_client.is_playing() == True:
-                self.song_queue.append(file)
-                await interaction.response.send_message(embed=discord.Embed(title=f"added `{title}` to queue", description= qdesc, color=0x00aeff))
+                self.song_queue.append(qbuild)
+                await interaction.response.send_message(embed=discord.Embed(title=f"added `{title}` to queue", description= qdesc, color=0x00aeff).set_footer(text = f"requested by {self.song_queue[0].get('user')}", icon_url = self.song_queue[0].get('user').avatar.url))
     
     @app_commands.command(name="seek", description="Sets the play position to the specified timestamp")
     @app_commands.describe(timestamp="(in seconds)")
     async def seek(self, interaction: discord.Integration, timestamp: str):
         bot_voice_client = discord.utils.get(self.bot.voice_clients, guild=interaction.guild)
-        bot_voice_client.source = discord.FFmpegOpusAudio(source=self.file_now_playing, before_options="-ss " + timestamp)
+        bot_voice_client.source = discord.FFmpegOpusAudio(source=self.song_queue[0], before_options="-ss " + timestamp)
         await interaction.response.send_message(embed=discord.Embed(description="seeked placeholder", color=0x00aeff))
     
     @app_commands.command(name="pause", description="Pauses the file")
@@ -134,7 +146,7 @@ class VcCog(commands.Cog):
         await interaction.response.send_message(embed=discord.Embed(description="File resumed.", color=0x00aeff))
 
     @app_commands.command(name="skip", description="Skips the file")
-    async def stop(self, interaction: discord.Interaction):
+    async def skip(self, interaction: discord.Interaction):
         bot_voice_client = discord.utils.get(self.bot.voice_clients, guild=interaction.guild)
         bot_voice_client.stop()
         await interaction.response.send_message(embed=discord.Embed(description="File stopped.", color=0x00aeff))
@@ -145,8 +157,40 @@ class VcCog(commands.Cog):
         bot_voice_client = discord.utils.get(self.bot.voice_clients, guild=interaction.guild)
         bot_voice_client.stop()
         await interaction.response.send_message(embed=discord.Embed(description="File stopped and queue cleared.", color=0x00aeff))
-        #do stuff to clear queue here
-
+        self.song_queue = []
+    
+    @app_commands.command(name="song", description="get info on a song")
+    async def song(self, interaction: discord.Interaction, song_number: Optional[int], verbose: Optional[bool]):
+        id = 0
+        if song_number:
+            if song_number > len(self.song_queue):
+                interaction.response.send_message(embed=discord.Embed(description=f"{song_number} is outside of range", color=0x00aeff))
+            else: id = song_number
+        await interaction.response.send_message(embed=discord.Embed(description=f"{self.song_queue[id].get('title')} \n {self.song_queue[id].get('desc')}", color=0x00aeff))
+    
+            
+    @app_commands.command(name="queue", description="see the queue of songs")
+    async def queue(self, interaction: discord.Interaction, page: Optional[int], verbose: Optional[bool]):
+        pagelen = 5
+        if not page or page < 1:
+            page = 1
+            
+        page_m = pagelen * page
+        
+        if len(self.song_queue) == 0:
+           await interaction.response.send_message(embed=discord.Embed(description="queue is empty", color=0x00aeff))
+        else:
+            queuebuild = discord.Embed(title="Queue",color=0x00aeff)
+            i = page_m - pagelen
+            while i < len(self.song_queue) and i < page_m:
+                if i == 0:
+                    queuebuild.add_field(name=f"Now Playing `{self.song_queue[i].get('title')}` \n", value=f"{timedelta(seconds=round(self.song_queue[i].get('time_sec'))) }",inline=False)
+                else:    
+                    queuebuild.add_field(name=f"{i}. {self.song_queue[i].get('title')} \n", value=f"{timedelta(seconds=round(self.song_queue[i].get('time_sec'))) }",inline=False)
+                    i+=1
+            await interaction.response.send_message(embed=queuebuild)
+            
+            
     #constantly checks the vc instance
     #not sure if discord.utilis.get does an api request (i assume it does), might be an issue if too many requests are made but its only on 2 servers rn so idc
     @tasks.loop(seconds=0.1)
@@ -154,11 +198,12 @@ class VcCog(commands.Cog):
         bot_voice_client = discord.utils.get(self.bot.voice_clients, guild=interaction.guild)
         if bot_voice_client.source == None or bot_voice_client.is_playing() == False:
             # print("file is NOT playing")
-            self.file_now_playing = None
+            self.song_queue[0] = None
             self.current_song_timestamp = 0
             if len(self.song_queue) > 1:
                 del self.song_queue[0]
-                await self.play(interaction, None, self.song_queue[0])
+                print(self.song_queue[0])
+                bot_voice_client.play(discord.FFmpegOpusAudio(source=self.song_queue[0].get("file")))
         elif bot_voice_client.is_paused():
             # print("file is paused")
             h = 0
@@ -167,7 +212,8 @@ class VcCog(commands.Cog):
             self.current_song_timestamp += 0.1
         # print(self.current_song_timestamp)
         # print(bot_voice_client.source)
-        # print(self.song_queue)
-
+        #    print(self.song_queue)
+            print(self.song_queue[0].get('file'))
+            
 async def setup(bot):
     await bot.add_cog(VcCog(bot))
