@@ -11,6 +11,17 @@ import traceback
 
 #everything needs try excepts but im just playing around rn
 #pitch stuff: `, options="-af asetrate=44100*0.9"` check https://stackoverflow.com/questions/53374590/ffmpeg-change-tone-frequency-keep-length-pitch-audio
+def sec_to_hms(seconds):
+    seconds_round = round(seconds)
+    min, sec = divmod(seconds_round, 60)
+    hour, min = divmod(min, 60)
+    if hour:
+        h = f"{hour}:"
+        m = f"{min:02d}"
+    else:
+        h = ''
+        m = min
+    return f"{h}{m}:{sec:02d}"
 
 class VcCog(commands.Cog):
     def __init__(self, bot):
@@ -19,6 +30,8 @@ class VcCog(commands.Cog):
         self.current_song_timestamp = 0
         self.inactivity_check = 0
         self.last_channel_interaction = ""
+
+
 
     @app_commands.command(name="connect", description="Connects the bot to the voice channel you are currently in")
     async def connect(self, interaction: discord.Interaction):
@@ -69,15 +82,17 @@ class VcCog(commands.Cog):
                 await interaction.response.send_message(embed=discord.Embed(description="no media uploaded"), ephemeral=True)
                 filecheck = 2
             
-            if not file.endswith(".mp3"):
-                print("not a valid file")
-            elif filecheck == 0:
+            #if not file.endswith(".mp3"):
+            #    print("not a valid file")
+            if filecheck == 0:
                 #get song len
                 ffmpegcheck = os.system(f'ffprobe -i {file} -show_entries format=duration -of csv="p=0" > time.txt')
                 if ffmpegcheck == 1:
                     raise FileNotFoundError
                 with open("time.txt",'r') as myfile:
-                    time_sec = float(str(myfile.readlines()[0]).strip())
+                    time_sec = float(str(myfile.readlines()[0]).strip())    
+                time_hms = sec_to_hms(time_sec)
+                    
                 print(f"song is {time_sec} secs long") 
                 #get metadata
                 os.system(f'ffmpeg -y -i {file} -f ffmetadata metadata.txt')
@@ -108,20 +123,18 @@ class VcCog(commands.Cog):
                 
                 if metadata.get('TITLE'):
                     title = f"{metadata.get('ARTIST').strip()} - {metadata.get('TITLE').strip()}"
-                    if verbose:
-                        desc = f" {metaout()} file name: `{fname}`"
-                        qdesc= desc
-                    else:
-                        desc = f"{ifkey('ALBUM')} {ifkey('TRACK')} {ifkey('DATE')} file name: `{fname}`"
-                        qdesc = ""
+                    desc = f"{ifkey('ALBUM')} {ifkey('TRACK')} {ifkey('DATE')} Length: `{time_hms}`\n file name: `{fname}`"
+                    qdesc = f"Length: `{time_hms}`"
+                    vdesc = f" {metaout()} \n  Length: `{time_hms}` \n File Name: `{fname}`"
                 else: 
                     title = fname
-                    desc = ''
-                    qdesc = ''
-                
+                    desc = f'Length: `{time_hms}`'
+                    qdesc = desc
+                    vdesc = f" {metaout()} \n  Length: `{time_hms}`"
                 #make song dict
-                qbuild = { "file": file, "metadata": metadata, "title": title, "desc": desc, "qdesc": qdesc, "user": interaction.user, "time_sec" :time_sec}
-                
+                qbuild = { "file": file, "metadata": metadata, "title": title, "desc": desc, "qdesc": qdesc, "vdesc": vdesc, "user": interaction.user, "time_sec": time_sec, "time_hms": time_hms}
+                if verbose:
+                    desc = vdesc
                 #actually play stuff            
                 if bot_voice_client == None or bot_voice_client.is_playing() == False:
                     if bot_voice_client == None:
@@ -133,11 +146,12 @@ class VcCog(commands.Cog):
                     else:
                         self.song_queue.append(qbuild)
                         bot_voice_client.play(discord.FFmpegOpusAudio(source=self.song_queue[0].get("file")))
+                        
                     
                     await interaction.response.send_message(embed=discord.Embed(title =f"now playing `{title}`", description= desc +"\n", color=0x00aeff).set_footer(text = f"requested by {self.song_queue[0].get('user')}", icon_url = self.song_queue[0].get('user').avatar.url))
                 elif bot_voice_client.is_playing() == True:
                     self.song_queue.append(qbuild)
-                    await interaction.response.send_message(embed=discord.Embed(title=f"added `{title}` to queue", description= qdesc, color=0x00aeff).set_footer(text = f"requested by {self.song_queue[0].get('user')}", icon_url = self.song_queue[0].get('user').avatar.url))
+                    await interaction.response.send_message(embed=discord.Embed(title=f"added `{title}` to queue", description= desc, color=0x00aeff).set_footer(text = f"requested by {self.song_queue[0].get('user')}", icon_url = self.song_queue[0].get('user').avatar.url))
         except AttributeError as error:
             await interaction.response.send_message(embed=discord.Embed(description="You are not connected to a voice channel!", color=0xff0000), ephemeral=True)
             raise
@@ -186,9 +200,15 @@ class VcCog(commands.Cog):
         id = 0
         if song_number:
             if song_number > len(self.song_queue):
-                interaction.response.send_message(embed=discord.Embed(description=f"{song_number} is outside of range", color=0x00aeff))
+                interaction.response.send_message(embed=discord.Embed(description=f"{song_number} is outside of range", color=0xff0000))
             else: id = song_number
-        await interaction.response.send_message(embed=discord.Embed(description=f"**{self.song_queue[id].get('title')}** \n {self.song_queue[id].get('desc')}", color=0x00aeff))
+            
+        if verbose:
+            desc = f"**{self.song_queue[id].get('title')}** \n {self.song_queue[id].get('vdesc')}"
+        else:
+            desc = f"**{self.song_queue[id].get('title')}** \n {self.song_queue[id].get('desc')}"
+                
+        await interaction.response.send_message(embed=discord.Embed(description=desc, color=0x00aeff))
             
     @app_commands.command(name="queue", description="see the queue of songs")
     async def queue(self, interaction: discord.Interaction, page: Optional[int], verbose: Optional[bool]):
@@ -205,9 +225,9 @@ class VcCog(commands.Cog):
             i = page_m - pagelen
             while i < len(self.song_queue) and i < page_m:
                 if i == 0:
-                    queuebuild.add_field(name=f"Now Playing `{self.song_queue[i].get('title')}` \n", value=f"{timedelta(seconds=round(self.song_queue[i].get('time_sec'))) }",inline=False)
+                    queuebuild.add_field(name=f"Now Playing `{self.song_queue[i].get('title')}` \n", value=f"{self.song_queue[i].get('time_hms')}",inline=False)
                 else:    
-                    queuebuild.add_field(name=f"{i}. `{self.song_queue[i].get('title')}` \n", value=f"{timedelta(seconds=round(self.song_queue[i].get('time_sec'))) }",inline=False)
+                    queuebuild.add_field(name=f"{i}. `{self.song_queue[i].get('title')}` \n", value=f"{self.song_queue[i].get('time_hms') }",inline=False)
                 i+=1
             await interaction.response.send_message(embed=queuebuild)
             
