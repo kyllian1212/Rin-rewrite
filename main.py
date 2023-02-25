@@ -30,7 +30,11 @@ PORTER_ID = os.getenv('PORTER_ID')
 VERSION = os.getenv('VERSION')
 SPOTIPY_CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
 SPOTIPY_CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
-ADMIN = os.getenv('ADMIN')
+OWNER_ID = os.getenv('OWNER_ID')
+BOT_ID = os.getenv("BOT_ID")
+QUEUE_PAGE_LEN = os.getenv("QUEUE_PAGE_LEN")
+
+
 
 auth_manager = SpotifyClientCredentials(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET)
 sp = spotipy.Spotify(auth_manager=auth_manager)
@@ -39,8 +43,8 @@ intents = discord.Intents.all()
 bot = commands.Bot(command_prefix="!!", intents=intents, max_messages=10000, help_command=None)
 
 @app_commands.command(name="resync", description="resync slash commands")
-async def resync(self):
-    if discord.interaction.user.id == ADMIN:
+async def resync(interaction: discord.Interaction):
+    if interaction.user.id == OWNER_ID:
             await bot.tree.sync(guild = discord.Object(id = TEST_ID)) #remove guild value for global slash command (takes longer to synchronize)
             bot.tree.copy_global_to(guild = discord.Object(id = MADEON_ID))
     else:
@@ -76,10 +80,10 @@ async def on_ready():
 
     if not bot.synced:
         await bot.tree.sync() #remove guild value for global slash command (takes longer to synchronize)
-        bot.tree.copy_global_to(guild = discord.Object(id = MADEON_ID))
+        bot.tree.copy_global_to(guild = discord.Object(id = 849034525861740571))
         bot.synced = True
     
-    if not bot.user.name == "Rin | " + VERSION and not bot.user.id == 1072294056614432838:
+    if not bot.user.name == "Rin | " + VERSION and not bot.user.id == 849410467507601459:
         await bot.user.edit(username="Rin | " + VERSION)
 
 if __name__ == "__main__":
