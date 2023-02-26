@@ -196,19 +196,26 @@ class VcCog(commands.Cog):
         await interaction.response.send_message(embed=discord.Embed(description="File stopped and queue cleared.", color=0x00aeff))
     
     @app_commands.command(name="song", description="get info on a song")
-    async def song(self, interaction: discord.Interaction, song_number: Optional[int], verbose: Optional[bool]):
+    @app_commands.describe(queue_position="(0 for the song currently playing)")
+    async def song(self, interaction: discord.Interaction, queue_position: Optional[int], verbose: Optional[bool]):
         id = 0
-        if song_number:
-            if song_number > len(self.song_queue):
-                interaction.response.send_message(embed=discord.Embed(description=f"{song_number} is outside of range", color=0xff0000))
-            else: id = song_number
+        if queue_position:
+            if queue_position > len(self.song_queue):
+                interaction.response.send_message(embed=discord.Embed(description=f"{queue_position} is outside of range", color=0xff0000))
+            else: id = queue_position
             
         if verbose:
             desc = f"**{self.song_queue[id].get('title')}** \n {self.song_queue[id].get('vdesc')}"
         else:
             desc = f"**{self.song_queue[id].get('title')}** \n {self.song_queue[id].get('desc')}"
-                
-        await interaction.response.send_message(embed=discord.Embed(description=desc, color=0x00aeff))
+
+        song_embed = discord.Embed(description=desc, color=0x00aeff)
+        song_embed.set_footer(text = f"requested by {self.song_queue[id].get('user')}", icon_url = self.song_queue[id].get('user').avatar.url)
+
+        if id == 0:
+            song_embed.add_field(name="Position", value=f"{sec_to_hms(self.current_song_timestamp)}/{self.song_queue[id].get('time_hms')}")
+
+        await interaction.response.send_message(embed=song_embed)
             
     @app_commands.command(name="queue", description="see the queue of songs")
     async def queue(self, interaction: discord.Interaction, page: Optional[int], verbose: Optional[bool]):
