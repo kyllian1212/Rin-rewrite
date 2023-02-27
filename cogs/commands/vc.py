@@ -259,7 +259,12 @@ class VcCog(commands.Cog):
                 song_embed.set_footer(text = f"requested by {self.song_queue[id].get('user')}", icon_url = self.song_queue[id].get('user').avatar.url)
 
                 if id == 0:
-                    song_embed.add_field(name="Position", value=f"{sec_to_hms(self.current_song_timestamp)}/{self.song_queue[id].get('time_hms')}")
+                    song_percentage = self.current_song_timestamp/self.song_queue[id].get('time_sec')
+                    blue_squares = round(song_percentage*10)
+                    white_squares = 10-blue_squares
+                    display = f"🔷{'🟦'*blue_squares}{'⬜'*white_squares}🔷"
+
+                    song_embed.add_field(name="Position", value=f"{display}\n{sec_to_hms(self.current_song_timestamp)}/{self.song_queue[id].get('time_hms')}")
 
                 await interaction.response.send_message(embed=song_embed)
         except IndexError:
@@ -288,7 +293,7 @@ class VcCog(commands.Cog):
                 i = page_m - pagelen
                 while i < len(self.song_queue) and i < page_m:
                     if i == 0:
-                        queuebuild.add_field(name=f"Now Playing `{self.song_queue[i].get('title')}` \n", value=f"{sec_to_hms(self.current_song_timestamp)}/{self.song_queue[i].get('time_hms')}",inline=False)
+                        queuebuild.add_field(name=f"Now Playing `{self.song_queue[i].get('title')}` \n", value=f"{sec_to_hms(self.current_song_timestamp)}/{self.song_queue[i].get('time_hms')}", inline=False)
                     else:    
                         queuebuild.add_field(name=f"{i}. `{self.song_queue[i].get('title')}` \n", value=f"{self.song_queue[i].get('time_hms') }",inline=False)
                     i+=1
