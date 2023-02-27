@@ -11,7 +11,6 @@ from main import VERSION
 import math
 import traceback
 
-#everything needs try excepts but im just playing around rn
 #pitch stuff: `, options="-af asetrate=44100*0.9"` check https://stackoverflow.com/questions/53374590/ffmpeg-change-tone-frequency-keep-length-pitch-audio
 #add volume/speed/pitch/equalizer/reverb/reverse/bitrate eventually
 
@@ -45,7 +44,7 @@ class VcCog(commands.Cog):
             await voice_channel.connect()
             self.vccheck_task.start(interaction)
             await interaction.response.send_message(embed=discord.Embed(description=f"Successfully connected to <#{str(voice_channel.id)}>!", color=0x00aeff), ephemeral=True)
-        except AttributeError as error:
+        except AttributeError:
             await interaction.response.send_message(embed=discord.Embed(description="You are not connected to a voice channel!", color=0xff0000), ephemeral=True)
             raise
     
@@ -63,12 +62,12 @@ class VcCog(commands.Cog):
             await bot_voice_client.disconnect()
             self.__init__(self.bot)
             await interaction.followup.send(embed=discord.Embed(description=f"Successfully disconnected from <#{str(bot_voice_client.channel.id)}>!", color=0x00aeff), ephemeral=True)
-        except AttributeError as error:
+        except AttributeError:
             await interaction.followup.send(embed=discord.Embed(description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!", color=0xff0000), ephemeral=True)
             raise
     
     @app_commands.command(name="play", description="Plays a file or link in the voice channel you are currently in, or adds it to the queue if its not ")
-    @app_commands.describe(link="a link to an audio or video file. needs to be an actual file", verbose="show all metadata")
+    @app_commands.describe(link="A link to an audio or video file. Needs to be an actual file", verbose="show all metadata")
     async def play(self, interaction: discord.Interaction, attachment: Optional[discord.Attachment], link: Optional[str], verbose: Optional[bool] ):
         try:
             await interaction.response.defer() #avoids the "The application did not respond" message if the command takes too long to respond
@@ -81,7 +80,7 @@ class VcCog(commands.Cog):
             ffmpegcheck = None
             file = None
             if attachment and link:
-                await interaction.followup.send(embed=discord.Embed(description="please do not upload an attachment and link at the same"), ephemeral=True)
+                await interaction.followup.send(embed=discord.Embed(description="Please do not upload an attachment and a link at the same time.", color=0xff0000), ephemeral=True)
                 filecheck = 1
             elif attachment:
                 file = attachment.url
@@ -90,15 +89,16 @@ class VcCog(commands.Cog):
                 file = link
                 filecheck = 0
             else:
-                await interaction.followup.send(embed=discord.Embed(description="no media uploaded"), ephemeral=True)
+                await interaction.followup.send(embed=discord.Embed(description="No media uploaded.", color=0xff0000), ephemeral=True)
                 filecheck = 2
             
             #check if file format is supported
-            for format in self.supported_file_formats:
-                filecheck = 3
-                if file.endswith(f".{format}"):
-                    filecheck = 0
-                    break
+            if filecheck == 0:
+                for format in self.supported_file_formats:
+                    filecheck = 3
+                    if file.endswith(f".{format}"):
+                        filecheck = 0
+                        break
 
             if filecheck == 3:
                 await interaction.followup.send(embed=discord.Embed(description="File is not in a supported format!", color=0xff0000), ephemeral=True)
@@ -143,7 +143,7 @@ class VcCog(commands.Cog):
                         outstr += ifkey(key)
                     return outstr
                 
-                if metadata.get('TITLE'):
+                if metadata.get('TITLE') and metadata.get('ARTIST'):
                     title = f"{metadata.get('ARTIST').strip()} - {metadata.get('TITLE').strip()}"
                     desc = f"{ifkey('ALBUM')} {ifkey('TRACK')} {ifkey('DATE')} Length: `{time_hms}`\n file name: `{fname}`"
                     qdesc = f"Length: `{time_hms}`"
@@ -153,10 +153,12 @@ class VcCog(commands.Cog):
                     desc = f'Length: `{time_hms}`'
                     qdesc = desc
                     vdesc = f" {metaout()} \n  Length: `{time_hms}`"
+
                 #make song dict
                 qbuild = { "file": file, "metadata": metadata, "title": title, "desc": desc, "qdesc": qdesc, "vdesc": vdesc, "user": interaction.user, "time_sec": time_sec, "time_hms": time_hms}
                 if verbose:
                     desc = vdesc
+
                 #actually play stuff            
                 if bot_voice_client == None or bot_voice_client.is_playing() == False:
                     if bot_voice_client == None:
@@ -164,20 +166,18 @@ class VcCog(commands.Cog):
                         self.song_queue.append(qbuild)
                         vc.play(discord.FFmpegOpusAudio(source=self.song_queue[0].get("file")))
                         self.vccheck_task.start(interaction)
-                        print(vc.source)
                     else:
                         self.song_queue.append(qbuild)
                         bot_voice_client.play(discord.FFmpegOpusAudio(source=self.song_queue[0].get("file")))
-                        
-                    
-                    await interaction.followup.send(embed=discord.Embed(title =f"now playing `{title}`", description= desc +"\n", color=0x00aeff).set_footer(text = f"requested by {self.song_queue[0].get('user')}", icon_url = self.song_queue[0].get('user').avatar.url))
+
+                    await interaction.followup.send(embed=discord.Embed(title =f"Now playing `{title}`", description= desc +"\n", color=0x00aeff).set_footer(text = f"Requested by {self.song_queue[0].get('user')}", icon_url = self.song_queue[0].get('user').avatar.url))
                 elif bot_voice_client.is_playing() == True:
                     self.song_queue.append(qbuild)
-                    await interaction.followup.send(embed=discord.Embed(title=f"added `{title}` to queue", description= desc, color=0x00aeff).set_footer(text = f"requested by {self.song_queue[0].get('user')}", icon_url = self.song_queue[0].get('user').avatar.url))
-        except AttributeError as error:
+                    await interaction.followup.send(embed=discord.Embed(title=f"Added `{title}` to queue", description= desc, color=0x00aeff).set_footer(text = f"Requested by {self.song_queue[0].get('user')}", icon_url = self.song_queue[0].get('user').avatar.url))
+        except AttributeError:
             await interaction.followup.send(embed=discord.Embed(description="You are not connected to a voice channel!", color=0xff0000), ephemeral=True)
             raise
-        except FileNotFoundError as error:
+        except FileNotFoundError:
             await interaction.followup.send(embed=discord.Embed(description="Invalid file or file corrupted.", color=0xff0000), ephemeral=True)
             raise
         except:
@@ -191,8 +191,8 @@ class VcCog(commands.Cog):
             bot_voice_client = discord.utils.get(self.bot.voice_clients, guild=interaction.guild)
             bot_voice_client.source = discord.FFmpegOpusAudio(source=self.song_queue[0].get("file"), before_options=f"-ss {str(timestamp)}")
             self.current_song_timestamp = timestamp
-            await interaction.response.send_message(embed=discord.Embed(description="seeked placeholder", color=0x00aeff))
-        except AttributeError as error:
+            await interaction.response.send_message(embed=discord.Embed(description=f"File seeked to position {sec_to_hms(timestamp)}", color=0x00aeff))
+        except AttributeError:
             await interaction.response.send_message(embed=discord.Embed(description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!", color=0xff0000), ephemeral=True)
             raise
     
@@ -202,7 +202,7 @@ class VcCog(commands.Cog):
             bot_voice_client = discord.utils.get(self.bot.voice_clients, guild=interaction.guild)
             bot_voice_client.pause()
             await interaction.response.send_message(embed=discord.Embed(description="File paused.", color=0x00aeff))
-        except AttributeError as error:
+        except AttributeError:
             await interaction.response.send_message(embed=discord.Embed(description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!", color=0xff0000), ephemeral=True)
             raise
 
@@ -212,7 +212,7 @@ class VcCog(commands.Cog):
             bot_voice_client = discord.utils.get(self.bot.voice_clients, guild=interaction.guild)
             bot_voice_client.resume()
             await interaction.response.send_message(embed=discord.Embed(description="File resumed.", color=0x00aeff))
-        except AttributeError as error:
+        except AttributeError:
             await interaction.response.send_message(embed=discord.Embed(description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!", color=0xff0000), ephemeral=True)
             raise
 
@@ -222,7 +222,7 @@ class VcCog(commands.Cog):
             bot_voice_client = discord.utils.get(self.bot.voice_clients, guild=interaction.guild)
             bot_voice_client.stop()
             await interaction.response.send_message(embed=discord.Embed(description="File stopped.", color=0x00aeff))
-        except AttributeError as error:
+        except AttributeError:
             await interaction.response.send_message(embed=discord.Embed(description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!", color=0xff0000), ephemeral=True)
             raise
 
@@ -233,7 +233,7 @@ class VcCog(commands.Cog):
             self.song_queue.clear()
             bot_voice_client.stop()
             await interaction.response.send_message(embed=discord.Embed(description="File stopped and queue cleared.", color=0x00aeff))
-        except AttributeError as error:
+        except AttributeError:
             await interaction.response.send_message(embed=discord.Embed(description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!", color=0xff0000), ephemeral=True)
             raise
     
@@ -244,8 +244,8 @@ class VcCog(commands.Cog):
             id = 0
             queue_position_err = 0
             if queue_position:
-                if queue_position > len(self.song_queue):
-                    await interaction.response.send_message(embed=discord.Embed(description=f"{queue_position} is outside of range", color=0xff0000))
+                if queue_position > len(self.song_queue)-1:
+                    await interaction.response.send_message(embed=discord.Embed(description=f"Queue position {queue_position} doesn't exist.", color=0xff0000))
                     queue_position_err = 1
                 else: id = queue_position
             
@@ -256,7 +256,7 @@ class VcCog(commands.Cog):
                     desc = f"**{self.song_queue[id].get('title')}** \n {self.song_queue[id].get('desc')}"
 
                 song_embed = discord.Embed(description=desc, color=0x00aeff)
-                song_embed.set_footer(text = f"requested by {self.song_queue[id].get('user')}", icon_url = self.song_queue[id].get('user').avatar.url)
+                song_embed.set_footer(text = f"Requested by {self.song_queue[id].get('user')}", icon_url = self.song_queue[id].get('user').avatar.url)
 
                 if id == 0:
                     song_percentage = self.current_song_timestamp/self.song_queue[id].get('time_sec')
@@ -285,15 +285,15 @@ class VcCog(commands.Cog):
             max_page = math.ceil(len(self.song_queue)/pagelen)
             
             if len(self.song_queue) == 0:
-                await interaction.response.send_message(embed=discord.Embed(description="queue is empty", color=0x00aeff))
+                await interaction.response.send_message(embed=discord.Embed(description="Queue is currently empty.", color=0x00aeff))
             elif page > max_page:
-                await interaction.response.send_message(embed=discord.Embed(description="Not enough songs in the queue to display this page!", color=0x00aeff))
+                await interaction.response.send_message(embed=discord.Embed(description="Not enough songs in the queue to display this page.", color=0x00aeff))
             else:
                 queuebuild = discord.Embed(title="Queue",color=0x00aeff)
                 i = page_m - pagelen
                 while i < len(self.song_queue) and i < page_m:
                     if i == 0:
-                        queuebuild.add_field(name=f"Now Playing `{self.song_queue[i].get('title')}` \n", value=f"{sec_to_hms(self.current_song_timestamp)}/{self.song_queue[i].get('time_hms')}", inline=False)
+                        queuebuild.add_field(name=f"Now playing `{self.song_queue[i].get('title')}` \n", value=f"{sec_to_hms(self.current_song_timestamp)}/{self.song_queue[i].get('time_hms')}", inline=False)
                     else:    
                         queuebuild.add_field(name=f"{i}. `{self.song_queue[i].get('title')}` \n", value=f"{self.song_queue[i].get('time_hms') }",inline=False)
                     i+=1
@@ -315,7 +315,6 @@ class VcCog(commands.Cog):
             if bot_voice_client.is_paused():
                 pass
             elif bot_voice_client.source == None or bot_voice_client.is_playing() == False:
-                # print("file is NOT playing")
                 self.current_song_timestamp = 0
                 self.inactivity_check += 0.5
 
@@ -323,9 +322,8 @@ class VcCog(commands.Cog):
                     del self.song_queue[0]
                 elif len(self.song_queue) > 1:
                     del self.song_queue[0]
-                    print(self.song_queue[0])
                     bot_voice_client.play(discord.FFmpegOpusAudio(source=self.song_queue[0].get("file")))
-                    await self.bot.get_channel(self.last_channel_interaction).send(embed=discord.Embed(title =f"now playing `{self.song_queue[0].get('title')}`", description=f"{self.song_queue[0].get('desc')} \n", color=0x00aeff).set_footer(text = f"requested by {self.song_queue[0].get('user')}", icon_url = self.song_queue[0].get('user').avatar.url))
+                    await self.bot.get_channel(self.last_channel_interaction).send(embed=discord.Embed(title =f"Now playing `{self.song_queue[0].get('title')}`", description=f"{self.song_queue[0].get('desc')} \n", color=0x00aeff).set_footer(text = f"Requested by {self.song_queue[0].get('user')}", icon_url = self.song_queue[0].get('user').avatar.url))
                 
                 #check if bot has been inactive for too long
                 if self.inactivity_check > self.max_inactivity:
@@ -334,12 +332,7 @@ class VcCog(commands.Cog):
                     self.__init__(self.bot)
                     self.vccheck_task.cancel()
             else:
-                # print("file is playing")
                 self.current_song_timestamp += 0.5
-                print(self.current_song_timestamp)
-            # print(bot_voice_client.source)
-            #    print(self.song_queue)
-                print(self.song_queue[0].get('file'))
         except:
             raise
             
