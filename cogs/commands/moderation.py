@@ -9,6 +9,7 @@ from discord.ext import commands
 from datetime import datetime
 from datetime import timedelta
 import asyncio
+from typing import Optional
 import templates.embeds as embeds
 
 from main import db
@@ -134,9 +135,26 @@ class ModerationCog(commands.Cog):
             await interaction.response.send_message(embed=discord.Embed(title="There was an error banning the person. Please try again or contact the bot owner if you see this again", description="Maybe the Rin role is under a role that the user you want to ban has?" + user_dmd, color=0xff0000), ephemeral=True)
             raise
     
+    #rename channel
+    @app_commands.command(name="rename_channel", description="Renames the selected channel, or the channel you're in if none is selected")
+    @app_commands.describe(text_channel="The channel you want to rename", channel_name="The new channel name")
+    @app_commands.checks.has_permissions(manage_channels=True) 
+    async def rename_channel(self, interaction: discord.Interaction, text_channel: Optional[discord.TextChannel], channel_name: str):
+        try:
+            #defer (incl. on missing perm embed) to avoid api errors if rate limited
+            if text_channel == None:
+                text_channel = interaction.channel
+            text_channel_old_name = f"#{text_channel.name}"
+            await text_channel.edit(name=channel_name)
+            await interaction.response.send_message(embed=discord.Embed(description=f"Channel {text_channel_old_name} successfully renamed to <#{text_channel.id}>", color=0x00aeff), ephemeral=True)
+        except:
+            await interaction.response.send_message(embed=discord.Embed(title="There was an error renaming the channel.", description="Please try again or contact the bot owner if you see this again.", color=0xff0000), ephemeral=True)
+            raise
+
     @timeout.error
     @kick.error
     @ban.error
+    @rename_channel.error
     async def error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
         if isinstance(error, app_commands.MissingPermissions):
             await embeds.missing_permissions(interaction)
