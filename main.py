@@ -24,6 +24,7 @@ from db import db
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
+COMMAND_PREFIX = os.getenv('DISCORD_COMMAND_PREFIX')
 TEST_ID = os.getenv('TEST_ID')
 MADEON_ID = os.getenv('MADEON_ID')
 PORTER_ID = os.getenv('PORTER_ID')
@@ -34,13 +35,11 @@ OWNER_ID = os.getenv('OWNER_ID')
 BOT_ID = os.getenv("BOT_ID")
 QUEUE_PAGE_LEN = os.getenv("QUEUE_PAGE_LEN")
 
-
-
 auth_manager = SpotifyClientCredentials(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET)
 sp = spotipy.Spotify(auth_manager=auth_manager)
 
 intents = discord.Intents.all()
-bot = commands.Bot(command_prefix="!!", intents=intents, max_messages=10000, help_command=None)
+bot = commands.Bot(command_prefix=COMMAND_PREFIX, intents=intents, max_messages=10000, help_command=None)
 
 @app_commands.command(name="resync", description="resync slash commands")
 async def resync(interaction: discord.Interaction):

@@ -73,7 +73,7 @@ class ArchiveCog(commands.Cog):
 
                 await interaction.response.send_message(embed=discord.Embed(description="Channel <#" + str(interaction.channel.id) + "> successfully unarchived!", color=0x00aeff), ephemeral=True)
         except:
-            await interaction.response.send_message(embed=discord.Embed(title="There was an error unarchiving the channel. Please try again or contact the bot owner if you see this again", description="(Make sure to check the channel permissions just incase the bot has done something wrong)", color=0xff0000), ephemeral=True)
+            await interaction.response.send_message(embed=discord.Embed(title="There was an error unarchiving the channel. Please try again or contact the bot owner if you see this again", description="(Make sure to check the channel permissions just in case the bot has done something wrong)", color=0xff0000), ephemeral=True)
             raise
 
     @archive.error
