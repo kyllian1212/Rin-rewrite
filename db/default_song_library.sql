@@ -52,6 +52,9 @@ INSERT INTO bot_default_song_library (artist, song_title, album, length_in_secon
 ("Porter Robinson & Wednesday Campanella", "fullmoon lullaby", "Nurture", 243),
 -- post-nurture
 ("Porter Robinson & League of Legends", "Everything Goes On", "Everything Goes On", 202),
+/* skrillex, porter robinson & bibi bourelly*/
+-- still here
+("Skrillex, Porter Robinson & Bibi Bourelly", "Still Here (with the ones that I came with)", "Quest For Fire", 312),
 /* porter robinson & madeon */
 -- shelter
 ("Porter Robinson & Madeon", "Shelter", "Shelter", 219),
