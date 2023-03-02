@@ -10,6 +10,7 @@ from main import db
 from main import VERSION
 import math
 import traceback
+import templates.embeds as embeds
 
 #pitch stuff: `, options="-af asetrate=44100*0.9"` check https://stackoverflow.com/questions/53374590/ffmpeg-change-tone-frequency-keep-length-pitch-audio
 #add volume/speed/pitch/equalizer/reverb/reverse/bitrate eventually
@@ -39,20 +40,23 @@ class VcCog(commands.Cog):
     @app_commands.command(name="connect", description="Connects the bot to the voice channel you are currently in")
     async def connect(self, interaction: discord.Interaction):
         try:
+            await interaction.response.defer()
             voice_channel = interaction.user.voice.channel
             self.last_channel_interaction = interaction.channel_id
             await voice_channel.connect()
             self.vccheck_task.start(interaction)
-            await interaction.response.send_message(embed=discord.Embed(description=f"Successfully connected to <#{str(voice_channel.id)}>!", color=0x00aeff), ephemeral=True)
+            await interaction.followup.send(embed=discord.Embed(description=f"Successfully connected to <#{str(voice_channel.id)}>!", color=0x00aeff), ephemeral=True)
         except AttributeError:
-            await interaction.response.send_message(embed=discord.Embed(description="You are not connected to a voice channel!", color=0xff0000), ephemeral=True)
+            await interaction.followup.send(embed=discord.Embed(description="You are not connected to a voice channel!", color=0xff0000), ephemeral=True)
+            raise
+        except:
+            await embeds.error_executing_command(interaction)
             raise
     
     @app_commands.command(name="disconnect", description="Disconnects the bot from the voice channel it is currently in")
     async def disconnect(self, interaction: discord.Interaction):
         try:
-            await interaction.response.defer() #avoids the "The application did not respond" message if the command takes too long to respond
-
+            await interaction.response.defer()
             voice_channel = interaction.user.voice.channel
             bot_voice_client = discord.utils.get(self.bot.voice_clients, guild=interaction.guild)
             self.vccheck_task.cancel()
@@ -64,6 +68,9 @@ class VcCog(commands.Cog):
             await interaction.followup.send(embed=discord.Embed(description=f"Successfully disconnected from <#{str(bot_voice_client.channel.id)}>!", color=0x00aeff), ephemeral=True)
         except AttributeError:
             await interaction.followup.send(embed=discord.Embed(description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!", color=0xff0000), ephemeral=True)
+            raise
+        except:
+            await embeds.error_executing_command(interaction)
             raise
     
     @app_commands.command(name="play", description="Plays a file or link in the voice channel you are currently in, or adds it to the queue if its not ")
@@ -181,71 +188,92 @@ class VcCog(commands.Cog):
             await interaction.followup.send(embed=discord.Embed(description="Invalid file or file corrupted.", color=0xff0000), ephemeral=True)
             raise
         except:
-            await interaction.followup.send(embed=discord.Embed(title="An error has occured while executing the command.", description="Please try again or contact the bot owner if you see this again.", color=0xff0000), ephemeral=True)
+            await embeds.error_executing_command(interaction)
             raise
     
     @app_commands.command(name="seek", description="Sets the play position to the specified timestamp")
     @app_commands.describe(timestamp="(in seconds)")
-    async def seek(self, interaction: discord.Integration, timestamp: float):
+    async def seek(self, interaction: discord.Interaction, timestamp: float):
         try:
+            await interaction.response.defer()
             bot_voice_client = discord.utils.get(self.bot.voice_clients, guild=interaction.guild)
             bot_voice_client.source = discord.FFmpegOpusAudio(source=self.song_queue[0].get("file"), before_options=f"-ss {str(timestamp)}")
             self.current_song_timestamp = timestamp
-            await interaction.response.send_message(embed=discord.Embed(description=f"File seeked to position {sec_to_hms(timestamp)}", color=0x00aeff))
+            await interaction.followup.send(embed=discord.Embed(description=f"File seeked to position {sec_to_hms(timestamp)}", color=0x00aeff))
         except AttributeError:
-            await interaction.response.send_message(embed=discord.Embed(description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!", color=0xff0000), ephemeral=True)
+            await interaction.followup.send(embed=discord.Embed(description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!", color=0xff0000), ephemeral=True)
+            raise
+        except:
+            await embeds.error_executing_command(interaction)
             raise
     
     @app_commands.command(name="pause", description="Pauses the file")
     async def pause(self, interaction: discord.Interaction):
         try:
+            await interaction.response.defer()
             bot_voice_client = discord.utils.get(self.bot.voice_clients, guild=interaction.guild)
             bot_voice_client.pause()
-            await interaction.response.send_message(embed=discord.Embed(description="File paused.", color=0x00aeff))
+            await interaction.followup.send(embed=discord.Embed(description="File paused.", color=0x00aeff))
         except AttributeError:
-            await interaction.response.send_message(embed=discord.Embed(description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!", color=0xff0000), ephemeral=True)
+            await interaction.followup.send(embed=discord.Embed(description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!", color=0xff0000), ephemeral=True)
+            raise
+        except:
+            await embeds.error_executing_command(interaction)
             raise
 
     @app_commands.command(name="resume", description="Resumes the file")
     async def resume(self, interaction: discord.Interaction):
         try:
+            await interaction.response.defer()
             bot_voice_client = discord.utils.get(self.bot.voice_clients, guild=interaction.guild)
             bot_voice_client.resume()
-            await interaction.response.send_message(embed=discord.Embed(description="File resumed.", color=0x00aeff))
+            await interaction.followup.send(embed=discord.Embed(description="File resumed.", color=0x00aeff))
         except AttributeError:
-            await interaction.response.send_message(embed=discord.Embed(description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!", color=0xff0000), ephemeral=True)
+            await interaction.followup.send(embed=discord.Embed(description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!", color=0xff0000), ephemeral=True)
+            raise
+        except:
+            await embeds.error_executing_command(interaction)
             raise
 
     @app_commands.command(name="skip", description="Skips the file")
     async def skip(self, interaction: discord.Interaction):
         try:
+            await interaction.response.defer()
             bot_voice_client = discord.utils.get(self.bot.voice_clients, guild=interaction.guild)
             bot_voice_client.stop()
-            await interaction.response.send_message(embed=discord.Embed(description="File stopped.", color=0x00aeff))
+            await interaction.followup.send(embed=discord.Embed(description="File stopped.", color=0x00aeff))
         except AttributeError:
-            await interaction.response.send_message(embed=discord.Embed(description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!", color=0xff0000), ephemeral=True)
+            await interaction.followup.send(embed=discord.Embed(description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!", color=0xff0000), ephemeral=True)
+            raise
+        except:
+            await embeds.error_executing_command(interaction)
             raise
 
     @app_commands.command(name="stop", description="Stops playing and clears the queue")
     async def stop(self, interaction: discord.Interaction):
         try:
+            await interaction.response.defer()
             bot_voice_client = discord.utils.get(self.bot.voice_clients, guild=interaction.guild)
             self.song_queue.clear()
             bot_voice_client.stop()
-            await interaction.response.send_message(embed=discord.Embed(description="File stopped and queue cleared.", color=0x00aeff))
+            await interaction.followup.send(embed=discord.Embed(description="File stopped and queue cleared.", color=0x00aeff))
         except AttributeError:
-            await interaction.response.send_message(embed=discord.Embed(description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!", color=0xff0000), ephemeral=True)
+            await interaction.followup.send(embed=discord.Embed(description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!", color=0xff0000), ephemeral=True)
+            raise
+        except:
+            await embeds.error_executing_command(interaction)
             raise
     
     @app_commands.command(name="song", description="get info on a song")
     @app_commands.describe(queue_position="(0 for the song currently playing)")
     async def song(self, interaction: discord.Interaction, queue_position: Optional[int], verbose: Optional[bool]):
         try:
+            await interaction.response.defer()
             id = 0
             queue_position_err = 0
             if queue_position:
                 if queue_position > len(self.song_queue)-1:
-                    await interaction.response.send_message(embed=discord.Embed(description=f"Queue position {queue_position} doesn't exist.", color=0xff0000))
+                    await interaction.followup.send(embed=discord.Embed(description=f"Queue position {queue_position} doesn't exist.", color=0xff0000))
                     queue_position_err = 1
                 else: id = queue_position
             
@@ -266,17 +294,18 @@ class VcCog(commands.Cog):
 
                     song_embed.add_field(name="Position", value=f"{display}\n{sec_to_hms(self.current_song_timestamp)}/{self.song_queue[id].get('time_hms')}")
 
-                await interaction.response.send_message(embed=song_embed)
+                await interaction.followup.send(embed=song_embed)
         except IndexError:
-            await interaction.response.send_message(embed=discord.Embed(description=f"No song is currently playing.", color=0xff0000))
+            await interaction.followup.send(embed=discord.Embed(description=f"No song is currently playing.", color=0xff0000))
             raise
         except:
-            await interaction.response.send_message(embed=discord.Embed(title="An error has occured while executing the command.", description="Please try again or contact the bot owner if you see this again.", color=0xff0000), ephemeral=True)
+            await embeds.error_executing_command(interaction)
             raise
             
     @app_commands.command(name="queue", description="see the queue of songs")
     async def queue(self, interaction: discord.Interaction, page: Optional[int], verbose: Optional[bool]):
         try:
+            await interaction.response.defer()
             pagelen = 5
             if not page or page < 1:
                 page = 1
@@ -285,9 +314,9 @@ class VcCog(commands.Cog):
             max_page = math.ceil(len(self.song_queue)/pagelen)
             
             if len(self.song_queue) == 0:
-                await interaction.response.send_message(embed=discord.Embed(description="Queue is currently empty.", color=0x00aeff))
+                await interaction.followup.send(embed=discord.Embed(description="Queue is currently empty.", color=0x00aeff))
             elif page > max_page:
-                await interaction.response.send_message(embed=discord.Embed(description="Not enough songs in the queue to display this page.", color=0x00aeff))
+                await interaction.followup.send(embed=discord.Embed(description="Not enough songs in the queue to display this page.", color=0x00aeff))
             else:
                 queuebuild = discord.Embed(title="Queue",color=0x00aeff)
                 i = page_m - pagelen
@@ -300,9 +329,9 @@ class VcCog(commands.Cog):
 
                 queuebuild.set_footer(text=f"Page {page}/{max_page}")
 
-                await interaction.response.send_message(embed=queuebuild)
+                await interaction.followup.send(embed=queuebuild)
         except:
-            await interaction.response.send_message(embed=discord.Embed(title="An error has occured while executing the command.", description="Please try again or contact the bot owner if you see this again.", color=0xff0000), ephemeral=True)
+            await embeds.error_executing_command(interaction)
             raise
             
     #constantly checks the vc instance

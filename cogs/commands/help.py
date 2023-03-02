@@ -13,7 +13,7 @@ class HelpCog(commands.Cog):
     @app_commands.command(name="help", description="Displays help")
     async def help(self, interaction: discord.Interaction):
         try:
-            interaction.response.defer()
+            await interaction.response.defer()
             view = discord.ui.View()
             view.add_item(item=discord.ui.Button(label="Help", style=discord.ButtonStyle.blurple, url="https://github.com/kyllian1212/Rin-rewrite/wiki/Command-List"))
             await interaction.followup.send(embed=discord.Embed(title="Click on the link below to display the list of commands!", color=0x00aeff), ephemeral=True, view=view)
