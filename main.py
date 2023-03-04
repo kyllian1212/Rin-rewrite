@@ -12,6 +12,7 @@ from discord.ext import commands
 from discord.ext.commands import bot
 from dotenv import load_dotenv
 from datetime import datetime
+import cogs.tasks.song_presence as songp
 import os
 import sys
 import asyncio
@@ -84,6 +85,8 @@ async def on_ready():
     
     if not bot.user.name == "Rin | " + VERSION and not bot.user.id == 849410467507601459:
         await bot.user.edit(username="Rin | " + VERSION)
+
+    songp.SongPresenceCog(bot=bot).presence_task.start()
 
 if __name__ == "__main__":
     try:

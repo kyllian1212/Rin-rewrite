@@ -1,6 +1,7 @@
 import discord
 import asyncio
 import os
+import cogs.tasks.song_presence as songp
 from datetime import timedelta
 from discord import app_commands
 from discord.ext import commands, tasks
@@ -11,6 +12,11 @@ from main import VERSION
 import math
 import traceback
 import templates.embeds as embeds
+import json
+
+# Opening JSON file
+with open('tracklist.json') as json_file:
+    jsondata = json.load(json_file)      
 
 #pitch stuff: `, options="-af asetrate=44100*0.9"` check https://stackoverflow.com/questions/53374590/ffmpeg-change-tone-frequency-keep-length-pitch-audio
 #add volume/speed/pitch/equalizer/reverb/reverse/bitrate eventually
@@ -44,7 +50,13 @@ class VcCog(commands.Cog):
             voice_channel = interaction.user.voice.channel
             self.last_channel_interaction = interaction.channel_id
             await voice_channel.connect()
+            
+            #tasks 
             self.vccheck_task.start(interaction)
+            self.tracklisting.start()
+            songp.SongPresenceCog.presence_task.cancel()
+            await self.bot.change_presence(activity=None)
+
             await interaction.followup.send(embed=discord.Embed(description=f"Successfully connected to <#{str(voice_channel.id)}>!", color=0x00aeff), ephemeral=True)
         except AttributeError:
             await interaction.followup.send(embed=discord.Embed(description="You are not connected to a voice channel!", color=0xff0000), ephemeral=True)
@@ -59,7 +71,12 @@ class VcCog(commands.Cog):
             await interaction.response.defer()
             voice_channel = interaction.user.voice.channel
             bot_voice_client = discord.utils.get(self.bot.voice_clients, guild=interaction.guild)
+
+            #tasks
             self.vccheck_task.cancel()
+            self.tracklisting.cancel()
+            songp.SongPresenceCog.presence_task.start()
+
             if bot_voice_client.source != None or bot_voice_client.is_playing() == True:
                 bot_voice_client.stop()
                 await asyncio.sleep(1.5) #allows the bot to properly end the file before disconnecting
@@ -172,7 +189,12 @@ class VcCog(commands.Cog):
                         vc = await voice_channel.connect()
                         self.song_queue.append(qbuild)
                         vc.play(discord.FFmpegOpusAudio(source=self.song_queue[0].get("file")))
+
+                        #tasks
                         self.vccheck_task.start(interaction)
+                        self.tracklisting.start()
+                        songp.SongPresenceCog.presence_task.cancel()
+                        await self.bot.change_presence(activity=None)
                     else:
                         self.song_queue.append(qbuild)
                         bot_voice_client.play(discord.FFmpegOpusAudio(source=self.song_queue[0].get("file")))
@@ -359,11 +381,30 @@ class VcCog(commands.Cog):
                     await bot_voice_client.disconnect()
                     await self.bot.get_channel(self.last_channel_interaction).send(embed=discord.Embed(description=f"Bot has been connected to the voice channel for too long and has been disconnected to avoid excessive bandwidth usage and requests to the Discord API.", color=0x00aeff))
                     self.__init__(self.bot)
+
+                    #tasks
                     self.vccheck_task.cancel()
+                    self.tracklisting.cancel()
+                    songp.SongPresenceCog.presence_task.start()
             else:
                 self.current_song_timestamp += 0.5
         except:
             raise
+    
+    #tracklist task (wip)
+    @tasks.loop(seconds=0.5)
+    async def tracklisting(self):  
+        if self.song_queue != [] and self.song_queue[0].get("file") == 'https://cdn.discordapp.com/attachments/956642997943017522/1081322948280979538/toxheadjockeys.mp3':
+            for i in jsondata: 
+                if self.current_song_timestamp >= i.get("timestamp") and i.get("printed") == 0:
+                    i.update({"printed": 1})
+                    title = i.get("artist") + " - " + i.get("song")
+                    desc = "Album: `" + i.get("album") + '`'
+                    footer_icon =  "https://cdn.discordapp.com/avatars/264585115726905346/2ecfd3f4970b5eacf302f8e7ba0afa6b.png?size=1024"
+                    performer = "Toxin_X#3790"
+                    event_text = 787784083140378659 
+                    await self.bot.get_channel(event_text).send(embed = discord.Embed(title =f"Now Playing: `{title}`", description=f"{desc} \n", color=0x9912b9).set_footer(text = f"Set by {performer}", icon_url = footer_icon))
+                    await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{i.get('song')} by {i.get('artist')}"))
             
 async def setup(bot):
     await bot.add_cog(VcCog(bot))
