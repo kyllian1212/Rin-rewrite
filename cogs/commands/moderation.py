@@ -17,6 +17,7 @@ from main import db
 class ModerationCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.interaction_webhook = None
 
     #timeout
     @app_commands.command(name="rin_timeout", description="Times out a member (for up to 28 days) and DMs them (or not)")
@@ -45,11 +46,11 @@ class ModerationCog(commands.Cog):
                         await member.send(embed=discord.Embed(title=title, description=description, color=0xff0000))
                         user_dmd = "\nPlease note that the user has been DM'd so you will have to manually timeout!"
                     except discord.errors.Forbidden:
-                        view = DMErrorTimeoutButton(user_timeout_length=timeout, member=member, reason=reason)
+                        view = DMErrorTimeoutButton(user_timeout_length=timeout, member=member, reason=reason, mod_self=self)
                         extra = ""
                         if not reason == None:
                             extra = "\n\nIf you want to DM manually, here's the reason that was given: ```" + reason + "```"
-                        await interaction.followup.send(embed=discord.Embed(title="This member cannot be DM'd", description="This member either has DMs disabled for unknown people, or has the bot blocked (less likely). Do you want to timeout anyways without DMing?" + extra, color=0xff0000), ephemeral=True, view=view)
+                        self.interaction_webhook = await interaction.followup.send(embed=discord.Embed(title="This member cannot be DM'd", description="This member either has DMs disabled for unknown people, or has the bot blocked (less likely). Do you want to timeout anyways without DMing?" + extra, color=0xff0000), ephemeral=True, view=view, wait=True)
                         dm_block = True
 
                 if dm_block == False:
@@ -83,11 +84,10 @@ class ModerationCog(commands.Cog):
                     user_dmd = "\nPlease note that the user has been DM'd so you will have to manually kick!"
                     await asyncio.sleep(0.5) #small sleep period to make sure the dm is sent before kicking
                 except discord.errors.Forbidden:
-                    view = DMErrorKickButton(member=member, reason=reason)
-                    extra = ""
+                    view = DMErrorKickButton(member=member, reason=reason, mod_self=self)
                     if not reason == None:
                         extra = "\n\nIf you want to DM manually, here's the reason that was given: ```" + reason + "```"
-                    await interaction.followup.send(embed=discord.Embed(title="This member cannot be DM'd", description="This member either has DMs disabled for unknown people, or has the bot blocked (less likely). Do you want to kick anyways without DMing?" + extra, color=0xff0000), ephemeral=True, view=view)
+                    self.interaction_webhook = await interaction.followup.send(embed=discord.Embed(title="This member cannot be DM'd", description="This member either has DMs disabled for unknown people, or has the bot blocked (less likely). Do you want to kick anyways without DMing?" + extra, color=0xff0000), ephemeral=True, view=view)
                     dm_block = True
 
             if dm_block == False:
@@ -124,11 +124,11 @@ class ModerationCog(commands.Cog):
                         user_dmd = "\nPlease note that the user has been DM'd so you will have to manually ban!"
                         await asyncio.sleep(0.5) #small sleep period to make sure the dm is sent before banning
                     except discord.errors.Forbidden:
-                        view = DMErrorBanButton(member=member, reason=reason, delete_message_days=delete_message_days)
+                        view = DMErrorBanButton(member=member, reason=reason, delete_message_days=delete_message_days, mod_self=self)
                         extra = ""
                         if not reason == None:
                             extra = "\n\nIf you want to dm manually, here's the reason that was given: ```" + reason + "```"
-                        await interaction.followup.send(embed=discord.Embed(title="This member cannot be DM'd", description="This member either has DMs disabled for unknown people, or has the bot blocked (less likely). Do you want to ban anyways without DMing?" + extra, color=0xff0000), ephemeral=True, view=view)
+                        self.interaction_webhook = await interaction.followup.send(embed=discord.Embed(title="This member cannot be DM'd", description="This member either has DMs disabled for unknown people, or has the bot blocked (less likely). Do you want to ban anyways without DMing?" + extra, color=0xff0000), ephemeral=True, view=view)
                         dm_block = True
 
                 if dm_block == False:
@@ -164,51 +164,51 @@ class ModerationCog(commands.Cog):
             await embeds.missing_permissions(interaction)
 
 class DMErrorTimeoutButton(discord.ui.View):
-    def __init__(self, *, timeout=300, user_timeout_length: timedelta, member: discord.Member, reason: string):
+    def __init__(self, *, timeout=300, user_timeout_length: timedelta, member: discord.Member, reason: string, mod_self: ModerationCog):
         super().__init__(timeout=timeout)
         self.user_timeout_length = user_timeout_length
         self.member = member
         self.reason = reason
+        self.mod_self = mod_self
 
     @discord.ui.button(label="Timeout anyways", style=discord.ButtonStyle.green)
     async def timeout_anyways_button(self, interaction:discord.Interaction, button:discord.ui.Button):
-        button.disabled = True
         try:
-            await interaction.followup.edit(embed=discord.Embed(description="<@" + str(self.member.id) + "> successfully timed out!", color=0x00aeff), view=self)
             await self.member.timeout(self.user_timeout_length, reason=self.reason)
+            await self.mod_self.interaction_webhook.edit(embed=discord.Embed(description="<@" + str(self.member.id) + "> successfully timed out!", color=0x00aeff), view=None)
         except:
             await embeds.error_executing_command(interaction, edit=True)
             raise
 
 class DMErrorKickButton(discord.ui.View):
-    def __init__(self, *, timeout=300, member: discord.Member, reason: string):
+    def __init__(self, *, timeout=300, member: discord.Member, reason: string, mod_self: ModerationCog):
         super().__init__(timeout=timeout)
         self.member = member
         self.reason = reason
+        self.mod_self = mod_self
 
     @discord.ui.button(label="Kick anyways", style=discord.ButtonStyle.green)
     async def kick_anyways_button(self, interaction:discord.Interaction, button:discord.ui.Button):
-        button.disabled = True
         try:
-            await interaction.followup.edit(embed=discord.Embed(description="<@" + str(self.member.id) + "> successfully kicked!", color=0x00aeff), view=self)
             await self.member.kick(reason=self.reason)
+            await self.mod_self.interaction_webhook.edit(embed=discord.Embed(description="<@" + str(self.member.id) + "> successfully kicked!", color=0x00aeff), view=None)
         except:
             await embeds.error_executing_command(interaction, edit=True)
             raise
 
 class DMErrorBanButton(discord.ui.View):
-    def __init__(self, *, timeout=300, member: discord.Member, reason: string, delete_message_days: int):
+    def __init__(self, *, timeout=300, member: discord.Member, reason: string, delete_message_days: int, mod_self: ModerationCog):
         super().__init__(timeout=timeout)
         self.member = member
         self.reason = reason
         self.delete_message_days = delete_message_days
+        self.mod_self = mod_self
 
     @discord.ui.button(label="Ban anyways", style=discord.ButtonStyle.green)
     async def kick_anyways_button(self, interaction:discord.Interaction, button:discord.ui.Button):
-        button.disabled = True
         try:
-            await interaction.followup.edit(embed=discord.Embed(description="<@" + str(self.member.id) + "> successfully banned!", color=0x00aeff), view=self)
             await self.member.ban(delete_message_days=self.delete_message_days, reason=self.reason)
+            await self.mod_self.interaction_webhook.edit(embed=discord.Embed(description="<@" + str(self.member.id) + "> successfully banned!", color=0x00aeff), view=None)
         except:
             await embeds.error_executing_command(interaction, edit=True)
             raise
