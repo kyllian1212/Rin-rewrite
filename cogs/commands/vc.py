@@ -9,6 +9,7 @@ from datetime import datetime
 from typing import Optional
 from main import db
 from main import VERSION
+from main import BOT_ID
 import math
 import traceback
 import templates.embeds as embeds
@@ -49,6 +50,9 @@ class VcCog(commands.Cog):
             await interaction.response.defer()
             voice_channel = interaction.user.voice.channel
             self.last_channel_interaction = interaction.channel_id
+            guild = self.bot.get_guild(voice_channel.guild.id)
+            bot_member = await guild.fetch_member(BOT_ID)
+
             await voice_channel.connect()
             
             #tasks 
@@ -56,6 +60,10 @@ class VcCog(commands.Cog):
             self.tracklisting.start()
             songp.SongPresenceCog.presence_task.cancel()
             await self.bot.change_presence(activity=None)
+
+            #check if bot is in a stage channel instead of a voice channel and if so, let it speak
+            if voice_channel.type.name == "stage_voice" and bot_member.voice.suppress == True:
+                await bot_member.edit(suppress=False)
 
             await interaction.followup.send(embed=discord.Embed(description=f"Successfully connected to <#{str(voice_channel.id)}>!", color=0x00aeff), ephemeral=True)
         except AttributeError:
@@ -99,6 +107,9 @@ class VcCog(commands.Cog):
             voice_channel = interaction.user.voice.channel
             bot_voice_client = discord.utils.get(self.bot.voice_clients, guild=interaction.guild)
             self.last_channel_interaction = interaction.channel_id
+            guild = self.bot.get_guild(voice_channel.guild.id)
+            bot_member = await guild.fetch_member(BOT_ID)
+
             #check if only one file/attachment is attached and if that file/attachment is correct
             filecheck = None
             ffmpegcheck = None
@@ -183,11 +194,16 @@ class VcCog(commands.Cog):
                 if verbose:
                     desc = vdesc
 
-                #actually play stuff            
+                #actually play stuff
                 if bot_voice_client == None or bot_voice_client.is_playing() == False:
                     if bot_voice_client == None:
                         vc = await voice_channel.connect()
                         self.song_queue.append(qbuild)
+
+                        #check if bot is in a stage channel instead of a voice channel and if so, let it speak
+                        if voice_channel.type.name == "stage_voice" and bot_member.voice.suppress == True:
+                            await bot_member.edit(suppress=False)
+                        
                         vc.play(discord.FFmpegOpusAudio(source=self.song_queue[0].get("file")))
 
                         #tasks
@@ -197,6 +213,9 @@ class VcCog(commands.Cog):
                         await self.bot.change_presence(activity=None)
                     else:
                         self.song_queue.append(qbuild)
+                        #check if bot is in a stage channel instead of a voice channel and if so, let it speak
+                        if voice_channel.type.name == "stage_voice" and bot_member.voice.suppress == True:
+                            await bot_member.edit(suppress=False)
                         bot_voice_client.play(discord.FFmpegOpusAudio(source=self.song_queue[0].get("file")))
 
                     await interaction.followup.send(embed=discord.Embed(title =f"Now playing `{title}`", description= desc +"\n", color=0x00aeff).set_footer(text = f"Requested by {self.song_queue[0].get('user')}", icon_url = self.song_queue[0].get('user').avatar.url))
@@ -359,13 +378,17 @@ class VcCog(commands.Cog):
     #constantly checks the vc instance
     #not sure if discord.utilis.get does an api request (i assume it does), might be an issue if too many requests are made but its only on 2 servers rn so idc
     @tasks.loop(seconds=0.5)
-    async def vccheck_task(self, interaction):
+    async def vccheck_task(self, interaction: discord.Interaction):
         try:
+            voice_channel = interaction.user.voice.channel
             bot_voice_client = discord.utils.get(self.bot.voice_clients, guild=interaction.guild)
 
             if bot_voice_client.is_paused():
                 pass
             elif bot_voice_client.source == None or bot_voice_client.is_playing() == False:
+                guild = self.bot.get_guild(voice_channel.guild.id)
+                bot_member = await guild.fetch_member(BOT_ID)
+
                 self.current_song_timestamp = 0
                 self.inactivity_check += 0.5
 
@@ -373,7 +396,14 @@ class VcCog(commands.Cog):
                     del self.song_queue[0]
                 elif len(self.song_queue) > 1:
                     del self.song_queue[0]
+                    
+                    #check if bot is in a stage channel instead of a voice channel and if so, let it speak
+                    if voice_channel.type.name == "stage_voice" and bot_member.voice.suppress == True:
+                        await bot_member.edit(suppress=False)
+
                     bot_voice_client.play(discord.FFmpegOpusAudio(source=self.song_queue[0].get("file")))
+                    
+                    songp.SongPresenceCog.presence_task.cancel()
                     await self.bot.get_channel(self.last_channel_interaction).send(embed=discord.Embed(title =f"Now playing `{self.song_queue[0].get('title')}`", description=f"{self.song_queue[0].get('desc')} \n", color=0x00aeff).set_footer(text = f"Requested by {self.song_queue[0].get('user')}", icon_url = self.song_queue[0].get('user').avatar.url))
                 
                 #check if bot has been inactive for too long
@@ -387,8 +417,12 @@ class VcCog(commands.Cog):
                     self.tracklisting.cancel()
                     songp.SongPresenceCog.presence_task.start()
             else:
+                songp.SongPresenceCog.presence_task.cancel()
                 self.current_song_timestamp += 0.5
         except:
+            self.vccheck_task.stop()
+            self.tracklisting.cancel()
+            songp.SongPresenceCog.presence_task.start()
             raise
     
     #tracklist task (wip)
