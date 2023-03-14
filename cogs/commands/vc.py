@@ -58,7 +58,7 @@ class VcCog(commands.Cog):
             #tasks 
             self.vccheck_task.start(interaction)
             self.tracklisting.start()
-            songp.SongPresenceCog.presence_task.cancel()
+            songp.SongPresenceCog.presence_task.stop()
             await self.bot.change_presence(activity=None)
 
             #check if bot is in a stage channel instead of a voice channel and if so, let it speak
@@ -209,7 +209,7 @@ class VcCog(commands.Cog):
                         #tasks
                         self.vccheck_task.start(interaction)
                         self.tracklisting.start()
-                        songp.SongPresenceCog.presence_task.cancel()
+                        songp.SongPresenceCog.presence_task.stop()
                         await self.bot.change_presence(activity=None)
                     else:
                         self.song_queue.append(qbuild)
@@ -403,7 +403,7 @@ class VcCog(commands.Cog):
 
                     bot_voice_client.play(discord.FFmpegOpusAudio(source=self.song_queue[0].get("file")))
                     
-                    songp.SongPresenceCog.presence_task.cancel()
+                    songp.SongPresenceCog.presence_task.stop()
                     await self.bot.get_channel(self.last_channel_interaction).send(embed=discord.Embed(title =f"Now playing `{self.song_queue[0].get('title')}`", description=f"{self.song_queue[0].get('desc')} \n", color=0x00aeff).set_footer(text = f"Requested by {self.song_queue[0].get('user')}", icon_url = self.song_queue[0].get('user').avatar.url))
                 
                 #check if bot has been inactive for too long
@@ -417,7 +417,7 @@ class VcCog(commands.Cog):
                     self.tracklisting.cancel()
                     songp.SongPresenceCog.presence_task.start()
             else:
-                songp.SongPresenceCog.presence_task.cancel()
+                songp.SongPresenceCog.presence_task.stop()
                 self.current_song_timestamp += 0.5
         except:
             self.vccheck_task.stop()
