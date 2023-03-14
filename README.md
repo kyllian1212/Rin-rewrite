@@ -1,5 +1,5 @@
 # Rin
-Rin is a Discord Bot whose main purpose is to help with moderation & server settings (but not only!). It's a project started by me (`⭐kyllian1212 / Lysk⭐#1212`) in October 2020, with an initial "alpha" version with Discord.py v1.5.1 (iirc), and has been rewritten entirely in September 2020 with Discord.py v2.0.0 to support slash commands and the new Discord API (among other things).
+Rin is a Discord Bot whose main purpose is to help with moderation & server settings (but not only!). It's a project started by me (`⭐kyllian1212 / Lysk⭐#1212`) in October 2020, with an initial "alpha" version with Discord.py v1.5.1 (iirc), and has been rewritten entirely in September 2022 with Discord.py v2.0.0 to support slash commands and the new Discord API (among other things).
 
 # Verified servers
 This bot's code is open source so anyone can add it to their own server if they wish to. Those servers are however the only ones where the bot is hosted by me officially. If you see the bot in any other server I'm not responsible of what happens there!
