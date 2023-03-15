@@ -16,7 +16,7 @@ class ArchiveCog(commands.Cog):
     async def archive(self, interaction: discord.Interaction, category: discord.CategoryChannel):
         try:
             await interaction.response.defer()
-            archive_role_id = db.fetchone_singlecolumn(0, "SELECT archive_role_id FROM bot_archive_role WHERE server_id = ?", interaction.guild_id)
+            archive_role_id = db.fetchone_singlecolumn(0, "SELECT archive_role_id FROM bot_archive_role WHERE guild_id = ?", interaction.guild_id)
 
             if archive_role_id == None:
                 await interaction.followup.send(embed=discord.Embed(title="There are no archive role set for this server", description="Please set an archive role with the /set_archive_role command", color=0xff0000), ephemeral=True)
@@ -61,7 +61,7 @@ class ArchiveCog(commands.Cog):
     async def unarchive(self, interaction: discord.Interaction, category: discord.CategoryChannel):
         try:
             await interaction.response.defer()
-            archive_role_id = db.fetchone_singlecolumn(0, "SELECT archive_role_id FROM bot_archive_role WHERE server_id = ?", interaction.guild_id)
+            archive_role_id = db.fetchone_singlecolumn(0, "SELECT archive_role_id FROM bot_archive_role WHERE guild_id = ?", interaction.guild_id)
 
             if archive_role_id == None:
                 await interaction.followup.send(embed=discord.Embed(title="There are no archive role set for this server", description="Please set an archive role with the /set_archive_role command", color=0xff0000), ephemeral=True)

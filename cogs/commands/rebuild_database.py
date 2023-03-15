@@ -11,6 +11,7 @@ from main import db
 class RebuildDatabaseCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.interaction_webhook = None
 
     @app_commands.command(name="rebuild_database", description="Deletes the entire database and rebuilds it")
     @app_commands.checks.has_permissions(administrator=True)
@@ -18,8 +19,8 @@ class RebuildDatabaseCog(commands.Cog):
         try:
             await interaction.response.defer()
             if (interaction.user.id == 171000921927581696):
-                view = RebuildDatabaseButtons()
-                await interaction.followup.send(
+                view = RebuildDatabaseButtons(database_self=self)
+                self.interaction_webhook = await interaction.followup.send(
                     embed=discord.Embed(
                         title="Are you sure you want to rebuild the database?", 
                         description="This will cause the admin configuration of every server as well as the song library to be entirely destroyed, make sure to have a backup!! This cannot be undone", 
@@ -42,38 +43,37 @@ class RebuildDatabaseCog(commands.Cog):
             await embeds.missing_permissions(interaction)
 
 class RebuildDatabaseButtons(discord.ui.View):
-    def __init__(self, *, timeout=60):
+    def __init__(self, *, timeout=60, database_self: RebuildDatabaseCog):
         super().__init__(timeout=timeout)
+        self.database_self = database_self
 
     @discord.ui.button(label="Rebuild database", style=discord.ButtonStyle.danger)
     async def rebuild_database_button(self, interaction:discord.Interaction, button:discord.ui.Button):
         error = False
-        button.disabled = True
 
         try:
-            await interaction.followup.edit(embed=discord.Embed(
+            await self.database_self.interaction_webhook.edit(embed=discord.Embed(
                     title="Rebuilding database...", 
                     description="This might take some time.", 
                     color=0xff0000),
-                view = self)
+                view = None)
 
             db.drop_all_tables()
             db.build_database()
 
-            await interaction.followup.edit(embed=discord.Embed(
+            await self.database_self.interaction_webhook.edit(embed=discord.Embed(
                     title="Database rebuilt successfully!", 
                     color=0xff0000),
-                view = self)
+                view = None)
         except Exception as err:
             error = True
-            await interaction.followup.edit(embed=discord.Embed(
+            await self.database_self.interaction_webhook.edit(embed=discord.Embed(
                     title="Fatal error while rebuilding database.", description="Bot will clear all tables and shutdown for safety, please restart the bot to reattempt to build the database.", 
                     color=0xff0000),
-                view = self)
+                view = None)
             if error == True:
                 print(traceback.format_exc())
                 os._exit(-1)
-            
 
 async def setup(bot):
     await bot.add_cog(RebuildDatabaseCog(bot))

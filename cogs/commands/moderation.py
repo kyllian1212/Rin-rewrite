@@ -19,6 +19,12 @@ class ModerationCog(commands.Cog):
         self.bot = bot
         self.interaction_webhook = None
 
+    #enable moderation logging
+    @app_commands.command(name="toggle_moderation_log", description="Toggles bans and timeouts showing up in the log channel.")
+    @app_commands.checks.has_permissions(administrator=True)
+    async def toggle_moderation_log(self, interaction: discord.Interaction):
+        pass
+
     #timeout
     @app_commands.command(name="rin_timeout", description="Times out a member (for up to 28 days) and DMs them (or not)")
     @app_commands.describe(member="The member that will be timed out", reason="The reason why the member has been timed out (no reason by default)", dm="Sets if the user will be DM'd about the timeout or not (No by default)")

@@ -15,11 +15,11 @@ class SetArchiveRoleCog(commands.Cog):
     async def set_archive_role(self, interaction: discord.Interaction, role: discord.Role):
         try:
             await interaction.response.defer()
-            archive_role_set = db.fetchone_singlecolumn(0, "SELECT archive_role_id FROM bot_archive_role WHERE server_id = ?", interaction.guild_id)
+            archive_role_set = db.fetchone_singlecolumn(0, "SELECT archive_role_id FROM bot_archive_role WHERE guild_id = ?", interaction.guild_id)
             if archive_role_set == None:
                 db.update_db("INSERT INTO bot_archive_role VALUES(?,?)", interaction.guild_id, role.id)
             else:
-                db.update_db("UPDATE bot_archive_role SET archive_role_id = ? WHERE server_id = ?", role.id, interaction.guild_id)
+                db.update_db("UPDATE bot_archive_role SET archive_role_id = ? WHERE guild_id = ?", role.id, interaction.guild_id)
             await interaction.followup.send(embed=discord.Embed(description="Archive role successfully set to <@&" + str(role.id) + ">!", color=0x00aeff), ephemeral=True)
         except:
             await embeds.error_executing_command(interaction, title_detail="setting or updating the archive role.")
