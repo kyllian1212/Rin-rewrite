@@ -23,7 +23,23 @@ class ModerationCog(commands.Cog):
     @app_commands.command(name="toggle_moderation_log", description="Toggles bans and timeouts showing up in the log channel.")
     @app_commands.checks.has_permissions(administrator=True)
     async def toggle_moderation_log(self, interaction: discord.Interaction):
-        pass
+        try:
+            await interaction.response.defer()
+            moderation_log_set = db.fetchone_fullrow("SELECT * FROM bot_settings WHERE guild_id = ? AND setting_name = 'moderation_log'", interaction.guild_id)
+            description = "Moderation log successfully enabled!"
+            
+            if moderation_log_set == None:
+                db.update_db("INSERT INTO bot_settings VALUES (?,?,?)", interaction.guild_id, "moderation_log", '1')
+            elif moderation_log_set[2] == '1':
+                db.update_db("UPDATE bot_settings SET setting_value = ? WHERE guild_id = ? AND setting_name = 'moderation_log'", '0', interaction.guild_id)
+                description = "Moderation log successfully disabled!"
+            elif moderation_log_set[2] == '0':
+                db.update_db("UPDATE bot_settings SET setting_value = ? WHERE guild_id = ? AND setting_name = 'moderation_log'", '1', interaction.guild_id)
+
+            await interaction.followup.send(embed=discord.Embed(description=description, color=0x00aeff), ephemeral=True)
+        except:
+            await embeds.error_executing_command(interaction, title_detail="toggling the moderation log.")
+            raise
 
     #timeout
     @app_commands.command(name="rin_timeout", description="Times out a member (for up to 28 days) and DMs them (or not)")

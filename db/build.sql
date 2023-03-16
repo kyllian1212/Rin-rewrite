@@ -43,7 +43,6 @@ CREATE TABLE IF NOT EXISTS bot_word_blacklist(
 );
 
 CREATE TABLE IF NOT EXISTS bot_settings(
-    id INTEGER PRIMARY KEY,
     guild_id TEXT,
     setting_name VARCHAR(200),
     setting_value VARCHAR(200)
