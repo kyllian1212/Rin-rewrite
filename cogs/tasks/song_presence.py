@@ -11,7 +11,6 @@ from main import VERSION
 class SongPresenceCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.presence_task.start()
         self.count = 0
 
     @tasks.loop()

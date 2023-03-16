@@ -6,7 +6,7 @@ from datetime import datetime
 
 from main import db
 
-class OnRawReactionAddCog(commands.Cog):
+class ReactionsCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -14,10 +14,10 @@ class OnRawReactionAddCog(commands.Cog):
     async def on_raw_reaction_add(self, payload):
         channel = await self.bot.fetch_channel(payload.channel_id)
         reacted_message = await channel.fetch_message(payload.message_id)
-        log_channel_id = db.fetchone_singlecolumn(0, "SELECT log_channel_id FROM bot_log_channel WHERE server_id = ?", payload.guild_id)
+        log_channel_id = db.fetchone_singlecolumn(0, "SELECT log_channel_id FROM bot_log_channel WHERE guild_id = ?", payload.guild_id)
         description = ""
 
-        if log_channel_id == None:
+        if log_channel_id == None and payload.emoji.name == '🚫':
                 await channel.send(
                     embed=discord.Embed(
                         title="there are no log channel set for this server", 
@@ -88,4 +88,4 @@ class OnRawReactionAddCog(commands.Cog):
 
 
 async def setup(bot):
-    await bot.add_cog(OnRawReactionAddCog(bot))
+    await bot.add_cog(ReactionsCog(bot))
