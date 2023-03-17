@@ -167,6 +167,7 @@ class ReactionsCog(commands.Cog):
                         icon_url=payload.member.avatar.url,
                     )
                 else:
+                    # even if message is deleted, you can still jump to the context with jump_url
                     message = (
                         reacted_message.content
                         + "\n"
@@ -193,6 +194,7 @@ class ReactionsCog(commands.Cog):
                 file_names = []
 
                 for idx, attachment in enumerate(reacted_message.attachments):
+                    # max # of files to attach to a message == 10
                     if idx > 10:
                         continue
 
