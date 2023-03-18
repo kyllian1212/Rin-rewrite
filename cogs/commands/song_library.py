@@ -1,7 +1,4 @@
 from datetime import datetime
-from distutils.log import error
-from operator import inv
-from time import time
 import discord
 import templates.embeds as embeds
 from discord import app_commands
@@ -242,5 +239,5 @@ class NextPreviousButtons(discord.ui.View):
             await embeds.error_executing_command(interaction, edit=True)
             raise
             
-async def setup(bot):
+async def setup(bot: commands.Bot):
     await bot.add_cog(SongLibraryCog(bot))

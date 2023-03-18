@@ -106,7 +106,6 @@ class ReactionsCog(commands.Cog):
                     value="<@" + str(reacted_message.author.id) + ">",
                     inline=True,
                 )
-
                 reported_message_embed.add_field(
                     name="Channel",
                     value="<#" + str(reacted_message.channel.id) + ">",
@@ -119,7 +118,6 @@ class ReactionsCog(commands.Cog):
                         value=str(reacted_message_author_roles),
                         inline=True,
                     )
-
                 reported_message_embed.add_field(
                     name="Message creation date/time",
                     value="<t:"
