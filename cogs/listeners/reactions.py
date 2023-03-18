@@ -1,20 +1,26 @@
-from operator import truediv
+"""Reactions Module"""
+
+from datetime import datetime
 import discord
 from discord.ext import commands
 from discord.utils import get
-from datetime import datetime
 
 from main import db
 
 
 class ReactionsCog(commands.Cog):
-    def __init__(self, bot):
+    """Class to handling raw reactions"""
+
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.Cog.listener()
-    async def on_raw_reaction_add(self, payload):
+    async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
+        """Handler for raw reactions"""
         channel = await self.bot.fetch_channel(payload.channel_id)
-        reacted_message = await channel.fetch_message(payload.message_id)
+        reacted_message: discord.Message = await channel.fetch_message(
+            payload.message_id
+        )
         log_channel_id = db.fetchone_singlecolumn(
             0,
             "SELECT log_channel_id FROM bot_log_channel WHERE guild_id = ?",
@@ -22,7 +28,7 @@ class ReactionsCog(commands.Cog):
         )
         description = ""
 
-        if log_channel_id == None and payload.emoji.name == "🚫":
+        if log_channel_id is None and payload.emoji.name == "🚫":
             await channel.send(
                 embed=discord.Embed(
                     title="there are no log channel set for this server",
@@ -33,8 +39,8 @@ class ReactionsCog(commands.Cog):
             )
         elif payload.member.bot == False == False and payload.emoji.name == "🚫":
             if (
-                payload.member.guild_permissions.administrator == True
-                or payload.member.guild_permissions.manage_messages == True
+                payload.member.guild_permissions.administrator is True
+                or payload.member.guild_permissions.manage_messages is True
                 or payload.user_id == reacted_message.author.id
             ):
                 await reacted_message.delete()
@@ -59,7 +65,7 @@ class ReactionsCog(commands.Cog):
                     is_member = False
                     description += "\n*This user is currently not on the server.*"
 
-                if is_member == True:
+                if is_member is True:
                     for role in reacted_message.author.roles:
                         if role.name != "@everyone":
                             if reacted_message_author_roles is None:
@@ -76,7 +82,8 @@ class ReactionsCog(commands.Cog):
                     description=description,
                     color=0xFF0000,
                 )
-                if reacted_message.author.avatar == None:
+
+                if reacted_message.author.avatar is None:
                     reported_message_embed.set_thumbnail(
                         url="https://cdn.discordapp.com/embed/avatars/0.png"
                     )
@@ -84,13 +91,16 @@ class ReactionsCog(commands.Cog):
                     reported_message_embed.set_thumbnail(
                         url=reacted_message.author.avatar.url
                     )
+
                 reported_message_embed.add_field(
                     name="Username", value=reacted_message.author.name, inline=True
                 )
-                if is_member == True:
+
+                if is_member is True:
                     reported_message_embed.add_field(
                         name="Nickname", value=reacted_message.author.nick, inline=True
                     )
+
                 reported_message_embed.add_field(
                     name="User ID",
                     value="<@" + str(reacted_message.author.id) + ">",
@@ -101,7 +111,8 @@ class ReactionsCog(commands.Cog):
                     value="<#" + str(reacted_message.channel.id) + ">",
                     inline=True,
                 )
-                if is_member == True:
+
+                if is_member is True:
                     reported_message_embed.add_field(
                         name="User Roles",
                         value=str(reacted_message_author_roles),
@@ -120,24 +131,30 @@ class ReactionsCog(commands.Cog):
                 if len(reacted_message.content) >= 1000:
                     long_message = True
                     message_length = len(reacted_message.content)
+
                     reacted_message_content_part2 = reacted_message.content[
                         999:message_length
                     ]
+
                     reacted_message_content_part1 = reacted_message.content[0:999]
+
                     reported_message_embed.add_field(
                         name="Message",
                         value=reacted_message_content_part1,
                         inline=False,
                     )
+
                     reported_message_part2_embed = discord.Embed(
                         description="*The message is over 1000 characters, so it has been split into 2 Discord embeds.*",
                         color=0xFF0000,
                     )
+
                     reported_message_part2_embed.add_field(
                         name="Message (part 2)",
                         value=reacted_message_content_part2,
                         inline=False,
                     )
+
                     reported_message_part2_embed.set_footer(
                         text="Reported by "
                         + str(payload.member.name)
@@ -148,17 +165,19 @@ class ReactionsCog(commands.Cog):
                         icon_url=payload.member.avatar.url,
                     )
                 else:
-                    # if the message only contains an attachment
-                    if len(reacted_message.content) != 0:
-                        reported_message_embed.add_field(
-                            name="Message", value=reacted_message.content, inline=False
-                        )
-                    else:
-                        reported_message_embed.add_field(
-                            name="Attachment",
-                            value="*The reported message only contained an attachment; make sure to have it saved before reporting it as the bot cannot currently save (deleted) pictures. You can also give out a description of the attachment below*",
-                            inline=False,
-                        )
+                    # even if message is deleted, you can still jump to the context with jump_url
+                    message = (
+                        reacted_message.content
+                        + "\n"
+                        + "[Jump to message.]("
+                        + reacted_message.jump_url
+                        + ")"
+                    )
+
+                    reported_message_embed.add_field(
+                        name="Message", value=message, inline=False
+                    )
+
                     reported_message_embed.set_footer(
                         text="Reported by "
                         + str(payload.member.name)
@@ -169,10 +188,27 @@ class ReactionsCog(commands.Cog):
                         icon_url=payload.member.avatar.url,
                     )
 
-                await log_channel.send(embed=reported_message_embed)
-                if long_message == True:
+                files = []
+                file_names = []
+
+                for idx, attachment in enumerate(reacted_message.attachments):
+                    # max # of files to attach to a message == 10
+                    if idx > 10:
+                        continue
+
+                    files.append(await attachment.to_file(spoiler=True))
+                    file_names.append(attachment.filename)
+
+                if files:
+                    reported_message_embed.add_field(
+                        name="Attachments", value="\n".join(file_names), inline=False
+                    )
+
+                await log_channel.send(embed=reported_message_embed, files=files)
+                if long_message is True:
                     await log_channel.send(embed=reported_message_part2_embed)
 
 
-async def setup(bot: commands.Bot):
+async def setup(bot):
+    """Adds cog to bot"""
     await bot.add_cog(ReactionsCog(bot))
