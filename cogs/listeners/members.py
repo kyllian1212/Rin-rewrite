@@ -1,23 +1,36 @@
-from operator import truediv
+"""Members Module
+"""
+
+from datetime import datetime
 import discord
 from discord.ext import commands
-from discord.utils import get
-from datetime import datetime
 
 from main import db
 
 
 class MembersCog(commands.Cog):
+    """Members cog
+
+    Args:
+        commands (Cog): base class for all cogs
+    """
+
     def __init__(self, bot):
         self.bot = bot
 
     @commands.Cog.listener()
     async def on_member_ban(self, guild: discord.Guild, user: discord.User):
+        """Waits for member ban and logs ban in log channel
+
+        Args:
+            guild (discord.Guild): the Discord Server (Servers are referred to as "Guilds")
+            user (discord.User): the Discord user that has been banned
+        """
         log_channel_id = db.fetchone_singlecolumn(
             0, "SELECT log_channel_id FROM bot_log_channel WHERE guild_id = ?", guild.id
         )
 
-        if log_channel_id != None:
+        if log_channel_id is not None:
             log_channel = await self.bot.fetch_channel(log_channel_id)
             now = str(
                 datetime.now().astimezone().strftime("%d/%m/%Y - %H:%M:%S (UTC%z)")
@@ -37,11 +50,17 @@ class MembersCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_unban(self, guild: discord.Guild, user: discord.User):
+        """Waits for member unban and logs unban in log channel
+
+        Args:
+            guild (discord.Guild): the Discord Server (Servers are referred to as "Guilds")
+            user (discord.User): the Discord user that has been unbanned
+        """
         log_channel_id = db.fetchone_singlecolumn(
             0, "SELECT log_channel_id FROM bot_log_channel WHERE guild_id = ?", guild.id
         )
 
-        if log_channel_id != None:
+        if log_channel_id is not None:
             log_channel = await self.bot.fetch_channel(log_channel_id)
             now = str(
                 datetime.now().astimezone().strftime("%d/%m/%Y - %H:%M:%S (UTC%z)")
@@ -62,6 +81,28 @@ class MembersCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_update(self, before: discord.Member, after: discord.Member):
+        """Waits for member update and sends a log to log channel
+
+        This is called when one or more of the following things change:
+
+            * nickname
+
+            * roles
+
+            * pending
+
+            * timeout
+
+            * guild avatar
+
+            * flags
+
+        # Due to a Discord limitation, this event is not dispatched when a member's timeout expires.
+
+        Args:
+            before (discord.Member): the updated members old info
+            after (discord.Member): the updated members new info
+        """
         log_channel_id = db.fetchone_singlecolumn(
             0,
             "SELECT log_channel_id FROM bot_log_channel WHERE guild_id = ?",
@@ -69,7 +110,7 @@ class MembersCog(commands.Cog):
         )
 
         if (
-            log_channel_id != None
+            log_channel_id is not None
             and before.timed_out_until != after.timed_out_until
             and after.timed_out_until is not None
         ):
@@ -98,4 +139,9 @@ class MembersCog(commands.Cog):
 
 
 async def setup(bot: commands.Bot):
+    """initializes the Member cog
+
+    Args:
+        bot (commands.Bot): the discord bot
+    """
     await bot.add_cog(MembersCog(bot))

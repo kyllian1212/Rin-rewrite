@@ -7,8 +7,6 @@ from discord import app_commands
 from discord.ext import commands
 import templates.embeds as embeds
 
-from main import db
-
 
 class FunCog(commands.Cog):
     """Cog for all fun commands

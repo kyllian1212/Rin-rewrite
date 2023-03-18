@@ -144,7 +144,6 @@ class VcCog(commands.Cog):
         """
         try:
             await interaction.response.defer()
-            voice_channel = interaction.user.voice.channel
             bot_voice_client = discord.utils.get(
                 self.bot.voice_clients, guild=interaction.guild
             )
@@ -308,7 +307,7 @@ class VcCog(commands.Cog):
 
                 metadata = dict(metabuild)
 
-                dirname, fname = os.path.split(file)
+                fname = os.path.split(file)
 
                 def ifkey(key):
                     return (
@@ -360,7 +359,7 @@ class VcCog(commands.Cog):
                         # check if bot is in a stage channel instead of a voice channel and if so, let it speak
                         if (
                             voice_channel.type.name == "stage_voice"
-                            and bot_member.voice.suppress == True
+                            and bot_member.voice.suppress is True
                         ):
                             await bot_member.edit(suppress=False)
 
@@ -380,7 +379,7 @@ class VcCog(commands.Cog):
                         # check if bot is in a stage channel instead of a voice channel and if so, let it speak
                         if (
                             voice_channel.type.name == "stage_voice"
-                            and bot_member.voice.suppress == True
+                            and bot_member.voice.suppress is True
                         ):
                             await bot_member.edit(suppress=False)
                         bot_voice_client.play(
@@ -608,7 +607,7 @@ class VcCog(commands.Cog):
         """
         try:
             await interaction.response.defer()
-            id = 0
+            queue_id = 0
             queue_position_err = 0
             if queue_position:
                 if queue_position > len(self.song_queue) - 1:
@@ -620,23 +619,23 @@ class VcCog(commands.Cog):
                     )
                     queue_position_err = 1
                 else:
-                    id = queue_position
+                    queue_id = queue_position
 
             if queue_position_err == 0:
                 if verbose:
-                    desc = f"**{self.song_queue[id].get('title')}** \n {self.song_queue[id].get('vdesc')}"
+                    desc = f"**{self.song_queue[queue_id].get('title')}** \n {self.song_queue[queue_id].get('vdesc')}"
                 else:
-                    desc = f"**{self.song_queue[id].get('title')}** \n {self.song_queue[id].get('desc')}"
+                    desc = f"**{self.song_queue[queue_id].get('title')}** \n {self.song_queue[queue_id].get('desc')}"
 
                 song_embed = discord.Embed(description=desc, color=0x00AEFF)
                 song_embed.set_footer(
-                    text=f"Requested by {self.song_queue[id].get('user')}",
-                    icon_url=self.song_queue[id].get("user").avatar.url,
+                    text=f"Requested by {self.song_queue[queue_id].get('user')}",
+                    icon_url=self.song_queue[queue_id].get("user").avatar.url,
                 )
 
-                if id == 0:
+                if queue_id == 0:
                     song_percentage = self.current_song_timestamp / self.song_queue[
-                        id
+                        queue_id
                     ].get("time_sec")
                     blue_squares = round(song_percentage * 10)
                     white_squares = 10 - blue_squares
@@ -644,7 +643,7 @@ class VcCog(commands.Cog):
 
                     song_embed.add_field(
                         name="Position",
-                        value=f"{display}\n{sec_to_hms(self.current_song_timestamp)}/{self.song_queue[id].get('time_hms')}",
+                        value=f"{display}\n{sec_to_hms(self.current_song_timestamp)}/{self.song_queue[queue_id].get('time_hms')}",
                     )
 
                 await interaction.followup.send(embed=song_embed)
@@ -664,7 +663,6 @@ class VcCog(commands.Cog):
         self,
         interaction: discord.Interaction,
         page: Optional[int],
-        verbose: Optional[bool],
     ):
         """retrieves the queue of songs
 
@@ -755,7 +753,7 @@ class VcCog(commands.Cog):
                     # check if bot is in a stage channel instead of a voice channel and if so, let it speak
                     if (
                         voice_channel.type.name == "stage_voice"
-                        and bot_member.voice.suppress == True
+                        and bot_member.voice.suppress is True
                     ):
                         await bot_member.edit(suppress=False)
 
@@ -780,7 +778,7 @@ class VcCog(commands.Cog):
                     await bot_voice_client.disconnect()
                     await self.bot.get_channel(self.last_channel_interaction).send(
                         embed=discord.Embed(
-                            description=f"Bot has been connected to the voice channel for too long and has been disconnected to avoid excessive bandwidth usage and requests to the Discord API.",
+                            description="Bot has been connected to the voice channel for too long and has been disconnected to avoid excessive bandwidth usage and requests to the Discord API.",
                             color=0x00AEFF,
                         )
                     )
@@ -805,7 +803,7 @@ class VcCog(commands.Cog):
     @tasks.loop(seconds=0.5)
     async def tracklisting(self):
         if (
-            self.song_queue != []
+            self.song_queue
             and self.song_queue[0].get("file")
             == "https://cdn.discordapp.com/attachments/956642997943017522/1081322948280979538/toxheadjockeys.mp3"
         ):
