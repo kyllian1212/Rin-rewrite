@@ -8,10 +8,16 @@ This bot's code is open source so anyone can add it to their own server if they 
 * [Porter Robinson Discord](https://discord.gg/porterrobinson)
 
 I will eventually open up the bot to be added officially to anyone's server via an OAuth2 link but for now it'll stay in those servers.
+
 # Use 
 rename .env.example to .env
 fill all the variables in .env
 run main.py
+
+# Credits
+Big thanks to:
+- [toxin-x](https://github.com/toxin-x) for the extra help on the voice chat music and tracklisting features
+- [edwardsew](https://github.com/edwardsew) for the extra help on the report feature + code hygiene
 
 # Copyright
 Rin is a character from the anime 'Shelter', by Porter Robinson & A-1 Pictures, with music by Porter Robinson & Madeon. I do not own this character or any Shelter material referenced in the bot's code.

@@ -499,7 +499,7 @@ class DMErrorTimeoutButton(discord.ui.View):
         self.mod_self = mod_self
 
     @discord.ui.button(label="Timeout anyways", style=discord.ButtonStyle.green)
-    async def timeout_anyways_button(self, interaction: discord.Interaction):
+    async def timeout_anyways_button(self, interaction: discord.Interaction, button:discord.ui.Button):
         """Timeout button UI element
 
         Args:
@@ -544,7 +544,7 @@ class DMErrorKickButton(discord.ui.View):
         self.mod_self = mod_self
 
     @discord.ui.button(label="Kick anyways", style=discord.ButtonStyle.green)
-    async def kick_anyways_button(self, interaction: discord.Interaction):
+    async def kick_anyways_button(self, interaction: discord.Interaction, button:discord.ui.Button):
         """Kick button UI element
 
         Args:
@@ -590,7 +590,7 @@ class DMErrorBanButton(discord.ui.View):
         self.mod_self = mod_self
 
     @discord.ui.button(label="Ban anyways", style=discord.ButtonStyle.green)
-    async def ban_anyways_button(self, interaction: discord.Interaction):
+    async def ban_anyways_button(self, interaction: discord.Interaction, button:discord.ui.Button):
         """Ban button UI element
 
         Args:

@@ -169,7 +169,7 @@ class ReactionsCog(commands.Cog):
                     message = (
                         reacted_message.content
                         + "\n"
-                        + "[Jump to message.]("
+                        + "[Jump to context]("
                         + reacted_message.jump_url
                         + ")"
                     )

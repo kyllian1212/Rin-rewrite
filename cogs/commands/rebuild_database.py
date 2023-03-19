@@ -83,7 +83,7 @@ class RebuildDatabaseButtons(discord.ui.View):
         self.database_self = database_self
 
     @discord.ui.button(label="Rebuild database", style=discord.ButtonStyle.danger)
-    async def rebuild_database_button(self):
+    async def rebuild_database_button(self, interaction:discord.Interaction, button:discord.ui.Button):
         """Button component to rebuild database"""
 
         try:

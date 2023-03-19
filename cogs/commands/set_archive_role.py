@@ -28,7 +28,7 @@ class SetArchiveRoleCog(commands.Cog):
     async def set_archive_role(
         self, interaction: discord.Interaction, role: discord.Role
     ):
-        """The
+        """Sets the archive role for archived channels
 
         Args:
             interaction (discord.Interaction): Discord interaction. Occurs when user does notifiable action (e.g. slash commands)

@@ -47,3 +47,15 @@ CREATE TABLE IF NOT EXISTS bot_settings(
     setting_name VARCHAR(200),
     setting_value VARCHAR(200)
 );
+
+CREATE TABLE IF NOT EXISTS bot_count_game(
+    guild_id TEXT,
+    current_count INTEGER,
+    max_count INTEGER
+);
+
+CREATE TABLE IF NOT EXISTS bot_count_game(
+    guild_id TEXT,
+    current_count INTEGER,
+    max_count INTEGER
+);
