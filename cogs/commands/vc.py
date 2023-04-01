@@ -307,7 +307,7 @@ class VcCog(commands.Cog):
 
                 metadata = dict(metabuild)
 
-                fname = os.path.split(file)
+                dirname, fname = os.path.split(file)
 
                 def ifkey(key):
                     return (
