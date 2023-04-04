@@ -81,6 +81,7 @@ class VcCog(commands.Cog):
             "mov",
             "mp4",
         ]  # alphabetical order, audio formats followed by video formats
+        self.loop_setting = 0
         self.tracklist_channel_id = None
         self.played_tracks = []
 
@@ -730,7 +731,7 @@ class VcCog(commands.Cog):
  
     @app_commands.command(
             name="loop", 
-            description="see the queue of songs"
+            description="Changes the loop setting"
             )
     @app_commands.choices(queue_setting=[
         app_commands.Choice(name="Disabled", value="disabled"),
@@ -742,19 +743,31 @@ class VcCog(commands.Cog):
         interaction: discord.Interaction,
         queue_setting: app_commands.Choice[str]
     ):
-        """loop
+        """Changes the loop setting
 
         Args:
             interaction (discord.Interaction): Discord interaction. Occurs when user does notifiable action (e.g. slash commands)
             page (Optional[int]): the page number of the queue
             verbose (Optional[bool]): flag to toggle verbose logs
         """
-        if (queue_setting.value == 'disabled'):
-            pass
-        elif (queue_setting.value == 'queue'):
-            pass
-        elif (queue_setting.value == "song"):
-            pass
+        try:
+            await interaction.response.defer()
+
+            if (queue_setting.value == 'disabled'):
+                self.loop_setting = 0
+            elif (queue_setting.value == 'queue'):
+                self.loop_setting = 1
+            elif (queue_setting.value == "song"):
+                self.loop_setting = 2
+            
+            await interaction.followup.send(
+                embed=discord.Embed(
+                    description=f"Loop setting changed to `{queue_setting.name}`.", color=0x00AEFF
+                )
+            )
+        except:
+            await embeds.error_executing_command(interaction)
+            raise
 
     @app_commands.command(
             name="set_tracklist_channel", 
@@ -814,10 +827,20 @@ class VcCog(commands.Cog):
                 self.inactivity_check += 0.5
                 self.played_tracks = []
 
-                if len(self.song_queue) == 1:
+                if (
+                    len(self.song_queue) == 1 
+                    and self.loop_setting == 0
+                ):
                     del self.song_queue[0]
-                elif len(self.song_queue) > 1:
-                    del self.song_queue[0]
+                elif (
+                    len(self.song_queue) > 1 
+                    or self.loop_setting != 0
+                ):
+                    if self.loop_setting == 1:
+                        self.song_queue.append(self.song_queue[0])
+                    if self.loop_setting != 2:
+                        del self.song_queue[0]
+                            
 
                     # check if bot is in a stage channel instead of a voice channel and if so, let it speak
                     if (
