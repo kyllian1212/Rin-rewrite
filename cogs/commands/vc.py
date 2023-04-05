@@ -11,6 +11,7 @@ import os
 from typing import Optional
 import math
 import json
+import random
 
 import discord
 from discord import app_commands
@@ -260,7 +261,10 @@ class VcCog(commands.Cog):
                 file_check = 2
 
             # check if tracklist is json
-            if not tracklist.filename.endswith(".json"):
+            if (
+                tracklist is not None
+                and not tracklist.filename.endswith(".json")
+                ):
                 tracklist = None
 
             # check if file format is supported
@@ -362,7 +366,7 @@ class VcCog(commands.Cog):
                     desc = vdesc
 
                 # actually play stuff
-                if bot_voice_client is None or bot_voice_client.is_playing() is False:
+                if bot_voice_client is None or (bot_voice_client.is_paused() is False and bot_voice_client.is_playing() is False):
                     if bot_voice_client is None:
                         vc = await voice_channel.connect()
                         self.song_queue.append(qbuild)
@@ -409,7 +413,7 @@ class VcCog(commands.Cog):
                             icon_url=self.song_queue[0].get("user").avatar.url,
                         )
                     )
-                elif bot_voice_client.is_playing() is True:
+                elif bot_voice_client.is_playing() is True or bot_voice_client.is_paused() is True:
                     self.song_queue.append(qbuild)
                     await interaction.followup.send(
                         embed=discord.Embed(
@@ -769,6 +773,37 @@ class VcCog(commands.Cog):
             await embeds.error_executing_command(interaction)
             raise
 
+    @app_commands.command(
+            name="shuffle", 
+            description="Shuffles the queue"
+            )
+    async def shuffle(
+        self,
+        interaction: discord.Interaction,
+    ):
+        """Shuffles the queue
+
+        Args:
+            interaction (discord.Interaction): Discord interaction. Occurs when user does notifiable action (e.g. slash commands)
+            page (Optional[int]): the page number of the queue
+            verbose (Optional[bool]): flag to toggle verbose logs
+        """
+        try:
+            await interaction.response.defer()
+
+            queue_to_shuffle = self.song_queue[1:]
+            random.shuffle(queue_to_shuffle)
+            self.song_queue[1:] = queue_to_shuffle
+            
+            await interaction.followup.send(
+                embed=discord.Embed(
+                    description=f"Queue shuffled.", color=0x00AEFF
+                )
+            )
+        except:
+            await embeds.error_executing_command(interaction)
+            raise
+    
     @app_commands.command(
             name="set_tracklist_channel", 
             description="Sets the channel in which tracklists will be sent"
