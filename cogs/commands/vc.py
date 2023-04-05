@@ -752,7 +752,7 @@ class VcCog(commands.Cog):
         Args:
             interaction (discord.Interaction): Discord interaction. Occurs when user does notifiable action (e.g. slash commands)
             page (Optional[int]): the page number of the queue
-            verbose (Optional[bool]): flag to toggle verbose logs
+            queue_setting (app_commands.Choice[str]): which setting it's gonna be set to
         """
         try:
             await interaction.response.defer()
