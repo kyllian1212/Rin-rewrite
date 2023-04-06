@@ -206,6 +206,7 @@ class VcCog(commands.Cog):
         link: Optional[str],
         tracklist: Optional[discord.Attachment],
         verbose: Optional[bool],
+        position: Optional[int]
     ) -> str:
         """Plays a file or link in the voice channel that you are currently in, or adds it to the queue if its not
 
@@ -213,6 +214,7 @@ class VcCog(commands.Cog):
             interaction (discord.Interaction): Discord interaction. Occurs when user does notifiable action (e.g. slash commands)
             attachment (Optional[discord.Attachment]): File that should be played or queued
             link (Optional[str]): link to a song that should be played or queued
+            tracklist (Optional[discord.Attachment]): tracklist in json format
             verbose (Optional[bool]): flag to show verbose logs
 
         Raises:
@@ -367,7 +369,7 @@ class VcCog(commands.Cog):
 
                 # actually play stuff
                 if bot_voice_client is None or (bot_voice_client.is_paused() is False and bot_voice_client.is_playing() is False):
-                    if bot_voice_client is None:
+                    if bot_voice_client is None or len(self.song_queue) == 0:
                         vc = await voice_channel.connect()
                         self.song_queue.append(qbuild)
 
@@ -390,7 +392,10 @@ class VcCog(commands.Cog):
                         songp.SongPresenceCog.presence_task.stop()
                         await self.bot.change_presence(activity=None)
                     else:
-                        self.song_queue.append(qbuild)
+                        if not position:
+                            self.song_queue.append(qbuild)
+                        else:
+                            self.song_queue.insert(position, qbuild)
                         # check if bot is in a stage channel instead of a voice channel and if so, let it speak
                         if (
                             voice_channel.type.name == "stage_voice"
@@ -610,47 +615,43 @@ class VcCog(commands.Cog):
     async def song(
         self,
         interaction: discord.Interaction,
-        queue_position: Optional[int],
         verbose: Optional[bool],
+        queue_position: Optional[int] = 0
     ):
         """gets the info on the current playing song
 
         Args:
             interaction (discord.Interaction): Discord interaction. Occurs when user does notifiable action (e.g. slash commands)
-            queue_position (Optional[int]): the position of the requested file in the queue
             verbose (Optional[bool]): flag to toggle verbose logs
+            queue_position (Optional[int]): the position of the requested file in the queue
         """
         try:
             await interaction.response.defer()
-            queue_id = 0
             queue_position_err = 0
-            if queue_position:
-                if queue_position > len(self.song_queue) - 1:
-                    await interaction.followup.send(
-                        embed=discord.Embed(
-                            description=f"Queue position {queue_position} doesn't exist.",
-                            color=0xFF0000,
-                        )
+            if queue_position > len(self.song_queue) - 1:
+                await interaction.followup.send(
+                    embed=discord.Embed(
+                        description=f"Queue position {queue_position} doesn't exist.",
+                        color=0xFF0000,
                     )
-                    queue_position_err = 1
-                else:
-                    queue_id = queue_position
+                )
+                queue_position_err = 1
 
             if queue_position_err == 0:
                 if verbose:
-                    desc = f"**{self.song_queue[queue_id].get('title')}** \n {self.song_queue[queue_id].get('vdesc')}"
+                    desc = f"**{self.song_queue[queue_position].get('title')}** \n {self.song_queue[queue_position].get('vdesc')}"
                 else:
-                    desc = f"**{self.song_queue[queue_id].get('title')}** \n {self.song_queue[queue_id].get('desc')}"
+                    desc = f"**{self.song_queue[queue_position].get('title')}** \n {self.song_queue[queue_position].get('desc')}"
 
                 song_embed = discord.Embed(description=desc, color=0x00AEFF)
                 song_embed.set_footer(
-                    text=f"Requested by {self.song_queue[queue_id].get('user')}",
-                    icon_url=self.song_queue[queue_id].get("user").avatar.url,
+                    text=f"Requested by {self.song_queue[queue_position].get('user')}",
+                    icon_url=self.song_queue[queue_position].get("user").avatar.url,
                 )
 
-                if queue_id == 0:
+                if queue_position == 0:
                     song_percentage = self.current_song_timestamp / self.song_queue[
-                        queue_id
+                        queue_position
                     ].get("time_sec")
                     blue_squares = round(song_percentage * 10)
                     white_squares = 10 - blue_squares
@@ -658,7 +659,7 @@ class VcCog(commands.Cog):
 
                     song_embed.add_field(
                         name="Position",
-                        value=f"{display}\n{sec_to_hms(self.current_song_timestamp)}/{self.song_queue[queue_id].get('time_hms')}",
+                        value=f"{display}\n{sec_to_hms(self.current_song_timestamp)}/{self.song_queue[queue_position].get('time_hms')}",
                     )
 
                 await interaction.followup.send(embed=song_embed)
@@ -698,7 +699,8 @@ class VcCog(commands.Cog):
             if len(self.song_queue) == 0:
                 await interaction.followup.send(
                     embed=discord.Embed(
-                        description="Queue is currently empty.", color=0x00AEFF
+                        description="Queue is currently empty.", 
+                        color=0x00AEFF
                     )
                 )
             elif page > max_page:
@@ -725,8 +727,17 @@ class VcCog(commands.Cog):
                             inline=False,
                         )
                     i += 1
+                
+                loop_setting_str = ""
+                match self.loop_setting:
+                    case 0:
+                        loop_setting_str = "Disabled"
+                    case 1:
+                        loop_setting_str = "Queue"
+                    case 2:
+                        loop_setting_str = "Song"
 
-                queue_build.set_footer(text=f"Page {page}/{max_page}")
+                queue_build.set_footer(text=f"Page {page}/{max_page}  •  Loop setting: {loop_setting_str}")
 
                 await interaction.followup.send(embed=queue_build)
         except:
@@ -798,6 +809,35 @@ class VcCog(commands.Cog):
             await interaction.followup.send(
                 embed=discord.Embed(
                     description=f"Queue shuffled.", color=0x00AEFF
+                )
+            )
+        except:
+            await embeds.error_executing_command(interaction)
+            raise
+    
+    @app_commands.command(
+            name="move", 
+            description="Moves a song in queue to another position"
+            )
+    async def shuffle(
+        self,
+        interaction: discord.Interaction,
+        song_position_before: int,
+        song_position_after: int
+    ):
+        """Moves a song in queue to another position
+
+        Args:
+            interaction (discord.Interaction): Discord interaction. Occurs when user does notifiable action (e.g. slash commands)
+            page (Optional[int]): the page number of the queue
+            verbose (Optional[bool]): flag to toggle verbose logs
+        """
+        try:
+            await interaction.response.defer()
+            
+            await interaction.followup.send(
+                embed=discord.Embed(
+                    description=f"Song placeholder moved from placeholder to placeholder", color=0x00AEFF
                 )
             )
         except:
