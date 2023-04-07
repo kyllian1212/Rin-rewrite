@@ -25,7 +25,6 @@ from main import BOT_ID
 # pitch stuff: `, options="-af asetrate=44100*0.9"` check https://stackoverflow.com/questions/53374590/ffmpeg-change-tone-frequency-keep-length-pitch-audio
 # add volume/speed/pitch/equalizer/reverb/reverse/bitrate eventually
 
-
 def sec_to_hms(seconds: int) -> str:
     """converts seconds to hours, seconds, and minutes
 
@@ -52,6 +51,7 @@ def mmss_to_sec(mmss):
         return((int(m) * 60)+ int(s))
     except:
         return(f"{mmss} is not a number")
+
 
 class VcCog(commands.Cog):
     """Cog that handles voice channel interactions
@@ -112,10 +112,7 @@ class VcCog(commands.Cog):
             await self.bot.change_presence(activity=None)
 
             # check if bot is in a stage channel instead of a voice channel and if so, let it speak
-            if (
-                voice_channel.type.name == "stage_voice"
-                and bot_member.voice.suppress is True
-            ):
+            if (voice_channel.type.name == "stage_voice" and bot_member.voice.suppress is True):
                 await bot_member.edit(suppress=False)
 
             await interaction.followup.send(
@@ -143,7 +140,7 @@ class VcCog(commands.Cog):
         description="Disconnects the bot from the voice channel it is currently in",
     )
     async def disconnect(self, interaction: discord.Interaction):
-        """disconnects from the voice channel
+        """Disconnects from the voice channel
 
         Args:
             interaction (discord.Interaction): Discord interaction. Occurs when user does notifiable action (e.g. slash commands)
@@ -159,10 +156,7 @@ class VcCog(commands.Cog):
             self.tracklisting.cancel()
             songp.SongPresenceCog.presence_task.start()
 
-            if (
-                bot_voice_client.source is not None
-                or bot_voice_client.is_playing() is True
-            ):
+            if (bot_voice_client.source is not None or bot_voice_client.is_playing() is True):
                 bot_voice_client.stop()
                 await asyncio.sleep(
                     1.5
@@ -196,8 +190,11 @@ class VcCog(commands.Cog):
         description="Plays a file or link in the voice channel you are currently in, or adds it to the queue if its not",
     )
     @app_commands.describe(
+        attachment="File to upload"
         link="A link to an audio or video file. Needs to be an actual file",
-        verbose="show all metadata",
+        verbose="Show all metadata",
+        tracklist="A .json attachment containing a tracklist (made on a specific website)"
+        position="Which position in the queue you want to add that song"
     )
     async def play(
         self,
@@ -256,17 +253,15 @@ class VcCog(commands.Cog):
             else:
                 await interaction.followup.send(
                     embed=discord.Embed(
-                        description="No media uploaded.", color=0xFF0000
+                        description="No media uploaded.", 
+                        color=0xFF0000
                     ),
                     ephemeral=True,
                 )
                 file_check = 2
 
             # check if tracklist is json
-            if (
-                tracklist is not None
-                and not tracklist.filename.endswith(".json")
-                ):
+            if (tracklist is not None and not tracklist.filename.endswith(".json")):
                 tracklist = None
 
             # check if file format is supported
@@ -280,7 +275,8 @@ class VcCog(commands.Cog):
             if file_check == 3:
                 await interaction.followup.send(
                     embed=discord.Embed(
-                        description="File is not in a supported format!", color=0xFF0000
+                        description="File is not in a supported format!", 
+                        color=0xFF0000
                     ),
                     ephemeral=True,
                 )
@@ -392,15 +388,12 @@ class VcCog(commands.Cog):
                         songp.SongPresenceCog.presence_task.stop()
                         await self.bot.change_presence(activity=None)
                     else:
-                        if not position:
+                        if (not position) or (position > len(self.song_queue)):
                             self.song_queue.append(qbuild)
                         else:
                             self.song_queue.insert(position, qbuild)
                         # check if bot is in a stage channel instead of a voice channel and if so, let it speak
-                        if (
-                            voice_channel.type.name == "stage_voice"
-                            and bot_member.voice.suppress is True
-                        ):
+                        if (voice_channel.type.name == "stage_voice" and bot_member.voice.suppress is True):
                             await bot_member.edit(suppress=False)
                         bot_voice_client.play(
                             discord.FFmpegOpusAudio(
@@ -419,7 +412,11 @@ class VcCog(commands.Cog):
                         )
                     )
                 elif bot_voice_client.is_playing() is True or bot_voice_client.is_paused() is True:
-                    self.song_queue.append(qbuild)
+                    if (not position) or (position > len(self.song_queue)):
+                        self.song_queue.append(qbuild)
+                    else:
+                        self.song_queue.insert(position, qbuild)
+                    
                     await interaction.followup.send(
                         embed=discord.Embed(
                             title=f"Added `{title}` to queue",
@@ -442,7 +439,8 @@ class VcCog(commands.Cog):
         except FileNotFoundError:
             await interaction.followup.send(
                 embed=discord.Embed(
-                    description="Invalid file or file corrupted.", color=0xFF0000
+                    description="Invalid file or file corrupted.", 
+                    color=0xFF0000
                 ),
                 ephemeral=True,
             )
@@ -452,11 +450,14 @@ class VcCog(commands.Cog):
             raise
 
     @app_commands.command(
-        name="seek", description="Sets the play position to the specified timestamp"
+        name="seek", 
+        description="Sets the play position to the specified timestamp"
     )
-    @app_commands.describe(timestamp="(in seconds)")
+    @app_commands.describe(
+        timestamp="(in seconds)"
+    )
     async def seek(self, interaction: discord.Interaction, timestamp: float):
-        """sets the play position to the specified timestamp
+        """Sets the play position to the specified timestamp
 
         Args:
             interaction (discord.Interaction): Discord interaction. Occurs when user does notifiable action (e.g. slash commands)
@@ -491,9 +492,12 @@ class VcCog(commands.Cog):
             await embeds.error_executing_command(interaction)
             raise
 
-    @app_commands.command(name="pause", description="Pauses the file")
+    @app_commands.command(
+        name="pause", 
+        description="Pauses the file"
+    )
     async def pause(self, interaction: discord.Interaction):
-        """pauses the current playing file
+        """Pauses the current playing file
 
         Args:
             interaction (discord.Interaction): Discord interaction. Occurs when user does notifiable action (e.g. slash commands)
@@ -505,96 +509,9 @@ class VcCog(commands.Cog):
             )
             bot_voice_client.pause()
             await interaction.followup.send(
-                embed=discord.Embed(description="File paused.", color=0x00AEFF)
-            )
-        except AttributeError:
-            await interaction.followup.send(
                 embed=discord.Embed(
-                    description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!",
-                    color=0xFF0000,
-                ),
-                ephemeral=True,
-            )
-            raise
-        except:
-            await embeds.error_executing_command(interaction)
-            raise
-
-    @app_commands.command(name="resume", description="Resumes the file")
-    async def resume(self, interaction: discord.Interaction):
-        """resumes the current playing file
-
-        Args:
-            interaction (discord.Interaction): Discord interaction. Occurs when user does notifiable action (e.g. slash commands)
-        """
-        try:
-            await interaction.response.defer()
-            bot_voice_client = discord.utils.get(
-                self.bot.voice_clients, guild=interaction.guild
-            )
-            bot_voice_client.resume()
-            await interaction.followup.send(
-                embed=discord.Embed(description="File resumed.", color=0x00AEFF)
-            )
-        except AttributeError:
-            await interaction.followup.send(
-                embed=discord.Embed(
-                    description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!",
-                    color=0xFF0000,
-                ),
-                ephemeral=True,
-            )
-            raise
-        except:
-            await embeds.error_executing_command(interaction)
-            raise
-
-    @app_commands.command(name="skip", description="Skips the file")
-    async def skip(self, interaction: discord.Interaction):
-        """skips the current playing file
-
-        Args:
-            interaction (discord.Interaction): Discord interaction. Occurs when user does notifiable action (e.g. slash commands)
-        """
-        try:
-            await interaction.response.defer()
-            bot_voice_client = discord.utils.get(
-                self.bot.voice_clients, guild=interaction.guild
-            )
-            bot_voice_client.stop()
-            await interaction.followup.send(
-                embed=discord.Embed(description="File stopped.", color=0x00AEFF)
-            )
-        except AttributeError:
-            await interaction.followup.send(
-                embed=discord.Embed(
-                    description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!",
-                    color=0xFF0000,
-                ),
-                ephemeral=True,
-            )
-            raise
-        except:
-            await embeds.error_executing_command(interaction)
-            raise
-
-    @app_commands.command(name="stop", description="Stops playing and clears the queue")
-    async def stop(self, interaction: discord.Interaction):
-        """stops playing the file and clears the queue
-
-        Args:
-            interaction (discord.Interaction): Discord interaction. Occurs when user does notifiable action (e.g. slash commands)
-        """
-        try:
-            await interaction.response.defer()
-            bot_voice_client = discord.utils.get(
-                self.bot.voice_clients, guild=interaction.guild
-            )
-            self.song_queue.clear()
-            bot_voice_client.stop()
-            await interaction.followup.send(
-                embed=discord.Embed(
-                    description="File stopped and queue cleared.", color=0x00AEFF
+                    description="File paused.", 
+                    color=0x00AEFF
                 )
             )
         except AttributeError:
@@ -610,15 +527,126 @@ class VcCog(commands.Cog):
             await embeds.error_executing_command(interaction)
             raise
 
-    @app_commands.command(name="song", description="get info on a song")
-    @app_commands.describe(queue_position="(0 for the song currently playing)")
+    @app_commands.command(
+        name="resume", 
+        description="Resumes the file"
+    )
+    async def resume(self, interaction: discord.Interaction):
+        """Resumes the current playing file
+
+        Args:
+            interaction (discord.Interaction): Discord interaction. Occurs when user does notifiable action (e.g. slash commands)
+        """
+        try:
+            await interaction.response.defer()
+            bot_voice_client = discord.utils.get(
+                self.bot.voice_clients, guild=interaction.guild
+            )
+            bot_voice_client.resume()
+            await interaction.followup.send(
+                embed=discord.Embed(
+                    description="File resumed.", 
+                    color=0x00AEFF
+                )
+            )
+        except AttributeError:
+            await interaction.followup.send(
+                embed=discord.Embed(
+                    description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!",
+                    color=0xFF0000,
+                ),
+                ephemeral=True,
+            )
+            raise
+        except:
+            await embeds.error_executing_command(interaction)
+            raise
+
+    @app_commands.command(
+        name="skip", 
+        description="Skips the file"
+    )
+    async def skip(self, interaction: discord.Interaction):
+        """Skips the current playing file
+
+        Args:
+            interaction (discord.Interaction): Discord interaction. Occurs when user does notifiable action (e.g. slash commands)
+        """
+        try:
+            await interaction.response.defer()
+            bot_voice_client = discord.utils.get(
+                self.bot.voice_clients, guild=interaction.guild
+            )
+            bot_voice_client.stop()
+            await interaction.followup.send(
+                embed=discord.Embed(
+                    description="File stopped.", 
+                    color=0x00AEFF
+                )
+            )
+        except AttributeError:
+            await interaction.followup.send(
+                embed=discord.Embed(
+                    description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!",
+                    color=0xFF0000,
+                ),
+                ephemeral=True,
+            )
+            raise
+        except:
+            await embeds.error_executing_command(interaction)
+            raise
+
+    @app_commands.command(
+        name="stop", 
+        description="Stops playing and clears the queue"
+    )
+    async def stop(self, interaction: discord.Interaction):
+        """Stops playing the file and clears the queue
+
+        Args:
+            interaction (discord.Interaction): Discord interaction. Occurs when user does notifiable action (e.g. slash commands)
+        """
+        try:
+            await interaction.response.defer()
+            bot_voice_client = discord.utils.get(
+                self.bot.voice_clients, guild=interaction.guild
+            )
+            self.song_queue.clear()
+            bot_voice_client.stop()
+            await interaction.followup.send(
+                embed=discord.Embed(
+                    description="File stopped and queue cleared.", 
+                    color=0x00AEFF
+                )
+            )
+        except AttributeError:
+            await interaction.followup.send(
+                embed=discord.Embed(
+                    description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!",
+                    color=0xFF0000,
+                ),
+                ephemeral=True,
+            )
+            raise
+        except:
+            await embeds.error_executing_command(interaction)
+            raise
+
+    @app_commands.command(
+        name="song", 
+        description="Get info on a song"
+    )
+    @app_commands.describe(
+        queue_position="(0 for the song currently playing)"
+    )
     async def song(
         self,
         interaction: discord.Interaction,
         verbose: Optional[bool],
         queue_position: Optional[int] = 0
     ):
-        """gets the info on the current playing song
+        """Gets the info on the currently playing or a specific song
 
         Args:
             interaction (discord.Interaction): Discord interaction. Occurs when user does notifiable action (e.g. slash commands)
@@ -650,9 +678,7 @@ class VcCog(commands.Cog):
                 )
 
                 if queue_position == 0:
-                    song_percentage = self.current_song_timestamp / self.song_queue[
-                        queue_position
-                    ].get("time_sec")
+                    song_percentage = self.current_song_timestamp / self.song_queue[queue_position].get("time_sec")
                     blue_squares = round(song_percentage * 10)
                     white_squares = 10 - blue_squares
                     display = f"🔷{'🟦'*blue_squares}{'⬜'*white_squares}🔷"
@@ -666,7 +692,8 @@ class VcCog(commands.Cog):
         except IndexError:
             await interaction.followup.send(
                 embed=discord.Embed(
-                    description="No song is currently playing.", color=0xFF0000
+                    description="No song is currently playing.", 
+                    color=0xFF0000
                 )
             )
             raise
@@ -674,7 +701,10 @@ class VcCog(commands.Cog):
             await embeds.error_executing_command(interaction)
             raise
 
-    @app_commands.command(name="queue", description="see the queue of songs")
+    @app_commands.command(
+        name="queue", 
+        description="See the queue of songs"
+    )
     async def queue(
         self,
         interaction: discord.Interaction,
@@ -745,9 +775,9 @@ class VcCog(commands.Cog):
             raise
  
     @app_commands.command(
-            name="loop", 
-            description="Changes the loop setting"
-            )
+        name="loop", 
+        description="Changes the loop setting"
+    )
     @app_commands.choices(queue_setting=[
         app_commands.Choice(name="Disabled", value="disabled"),
         app_commands.Choice(name="Queue", value="queue"),
@@ -777,7 +807,8 @@ class VcCog(commands.Cog):
             
             await interaction.followup.send(
                 embed=discord.Embed(
-                    description=f"Loop setting changed to `{queue_setting.name}`.", color=0x00AEFF
+                    description=f"Loop setting changed to `{queue_setting.name}`.", 
+                    color=0x00AEFF
                 )
             )
         except:
@@ -785,9 +816,9 @@ class VcCog(commands.Cog):
             raise
 
     @app_commands.command(
-            name="shuffle", 
-            description="Shuffles the queue"
-            )
+        name="shuffle", 
+        description="Shuffles the queue"
+    )
     async def shuffle(
         self,
         interaction: discord.Interaction,
@@ -808,7 +839,8 @@ class VcCog(commands.Cog):
             
             await interaction.followup.send(
                 embed=discord.Embed(
-                    description=f"Queue shuffled.", color=0x00AEFF
+                    description=f"Queue shuffled.", 
+                    color=0x00AEFF
                 )
             )
         except:
@@ -816,9 +848,13 @@ class VcCog(commands.Cog):
             raise
     
     @app_commands.command(
-            name="move", 
-            description="Moves a song in queue to another position"
-            )
+        name="move", 
+        description="Moves a song in queue to another position"
+    )
+    @app_commands.describe(
+        song_position_before="Song you want to move"
+        song_position_after="Where in the queue you want to move that song"
+    )
     async def shuffle(
         self,
         interaction: discord.Interaction,
@@ -835,20 +871,43 @@ class VcCog(commands.Cog):
         try:
             await interaction.response.defer()
             
-            await interaction.followup.send(
-                embed=discord.Embed(
-                    description=f"Song placeholder moved from placeholder to placeholder", color=0x00AEFF
+            if song_position_before == 0:
+                await interaction.followup.send(
+                    embed=discord.Embed(
+                        description=f"Cannot move the currently playing song!", 
+                        color=0xFF0000
+                    )
                 )
-            )
+            elif song_position_after == 0:
+                await interaction.followup.send(
+                    embed=discord.Embed(
+                        description=f"Cannot move the song to the one currently playing!", 
+                        color=0xFF0000
+                    )
+                )
+            else: 
+                if song_position_after > len(self.song_queue):
+                    self.song_queue.append(self.song_queue.pop(song_position_before))
+                else:
+                    self.song_queue.insert(song_position_after, self.song_queue.pop(song_position_before))
+            
+                await interaction.followup.send(
+                    embed=discord.Embed(
+                        description=f"Song placeholder moved from placeholder to placeholder", 
+                        color=0x00AEFF
+                    )
+                )
         except:
             await embeds.error_executing_command(interaction)
             raise
     
     @app_commands.command(
-            name="set_tracklist_channel", 
-            description="Sets the channel in which tracklists will be sent"
-            )
-    @app_commands.describe(channel="The channel in which the tracklists will be sent")
+        name="set_tracklist_channel", 
+        description="Sets the channel in which tracklists will be sent"
+    )
+    @app_commands.describe(
+        channel="The channel in which the tracklists will be sent"
+    )
     @app_commands.checks.has_permissions(administrator=True)
     async def set_tracklist_channel(
         self,
@@ -864,9 +923,10 @@ class VcCog(commands.Cog):
         try:
             await interaction.response.defer(ephemeral=True)
             self.tracklist_channel_id = channel.id
-            await interaction.followup.send(embed=discord.Embed(
-                description=f"Tracklisting channel successfully set to <#{channel.id}>!",
-                color=0x00AEFF
+            await interaction.followup.send(
+                embed=discord.Embed(
+                    description=f"Tracklisting channel successfully set to <#{channel.id}>!",
+                    color=0x00AEFF
                 ),
                 ephemeral=True
             )
@@ -891,10 +951,7 @@ class VcCog(commands.Cog):
 
             if bot_voice_client.is_paused():
                 pass
-            elif (
-                bot_voice_client.source is None
-                or bot_voice_client.is_playing() is False
-            ):
+            elif (bot_voice_client.source is None or bot_voice_client.is_playing() is False):
                 guild = self.bot.get_guild(voice_channel.guild.id)
                 bot_member = await guild.fetch_member(BOT_ID)
 
@@ -902,15 +959,9 @@ class VcCog(commands.Cog):
                 self.inactivity_check += 0.5
                 self.played_tracks = []
 
-                if (
-                    len(self.song_queue) == 1 
-                    and self.loop_setting == 0
-                ):
+                if (len(self.song_queue) == 1 and self.loop_setting == 0):
                     del self.song_queue[0]
-                elif (
-                    len(self.song_queue) > 1 
-                    or self.loop_setting != 0
-                ):
+                elif (len(self.song_queue) > 1 or self.loop_setting != 0):
                     if self.loop_setting == 1:
                         self.song_queue.append(self.song_queue[0])
                     if self.loop_setting != 2:
@@ -918,10 +969,7 @@ class VcCog(commands.Cog):
                             
 
                     # check if bot is in a stage channel instead of a voice channel and if so, let it speak
-                    if (
-                        voice_channel.type.name == "stage_voice"
-                        and bot_member.voice.suppress is True
-                    ):
+                    if (voice_channel.type.name == "stage_voice" and bot_member.voice.suppress is True):
                         await bot_member.edit(suppress=False)
 
                     bot_voice_client.play(
@@ -969,6 +1017,7 @@ class VcCog(commands.Cog):
     # tracklist task (wip)
     @tasks.loop(seconds=0.5)
     async def tracklisting(self):
+        """Task to display the tracklist in chat"""
         try:
             if (
                 self.song_queue
@@ -992,7 +1041,7 @@ class VcCog(commands.Cog):
                                 color = int(color_hold[1:], 16)
                                 await self.bot.get_channel(self.tracklist_channel_id).send(embed=discord.Embed(title = title, description=desc, color = color))
                                 await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{track.get('artist')} - {track.get('title')}"))
-        except Exception as e:
+        except:
             raise
 
 
