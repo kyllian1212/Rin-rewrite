@@ -190,10 +190,10 @@ class VcCog(commands.Cog):
         description="Plays a file or link in the voice channel you are currently in, or adds it to the queue if its not",
     )
     @app_commands.describe(
-        attachment="File to upload"
+        attachment="File to upload",
         link="A link to an audio or video file. Needs to be an actual file",
         verbose="Show all metadata",
-        tracklist="A .json attachment containing a tracklist (made on a specific website)"
+        tracklist="A .json attachment containing a tracklist (made on a specific website)",
         position="Which position in the queue you want to add that song"
     )
     async def play(
@@ -852,7 +852,7 @@ class VcCog(commands.Cog):
         description="Moves a song in queue to another position"
     )
     @app_commands.describe(
-        song_position_before="Song you want to move"
+        song_position_before="Song you want to move",
         song_position_after="Where in the queue you want to move that song"
     )
     async def shuffle(
