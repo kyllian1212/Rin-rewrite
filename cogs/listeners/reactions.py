@@ -33,8 +33,8 @@ class ReactionsCog(commands.Cog):
         if log_channel_id is None and payload.emoji.name == "🚫":
             await channel.send(
                 embed=discord.Embed(
-                    title="there are no log channel set for this server",
-                    description="please set a log channel with the /set_log_channel command",
+                    title="There are no log channel set for this server",
+                    description="Please set a log channel with the /set_log_channel command",
                     color=0xFF0000,
                 ),
                 delete_after=10,
