@@ -1,19 +1,59 @@
+"""
+Help module
+"""
+
 import discord
 from discord import app_commands
 from discord.ext import commands
-import random
+import templates.embeds as embeds
 
-from main import db
 
 class HelpCog(commands.Cog):
+    """Cog for bot help interface
+
+    Args:
+        commands (Cog): base class for all cogs
+    """
+
     def __init__(self, bot):
         self.bot = bot
 
-    @app_commands.command(name="help", description="Displays help")
+    @app_commands.command(
+        name="help", 
+        description="Displays help"
+    )
     async def help(self, interaction: discord.Interaction):
-        view = discord.ui.View()
-        view.add_item(item=discord.ui.Button(label="Help", style=discord.ButtonStyle.blurple, url="https://github.com/kyllian1212/Rin-rewrite/wiki/Command-List"))
-        await interaction.response.send_message(embed=discord.Embed(title="Click on the link below to display the list of commands!", color=0x00aeff), ephemeral=True, view=view)
+        """displays the list of commands and arguments
 
-async def setup(bot):
+        Args:
+            interaction (discord.Interaction): Discord interaction. Occurs when user does notifiable action (e.g. slash commands)
+        """
+        try:
+            await interaction.response.defer(ephemeral=True)
+            view = discord.ui.View()
+            view.add_item(
+                item=discord.ui.Button(
+                    label="Help",
+                    style=discord.ButtonStyle.blurple,
+                    url="https://github.com/kyllian1212/Rin-rewrite/wiki/Command-List",
+                )
+            )
+            await interaction.followup.send(
+                embed=discord.Embed(
+                    title="Click on the link below to display the list of commands!",
+                    color=0x00AEFF,
+                ),
+                view=view,
+            )
+        except:
+            await embeds.error_executing_command(interaction)
+            raise
+
+
+async def setup(bot: commands.Bot):
+    """initialize cog
+
+    Args:
+        bot (commands.Bot): the discord bot
+    """
     await bot.add_cog(HelpCog(bot))

@@ -50,12 +50,22 @@ INSERT INTO bot_default_song_library (artist, song_title, album, length_in_secon
 ("Porter Robinson & Totally Enormous Extinct Dinosaurs", "Unfold", "Nurture", 286),
 ("Porter Robinson", "Trying to Feel Alive", "Nurture", 284),
 ("Porter Robinson & Wednesday Campanella", "fullmoon lullaby", "Nurture", 243),
+-- nurture live edit bc i love it so much
+("Porter Robinson", "Musician (Part 2)", "Nurture Live (Secret Sky 2021)", 157),
+("Porter Robinson", "EZ Sea of Voices", "Nurture Live (Secret Sky 2021)", 232),
 -- post-nurture
 ("Porter Robinson & League of Legends", "Everything Goes On", "Everything Goes On", 202),
+/* skrillex, porter robinson & bibi bourelly*/
+-- still here
+("Skrillex, Porter Robinson & Bibi Bourelly", "Still Here (with the ones that I came with)", "Quest For Fire", 312),
 /* porter robinson & madeon */
 -- shelter
 ("Porter Robinson & Madeon", "Shelter", "Shelter", 219),
 /* madeon */
+-- pre-adventure
+("Madeon", "For You", "For You", 196),
+("Madeon", "Shuriken", "Shuriken", 80),
+("Madeon", "Pop Culture", "Pop Culture", 204),
 -- adventure (deluxe)
 ("Madeon", "Isometric (Intro)", "Adventure (Deluxe)", 80),
 ("Madeon", "You're On (ft. Kyan)", "Adventure (Deluxe)", 192),
@@ -75,6 +85,9 @@ INSERT INTO bot_default_song_library (artist, song_title, album, length_in_secon
 ("Madeon", "Cut the Kid", "Adventure (Deluxe)", 197),
 ("Madeon", "Technicolor", "Adventure (Deluxe)", 385),
 ("Madeon", "Only Way Out (ft. Vancouver Sleep Clinic)", "Adventure (Deluxe)", 226),
+-- adventure live
+("Madeon", "Albatros", "Adventure Live", 114),
+("Madeon", "Together", "Pixel Empire Live", 150),
 -- good faith era
 ("Madeon", "Dream Dream Dream", "Good Faith", 234),
 ("Madeon", "All My Friends", "Good Faith", 204),

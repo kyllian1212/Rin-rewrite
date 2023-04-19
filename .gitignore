@@ -5,3 +5,6 @@ __pycache__
 .vscode
 database.db
 discord.log
+metadata.txt
+time.txt
+tracklist.json

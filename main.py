@@ -1,16 +1,18 @@
-# main.py
-# dont forget second sky countdown
-# archive channel function
+"""
+Main
+"""
 
 import os
 import sqlite3
 import sys
 
 import discord
+from discord import app_commands
 from discord.ext import commands
 from discord.ext.commands import bot
 from dotenv import load_dotenv
 from datetime import datetime
+import cogs.tasks.song_presence as songp
 import os
 import sys
 import asyncio
@@ -23,20 +25,30 @@ from db import db
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
+COMMAND_PREFIX = os.getenv('DISCORD_COMMAND_PREFIX')
 TEST_ID = os.getenv('TEST_ID')
 MADEON_ID = os.getenv('MADEON_ID')
 PORTER_ID = os.getenv('PORTER_ID')
-
+VERSION = os.getenv('VERSION')
 SPOTIPY_CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
 SPOTIPY_CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
+OWNER_ID = os.getenv('OWNER_ID')
+BOT_ID = os.getenv("BOT_ID")
+QUEUE_PAGE_LEN = os.getenv("QUEUE_PAGE_LEN")
 
 auth_manager = SpotifyClientCredentials(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET)
 sp = spotipy.Spotify(auth_manager=auth_manager)
 
 intents = discord.Intents.all()
-bot = commands.Bot(command_prefix="!!", intents=intents, max_messages=10000, help_command=None)
+bot = commands.Bot(command_prefix=COMMAND_PREFIX, intents=intents, max_messages=10000, help_command=None)
 
-VERSION = "v1.0.5"
+@app_commands.command(name="resync", description="resync slash commands")
+async def resync(interaction: discord.Interaction):
+    if interaction.user.id == OWNER_ID:
+            await bot.tree.sync(guild = discord.Object(id = TEST_ID)) #remove guild value for global slash command (takes longer to synchronize)
+            bot.tree.copy_global_to(guild = discord.Object(id = MADEON_ID))
+    else:
+        discord.interaction.response.send_message(embed=discord.Embed(description="you can't use this command", color=0x00aeff), ephemeral=True)
 
 @bot.event
 async def on_ready():
@@ -73,6 +85,8 @@ async def on_ready():
     
     if not bot.user.name == "Rin | " + VERSION and not bot.user.id == 849410467507601459:
         await bot.user.edit(username="Rin | " + VERSION)
+
+    songp.SongPresenceCog(bot=bot).presence_task.start()
 
 if __name__ == "__main__":
     try:
