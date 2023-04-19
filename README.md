@@ -10,9 +10,9 @@ This bot's code is open source so anyone can add it to their own server if they 
 I will eventually open up the bot to be added officially to anyone's server via an OAuth2 link but for now it'll stay in those servers.
 
 # Use 
-rename .env.example to .env
-fill all the variables in .env
-run main.py
+* Rename .env.example to .env
+* Fill all the variables in .env
+* Run main.py
 
 # Credits
 Big thanks to:
