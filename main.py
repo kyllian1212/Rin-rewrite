@@ -1,6 +1,6 @@
-# main.py
-# dont forget second sky countdown
-# archive channel function
+"""
+Main
+"""
 
 import os
 import sqlite3

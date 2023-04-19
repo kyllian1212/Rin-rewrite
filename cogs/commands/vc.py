@@ -6,6 +6,11 @@ Raises:
 Returns:
     _type_: _description_
 """
+
+"""
+Vc Module
+"""
+
 import asyncio
 import os
 from typing import Optional
@@ -17,7 +22,6 @@ import discord
 from discord import app_commands
 from discord.ext import commands, tasks
 
-import cogs.tasks.song_presence as songp
 import templates.embeds as embeds
 
 from main import BOT_ID
@@ -108,7 +112,6 @@ class VcCog(commands.Cog):
             # tasks
             self.vc_check_task.start(interaction)
             self.tracklisting.start()
-            songp.SongPresenceCog.presence_task.stop()
             await self.bot.change_presence(activity=None)
 
             # check if bot is in a stage channel instead of a voice channel and if so, let it speak
@@ -119,16 +122,14 @@ class VcCog(commands.Cog):
                 embed=discord.Embed(
                     description=f"Successfully connected to <#{str(voice_channel.id)}>!",
                     color=0x00AEFF,
-                ),
-                ephemeral=True,
+                )
             )
         except AttributeError:
             await interaction.followup.send(
                 embed=discord.Embed(
                     description="You are not connected to a voice channel!",
                     color=0xFF0000,
-                ),
-                ephemeral=True,
+                )
             )
             raise
         except:
@@ -154,7 +155,6 @@ class VcCog(commands.Cog):
             # tasks
             self.vc_check_task.cancel()
             self.tracklisting.cancel()
-            songp.SongPresenceCog.presence_task.start()
 
             if (bot_voice_client.source is not None or bot_voice_client.is_playing() is True):
                 bot_voice_client.stop()
@@ -169,16 +169,14 @@ class VcCog(commands.Cog):
                 embed=discord.Embed(
                     description=f"Successfully disconnected from <#{str(bot_voice_client.channel.id)}>!",
                     color=0x00AEFF,
-                ),
-                ephemeral=True,
+                )
             )
         except AttributeError:
             await interaction.followup.send(
                 embed=discord.Embed(
                     description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!",
                     color=0xFF0000,
-                ),
-                ephemeral=True,
+                )
             )
             raise
         except:
@@ -240,8 +238,7 @@ class VcCog(commands.Cog):
                     embed=discord.Embed(
                         description="Please do not upload an attachment and a link at the same time.",
                         color=0xFF0000,
-                    ),
-                    ephemeral=True,
+                    )
                 )
                 file_check = 1
             elif attachment:
@@ -255,8 +252,7 @@ class VcCog(commands.Cog):
                     embed=discord.Embed(
                         description="No media uploaded.", 
                         color=0xFF0000
-                    ),
-                    ephemeral=True,
+                    )
                 )
                 file_check = 2
 
@@ -277,8 +273,7 @@ class VcCog(commands.Cog):
                     embed=discord.Embed(
                         description="File is not in a supported format!", 
                         color=0xFF0000
-                    ),
-                    ephemeral=True,
+                    )
                 )
             elif file_check == 0:
                 # get song len
@@ -365,7 +360,7 @@ class VcCog(commands.Cog):
 
                 # actually play stuff
                 if bot_voice_client is None or (bot_voice_client.is_paused() is False and bot_voice_client.is_playing() is False):
-                    if bot_voice_client is None or len(self.song_queue) == 0:
+                    if bot_voice_client is None:
                         vc = await voice_channel.connect()
                         self.song_queue.append(qbuild)
 
@@ -385,7 +380,6 @@ class VcCog(commands.Cog):
                         # tasks
                         self.vc_check_task.start(interaction)
                         self.tracklisting.start()
-                        songp.SongPresenceCog.presence_task.stop()
                         await self.bot.change_presence(activity=None)
                     else:
                         if (not position) or (position > len(self.song_queue)):
@@ -432,8 +426,7 @@ class VcCog(commands.Cog):
                 embed=discord.Embed(
                     description="You are not connected to a voice channel!",
                     color=0xFF0000,
-                ),
-                ephemeral=True,
+                )
             )
             raise
         except FileNotFoundError:
@@ -441,8 +434,7 @@ class VcCog(commands.Cog):
                 embed=discord.Embed(
                     description="Invalid file or file corrupted.", 
                     color=0xFF0000
-                ),
-                ephemeral=True,
+                )
             )
             raise
         except:
@@ -453,9 +445,7 @@ class VcCog(commands.Cog):
         name="seek", 
         description="Sets the play position to the specified timestamp"
     )
-    @app_commands.describe(
-        timestamp="(in seconds)"
-    )
+    @app_commands.describe(timestamp="(in seconds)")
     async def seek(self, interaction: discord.Interaction, timestamp: float):
         """Sets the play position to the specified timestamp
 
@@ -465,27 +455,91 @@ class VcCog(commands.Cog):
         """
         try:
             await interaction.response.defer()
+            voice_channel = interaction.user.voice.channel #not inherently used, but serves as a way to check if user is in voice channel
             bot_voice_client = discord.utils.get(
                 self.bot.voice_clients, guild=interaction.guild
             )
-            bot_voice_client.source = discord.FFmpegOpusAudio(
-                source=self.song_queue[0].get("file"),
-                before_options=f"-ss {str(timestamp)}",
-            )
-            self.current_song_timestamp = timestamp
-            await interaction.followup.send(
-                embed=discord.Embed(
-                    description=f"File sought to position {sec_to_hms(timestamp)}",
-                    color=0x00AEFF,
+            if len(self.song_queue) == 0:
+                await interaction.followup.send(
+                    embed=discord.Embed(
+                        description=f"Queue is empty!",
+                        color=0xFF0000,
+                    )
                 )
-            )
+            else:
+                bot_voice_client.source = discord.FFmpegOpusAudio(
+                    source=self.song_queue[0].get("file"),
+                    before_options=f"-ss {str(timestamp)}",
+                )
+                self.current_song_timestamp = timestamp
+                await interaction.followup.send(
+                    embed=discord.Embed(
+                        description=f"File sought to position {sec_to_hms(timestamp)}",
+                        color=0x00AEFF,
+                    )
+                )
         except AttributeError:
             await interaction.followup.send(
                 embed=discord.Embed(
                     description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!",
                     color=0xFF0000,
-                ),
-                ephemeral=True,
+                )
+            )
+            raise
+        except:
+            await embeds.error_executing_command(interaction)
+            raise
+    
+    @app_commands.command(
+        name="pitch", 
+        description="Changes the pitch of the song currently playing (Experimental)"
+    )
+    @app_commands.describe(pitch="Pitch (between 0.5 and 2)")
+    async def pitch(self, interaction: discord.Interaction, pitch: float):
+        """Changes the song's pitch
+
+        Args:
+            interaction (discord.Interaction): Discord interaction. Occurs when user does notifiable action (e.g. slash commands)
+            pitch (float): Pitch value 
+        """
+        try:
+            await interaction.response.defer()
+            voice_channel = interaction.user.voice.channel #not inherently used, but serves as a way to check if user is in voice channel
+            bot_voice_client = discord.utils.get(
+                self.bot.voice_clients, guild=interaction.guild
+            )
+            if len(self.song_queue) == 0:
+                await interaction.followup.send(
+                    embed=discord.Embed(
+                        description=f"Queue is empty!",
+                        color=0xFF0000,
+                    )
+                )
+            elif pitch < 0.5 or pitch > 2:
+                await interaction.followup.send(
+                    embed=discord.Embed(
+                        description=f"Pitch cannot be under 0.5 or above 2!",
+                        color=0xFF0000,
+                    )
+                )
+            else:
+                bot_voice_client.source = discord.FFmpegOpusAudio(
+                    source=self.song_queue[0].get("file"),
+                    before_options=f"-ss {str(self.current_song_timestamp)}",
+                    options=f"-af asetrate=44100*{str(pitch)},aresample=44100,atempo=1/{str(pitch)}"
+                )
+                await interaction.followup.send(
+                    embed=discord.Embed(
+                        description=f"File successfully pitched to {str(pitch)}",
+                        color=0x00AEFF,
+                    )
+                )
+        except AttributeError:
+            await interaction.followup.send(
+                embed=discord.Embed(
+                    description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!",
+                    color=0xFF0000,
+                )
             )
             raise
         except:
@@ -519,8 +573,7 @@ class VcCog(commands.Cog):
                 embed=discord.Embed(
                     description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!",
                     color=0xFF0000,
-                ),
-                ephemeral=True,
+                )
             )
             raise
         except:
@@ -554,8 +607,7 @@ class VcCog(commands.Cog):
                 embed=discord.Embed(
                     description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!",
                     color=0xFF0000,
-                ),
-                ephemeral=True,
+                )
             )
             raise
         except:
@@ -589,8 +641,7 @@ class VcCog(commands.Cog):
                 embed=discord.Embed(
                     description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!",
                     color=0xFF0000,
-                ),
-                ephemeral=True,
+                )
             )
             raise
         except:
@@ -625,8 +676,7 @@ class VcCog(commands.Cog):
                 embed=discord.Embed(
                     description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!",
                     color=0xFF0000,
-                ),
-                ephemeral=True,
+                )
             )
             raise
         except:
@@ -927,8 +977,7 @@ class VcCog(commands.Cog):
                 embed=discord.Embed(
                     description=f"Tracklisting channel successfully set to <#{channel.id}>!",
                     color=0x00AEFF
-                ),
-                ephemeral=True
+                )
             )
         except:
             await embeds.error_executing_command(interaction)
@@ -976,7 +1025,6 @@ class VcCog(commands.Cog):
                         discord.FFmpegOpusAudio(source=self.song_queue[0].get("file"))
                     )
 
-                    songp.SongPresenceCog.presence_task.stop()
                     await self.bot.get_channel(self.last_channel_interaction).send(
                         embed=discord.Embed(
                             title=f"Now playing `{self.song_queue[0].get('title')}`",
@@ -1004,14 +1052,11 @@ class VcCog(commands.Cog):
                     # tasks
                     self.vc_check_task.cancel()
                     self.tracklisting.cancel()
-                    songp.SongPresenceCog.presence_task.start()
             else:
-                songp.SongPresenceCog.presence_task.stop()
                 self.current_song_timestamp += 0.5
         except:
             self.vc_check_task.stop()
             self.tracklisting.cancel()
-            songp.SongPresenceCog.presence_task.start()
             raise
 
     # tracklist task (wip)
@@ -1040,7 +1085,7 @@ class VcCog(commands.Cog):
                                 color_hold = tracklist.get('color')     
                                 color = int(color_hold[1:], 16)
                                 await self.bot.get_channel(self.tracklist_channel_id).send(embed=discord.Embed(title = title, description=desc, color = color))
-                                await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{track.get('artist')} - {track.get('title')}"))
+                                #await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{track.get('artist')} - {track.get('title')}"))
         except:
             raise
 

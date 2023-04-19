@@ -38,7 +38,7 @@ class ArchiveCog(commands.Cog):
             category (discord.CategoryChannel): Discord Channel Category
         """
         try:
-            await interaction.response.defer()
+            await interaction.response.defer(ephemeral=True)
             archive_role_id = db.fetchone_singlecolumn(
                 0,
                 "SELECT archive_role_id FROM bot_archive_role WHERE guild_id = ?",
@@ -51,8 +51,7 @@ class ArchiveCog(commands.Cog):
                         title="There are no archive role set for this server",
                         description="Please set an archive role with the /set_archive_role command",
                         color=0xFF0000,
-                    ),
-                    ephemeral=True,
+                    )
                 )
             else:
                 archive_role = interaction.guild.get_role(int(archive_role_id))
@@ -99,8 +98,7 @@ class ArchiveCog(commands.Cog):
                         + str(interaction.channel.id)
                         + "> successfully archived!",
                         color=0x00AEFF,
-                    ),
-                    ephemeral=True,
+                    )
                 )
         except:
             await embeds.error_executing_command(
@@ -128,7 +126,7 @@ class ArchiveCog(commands.Cog):
             category (discord.CategoryChannel): Discord channel category
         """
         try:
-            await interaction.response.defer()
+            await interaction.response.defer(ephemeral=True)
             archive_role_id = db.fetchone_singlecolumn(
                 0,
                 "SELECT archive_role_id FROM bot_archive_role WHERE guild_id = ?",
@@ -141,8 +139,7 @@ class ArchiveCog(commands.Cog):
                         title="There are no archive role set for this server",
                         description="Please set an archive role with the /set_archive_role command",
                         color=0xFF0000,
-                    ),
-                    ephemeral=True,
+                    )
                 )
             else:
                 archive_role = interaction.guild.get_role(int(archive_role_id))
@@ -165,8 +162,7 @@ class ArchiveCog(commands.Cog):
                         + str(interaction.channel.id)
                         + "> successfully un-archived!",
                         color=0x00AEFF,
-                    ),
-                    ephemeral=True,
+                    )
                 )
         except:
             await embeds.error_executing_command(

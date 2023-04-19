@@ -1,4 +1,5 @@
-"""Help module
+"""
+Help module
 """
 
 import discord
@@ -17,7 +18,10 @@ class HelpCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @app_commands.command(name="help", description="Displays help")
+    @app_commands.command(
+        name="help", 
+        description="Displays help"
+    )
     async def help(self, interaction: discord.Interaction):
         """displays the list of commands and arguments
 
@@ -25,7 +29,7 @@ class HelpCog(commands.Cog):
             interaction (discord.Interaction): Discord interaction. Occurs when user does notifiable action (e.g. slash commands)
         """
         try:
-            await interaction.response.defer()
+            await interaction.response.defer(ephemeral=True)
             view = discord.ui.View()
             view.add_item(
                 item=discord.ui.Button(
@@ -39,7 +43,6 @@ class HelpCog(commands.Cog):
                     title="Click on the link below to display the list of commands!",
                     color=0x00AEFF,
                 ),
-                ephemeral=True,
                 view=view,
             )
         except:

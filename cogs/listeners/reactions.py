@@ -1,4 +1,6 @@
-"""Reactions Module"""
+"""
+Reactions Module
+"""
 
 from datetime import datetime
 import discord

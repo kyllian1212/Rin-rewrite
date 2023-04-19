@@ -1,3 +1,7 @@
+"""
+Log Channel Module
+"""
+
 from datetime import datetime
 import discord
 import templates.embeds as embeds
@@ -11,28 +15,37 @@ from main import sp
 class SongLibraryCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.interaction_webhook = None
 
-    @app_commands.command(name="rebuild_song_library", description="Deletes the entire song library and rebuilds it")
+    @app_commands.command(
+        name="rebuild_song_library", 
+        description="Deletes the entire song library and rebuilds it"
+    )
     @app_commands.checks.has_permissions(administrator=True)
     async def rebuild_song_library(self, interaction: discord.Interaction):
         try:
-            await interaction.response.defer()
-            await interaction.followup.send(embed=discord.Embed(
+            await interaction.response.defer(ephemeral=True)
+            response = await interaction.followup.send(embed=discord.Embed(
                     title="Rebuilding song library...", 
                     description="This might take some time.", 
-                    color=0xff0000), ephemeral=True)
+                    color=0xff0000))
             db.clear_song_library()
             db.create_song_library()
-            await interaction.followup.edit(embed=discord.Embed(
+            await response.edit(embed=discord.Embed(
                     title="Song library rebuilt successfully!", 
                     color=0xff0000))
         except:
             await embeds.error_executing_command(interaction, edit=True, title_detail="rebuilding the song library.")
             raise
 
-    @app_commands.command(name="add_song_to_presence_queue", description="Adds a song in the presence queue for Rin to listen to")
+    @app_commands.command(
+        name="add_song_to_presence_queue", 
+        description="Adds a song in the presence queue for Rin to listen to"
+    )
     @app_commands.describe(url="URL of the song (Spotify only, single tracks only. No full albums or playlists links)")
-    async def add_song_to_presence_queue(self, interaction: discord.Interaction, url: str):
+    async def add_song_to_presence_queue(
+        self, interaction: discord.Interaction, url: str
+    ):
         try:
             await interaction.response.defer()
             user_id = interaction.user.id
@@ -93,12 +106,16 @@ class SongLibraryCog(commands.Cog):
             await embeds.error_executing_command(interaction)
             raise
 
-    @app_commands.command(name="check_presence_queue", description="Displays the queued songs for display on presence")
+    @app_commands.command(
+        name="check_presence_queue", 
+        description="Displays the queued songs for display on presence"
+    )
     @app_commands.describe(archive="Shows the list of songs that were already played by the bot (False by default)")
     @app_commands.checks.has_permissions(administrator=True)
-    async def check_presence_queue(self, interaction: discord.Interaction, archive: bool = False):
+    async def check_presence_queue(
+        self, interaction: discord.Interaction, archive: bool = False
+    ):
         try:
-            await interaction.response.defer()
             start = 0
             limit = 10
             view = NextPreviousButtons(start=start, limit=limit, archive=archive)
@@ -118,31 +135,39 @@ class SongLibraryCog(commands.Cog):
                 else:
                     for song in songs_in_queue:
                         queue_embed.add_field(name="Song " + str(song[0]), value="**" + song[3] + "** by " + song[2] + "\nAdded by <@" + song[1] + ">", inline=False)
-                await interaction.followup.send(embed=queue_embed, ephemeral=True, view=view)
+                await interaction.response.send_message(embed=queue_embed, ephemeral=True, view=view)
             else:
-                await interaction.followup.send(embed=discord.Embed(title="Currently no songs in queue", color=0x00aeff), ephemeral=True)
+                await interaction.response.send_message(embed=discord.Embed(title="Currently no songs in queue", color=0x00aeff), ephemeral=True)
         except:
             await embeds.error_executing_command(interaction)
             raise
     
-    @app_commands.command(name="delete_song_from_presence_queue", description="Removes a song from the queue")
+    @app_commands.command(
+        name="delete_song_from_presence_queue", 
+        description="Removes a song from the queue"
+    )
     @app_commands.describe(id="Song ID to be removed (the song number when you do /check_presence_queue)")
     @app_commands.checks.has_permissions(administrator=True)
-    async def delete_song_from_presence_queue(self, interaction: discord.Interaction, id: int):
+    async def delete_song_from_presence_queue(
+        self, interaction: discord.Interaction, id: int
+    ):
         try:
-            await interaction.response.defer()
+            await interaction.response.defer(ephemeral=True)
             db.update_db("DELETE FROM bot_user_song_library WHERE id = ?", id)
-            await interaction.followup.send(embed=discord.Embed(title="Song successfully deleted!", color=0x00aeff), ephemeral=True)
+            await interaction.followup.send(embed=discord.Embed(title="Song successfully deleted!", color=0x00aeff))
         except:
-            await interaction.followup.send(embed=discord.Embed(title="Error while deleting the song!", description="(You've probably entered a invalid song ID)", color=0xff0000), ephemeral=True)
+            await interaction.followup.send(embed=discord.Embed(title="Error while deleting the song!", description="(You've probably entered a invalid song ID)", color=0xff0000))
     
-    @app_commands.command(name="interrupt_current_song", description="Temporarily stops the currently playing song")
+    @app_commands.command(
+        name="interrupt_current_song", 
+        description="Temporarily stops the currently playing song"
+    )
     @app_commands.checks.has_permissions(administrator=True)
     async def interrupt_current_song(self, interaction: discord.Interaction):
         try:
-            await interaction.response.defer()
+            await interaction.response.defer(ephemeral=True)
             await self.bot.change_presence(activity=None)
-            await interaction.followup.send(embed=discord.Embed(title="Song successfully stopped!", color=0x00aeff), ephemeral=True)
+            await interaction.followup.send(embed=discord.Embed(title="Song successfully stopped!", color=0x00aeff))
         except:
             await embeds.error_executing_command(interaction)
             raise
@@ -151,7 +176,9 @@ class SongLibraryCog(commands.Cog):
     @check_presence_queue.error
     @delete_song_from_presence_queue.error
     @interrupt_current_song.error
-    async def error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
+    async def error(
+        self, interaction: discord.Interaction, error: app_commands.AppCommandError
+    ):
         if isinstance(error, app_commands.MissingPermissions):
             await embeds.missing_permissions(interaction)
 
@@ -201,9 +228,15 @@ class NextPreviousButtons(discord.ui.View):
             else:
                 for song in songs_in_queue:
                     queue_embed.add_field(name="Song " + str(song[0]), value="**" + song[3] + "** by " + song[2] + "\nAdded by <@" + song[1] + ">", inline=False)
-            await interaction.followup.edit(embed=queue_embed, view=self)
+            await interaction.response.edit_message(embed=queue_embed, view=self)
         except:
-            await embeds.error_executing_command(interaction, edit=True)
+            await interaction.response.edit_message(
+                embed=discord.Embed(
+                    title=f"An error has occured changing the page", 
+                    description=f"Please run the command again and retry, or contact the bot owner if you see this again.",
+                    color=0xff0000
+                )
+            )
             raise
     
     @discord.ui.button(style=discord.ButtonStyle.blurple, emoji='➡️')
@@ -233,10 +266,16 @@ class NextPreviousButtons(discord.ui.View):
                     queue_embed.add_field(name="Song " + str(song[0]), value="**" + song[3] + "** by " + song[2] + "\nAdded by <@" + song[1] + ">\nPlayed on <t:" + timestamp + ":D> - <t:" + timestamp + ":T>", inline=False)
             else:
                 for song in songs_in_queue:
-                    queue_embed.add_field(name="Song " + str(song[0]), value="**" + song[3] + "** by " + song[2] + "\nAdded by <@" + song[1] + ">", inline=False)
-            await interaction.followup.edit(embed=queue_embed, view=self)
+                    queue_embed.add_field(name="Song " + str(song[0]), value="**" + song[3] + "** by " + song[2] + "\nAdded by <@" + song[1] + ">", inline=False)            
+            await interaction.response.edit_message(embed=queue_embed, view=self)
         except:
-            await embeds.error_executing_command(interaction, edit=True)
+            await interaction.response.edit_message(
+                embed=discord.Embed(
+                    title=f"An error has occured changing the page", 
+                    description=f"Please run the command again and retry, or contact the bot owner if you see this again.",
+                    color=0xff0000
+                )
+            )
             raise
             
 async def setup(bot: commands.Bot):

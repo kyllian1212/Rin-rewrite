@@ -1,4 +1,5 @@
-"""Database module
+"""
+Database module
 """
 
 import os
@@ -34,7 +35,7 @@ class RebuildDatabaseCog(commands.Cog):
             interaction (discord.Interaction): Discord interaction. Occurs when user does notifiable action (e.g. slash commands)
         """
         try:
-            await interaction.response.defer()
+            await interaction.response.defer(ephemeral=True)
             if interaction.user.id == 171000921927581696:
                 view = RebuildDatabaseButtons(database_self=self)
                 self.interaction_webhook = await interaction.followup.send(
@@ -43,7 +44,6 @@ class RebuildDatabaseCog(commands.Cog):
                         description="This will cause the admin configuration of every server as well as the song library to be entirely destroyed, make sure to have a backup!! This cannot be undone",
                         color=0xFF0000,
                     ),
-                    ephemeral=True,
                     view=view,
                 )
             else:

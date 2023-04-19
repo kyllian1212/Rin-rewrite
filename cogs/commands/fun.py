@@ -1,4 +1,5 @@
-"""Fun Module
+"""
+Fun Module
 """
 
 import random
@@ -39,15 +40,19 @@ class FunCog(commands.Cog):
             await embeds.error_executing_command(interaction)
             raise
 
-    @app_commands.command(name="roll", description="Rolls a dice (1d6 by default)")
+    @app_commands.command(
+        name="roll", 
+        description="Rolls a dice (1d6 by default)"
+    )
     @app_commands.describe(
-        number_of_dices="Min. 1 / Max. 100", number_of_sides="Min. 1 / Max. 100"
+        number_of_dices="Min. 1 / Max. 100", 
+        number_of_sides="Min. 1 / Max. 100"
     )
     async def roll(
         self,
         interaction: discord.Interaction,
         number_of_dices: int = 1,
-        number_of_sides: int = 6,
+        number_of_sides: int = 6
     ):
         """rolls a custom specified dice
 
@@ -98,7 +103,10 @@ class FunCog(commands.Cog):
             await embeds.error_executing_command(interaction)
             raise
 
-    @app_commands.command(name="october18", description="Rin")
+    @app_commands.command(
+        name="october18", 
+        description="Rin"
+    )
     async def october18(self, interaction: discord.Interaction):
         """Mocks a message from the 'Dad' character from the shelter music video
 
@@ -122,7 +130,10 @@ class FunCog(commands.Cog):
             await embeds.error_executing_command(interaction)
             raise
 
-    @app_commands.command(name="irene", description="irene")
+    @app_commands.command(
+        name="irene", 
+        description="irene"
+    )
     async def irene(self, interaction: discord.Interaction):
         """Sends 'Irene' embed message
 

@@ -1,4 +1,5 @@
-"""Info Module
+"""
+Info Module
 """
 
 from datetime import datetime
@@ -20,7 +21,10 @@ class InfoCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @app_commands.command(name="info", description="Makes bot info appear")
+    @app_commands.command(
+        name="info", 
+        description="Makes bot info appear"
+    )
     async def info(self, interaction: discord.Interaction):
         """displays the bot's metadata
 

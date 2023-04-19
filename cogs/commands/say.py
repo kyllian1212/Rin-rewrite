@@ -1,4 +1,5 @@
-"""Say Module
+"""
+Say Module
 """
 from discord.ext import commands
 

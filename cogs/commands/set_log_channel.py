@@ -1,4 +1,5 @@
-"""Log Channel Module
+"""
+Log Channel Module
 """
 
 import discord
@@ -35,7 +36,7 @@ class SetLogChannelCog(commands.Cog):
             channel (discord.TextChannel): The Discord text channel
         """
         try:
-            await interaction.response.defer()
+            await interaction.response.defer(ephemeral=True)
             log_channel_set = db.fetchone_singlecolumn(
                 0,
                 "SELECT log_channel_id FROM bot_log_channel WHERE guild_id = ?",
@@ -60,7 +61,6 @@ class SetLogChannelCog(commands.Cog):
                     + ">!",
                     color=0x00AEFF,
                 ),
-                ephemeral=True,
             )
         except:
             await interaction.followup.send(
@@ -68,7 +68,6 @@ class SetLogChannelCog(commands.Cog):
                     title="There was an error setting or updating the log channel. Please try again or contact the bot owner if you see this again",
                     color=0xFF0000,
                 ),
-                ephemeral=True,
             )
             raise
 

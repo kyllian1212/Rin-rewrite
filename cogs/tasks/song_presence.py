@@ -1,3 +1,7 @@
+"""
+Song Presence task
+"""
+
 import discord
 import asyncio
 import random

@@ -1,4 +1,5 @@
-"""Moderation Module
+"""
+Moderation Module
 """
 
 from datetime import timedelta
@@ -37,7 +38,7 @@ class ModerationCog(commands.Cog):
             interaction (discord.Interaction): Discord interaction. Occurs when user does notifiable action (e.g. slash commands)
         """
         try:
-            await interaction.response.defer()
+            await interaction.response.defer(ephemeral=True)
             moderation_log_set = db.fetchone_fullrow(
                 "SELECT * FROM bot_settings WHERE guild_id = ? AND setting_name = 'moderation_log'",
                 interaction.guild_id,
@@ -67,7 +68,6 @@ class ModerationCog(commands.Cog):
 
             await interaction.followup.send(
                 embed=discord.Embed(description=description, color=0x00AEFF),
-                ephemeral=True,
             )
         except:
             await embeds.error_executing_command(
@@ -108,13 +108,12 @@ class ModerationCog(commands.Cog):
             dm (bool, optional): specifies whether a DM will be sent to the user being timed out. Defaults to False.
         """
         try:
-            await interaction.response.defer()
+            await interaction.response.defer(ephemeral=True)
             if timeout_length_minutes + timeout_length_hours + timeout_length_days == 0:
                 await interaction.followup.send(
                     embed=discord.Embed(
                         title="You cannot timeout someone for 0 minutes", color=0xFF0000
-                    ),
-                    ephemeral=True,
+                    )
                 )
             else:
                 timeout = timedelta(
@@ -174,7 +173,6 @@ class ModerationCog(commands.Cog):
                                 + extra,
                                 color=0xFF0000,
                             ),
-                            ephemeral=True,
                             view=view,
                             wait=True,
                         )
@@ -188,8 +186,7 @@ class ModerationCog(commands.Cog):
                             + str(member.id)
                             + "> successfully timed out!",
                             color=0x00AEFF,
-                        ),
-                        ephemeral=True,
+                        )
                     )
         except:
             await embeds.error_executing_command(
@@ -225,7 +222,7 @@ class ModerationCog(commands.Cog):
             dm (bool, optional): specifies whether a DM will be sent to the user being timed out. Defaults to False.
         """
         try:
-            await interaction.response.defer()
+            await interaction.response.defer(ephemeral=True)
             dm_block = False
             user_dmd = ""
 
@@ -275,7 +272,6 @@ class ModerationCog(commands.Cog):
                             + extra,
                             color=0xFF0000,
                         ),
-                        ephemeral=True,
                         view=view,
                     )
                     dm_block = True
@@ -287,7 +283,6 @@ class ModerationCog(commands.Cog):
                         description="<@" + str(member.id) + "> successfully kicked!",
                         color=0x00AEFF,
                     ),
-                    ephemeral=True,
                 )
         except:
             await embeds.error_executing_command(
@@ -326,7 +321,7 @@ class ModerationCog(commands.Cog):
             dm (bool, optional): specifies whether a DM will be sent to the user being banned. Defaults to False.
         """
         try:
-            await interaction.response.defer()
+            await interaction.response.defer(ephemeral=True)
             dm_block = False
             user_dmd = ""
 
@@ -336,7 +331,6 @@ class ModerationCog(commands.Cog):
                         title="You cannot delete messages for less than 0 days or more than 7 days",
                         color=0xFF0000,
                     ),
-                    ephemeral=True,
                 )
             else:
                 if dm is True:
@@ -387,7 +381,6 @@ class ModerationCog(commands.Cog):
                                 + extra,
                                 color=0xFF0000,
                             ),
-                            ephemeral=True,
                             view=view,
                         )
                         dm_block = True
@@ -403,7 +396,6 @@ class ModerationCog(commands.Cog):
                             + "> successfully banned!",
                             color=0x00AEFF,
                         ),
-                        ephemeral=True,
                     )
         except:
             await embeds.error_executing_command(
@@ -437,7 +429,7 @@ class ModerationCog(commands.Cog):
             channel_name (str): the new channel name
         """
         try:
-            await interaction.response.defer()
+            await interaction.response.defer(ephemeral=True)
             # defer (incl. on missing perm embed) to avoid api errors if rate limited
             if text_channel is None:
                 text_channel = interaction.channel
@@ -448,7 +440,6 @@ class ModerationCog(commands.Cog):
                     description=f"Channel {text_channel_old_name} successfully renamed to <#{text_channel.id}>",
                     color=0x00AEFF,
                 ),
-                ephemeral=True,
             )
         except:
             await embeds.error_executing_command(

@@ -1,4 +1,5 @@
-"""The Archive Role Module
+"""
+The Archive Role Module
 """
 
 import discord
@@ -35,7 +36,7 @@ class SetArchiveRoleCog(commands.Cog):
             role (discord.Role): the archive role
         """
         try:
-            await interaction.response.defer()
+            await interaction.response.defer(ephemeral=True)
             archive_role_set = db.fetchone_singlecolumn(
                 0,
                 "SELECT archive_role_id FROM bot_archive_role WHERE guild_id = ?",
@@ -60,7 +61,6 @@ class SetArchiveRoleCog(commands.Cog):
                     + ">!",
                     color=0x00AEFF,
                 ),
-                ephemeral=True,
             )
         except:
             await embeds.error_executing_command(
