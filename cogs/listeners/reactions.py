@@ -203,7 +203,7 @@ class ReactionsCog(commands.Cog):
 
                 if files:
                     reported_message_embed.add_field(
-                        name="Attachments (uploaded above this embed)", value="\n".join(file_names), inline=False
+                        name="Attachments (reuploaded above this embed)", value="\n".join(file_names), inline=False
                     )
 
                 await log_channel.send(embed=reported_message_embed, files=files)
