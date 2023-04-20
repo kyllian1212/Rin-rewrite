@@ -112,7 +112,6 @@ class VcCog(commands.Cog):
             # tasks
             self.vc_check_task.start(interaction)
             self.tracklisting.start()
-            await self.bot.change_presence(activity=None)
 
             # check if bot is in a stage channel instead of a voice channel and if so, let it speak
             if (voice_channel.type.name == "stage_voice" and bot_member.voice.suppress is True):
@@ -380,7 +379,6 @@ class VcCog(commands.Cog):
                         # tasks
                         self.vc_check_task.start(interaction)
                         self.tracklisting.start()
-                        await self.bot.change_presence(activity=None)
                     else:
                         if (not position) or (position > len(self.song_queue)):
                             self.song_queue.append(qbuild)
