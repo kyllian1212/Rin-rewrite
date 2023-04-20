@@ -1039,7 +1039,7 @@ class VcCog(commands.Cog):
                     await bot_voice_client.disconnect()
                     await self.bot.get_channel(self.last_channel_interaction).send(
                         embed=discord.Embed(
-                            description="Bot has been connected to the voice channel for too long and has been disconnected to avoid excessive bandwidth usage and requests to the Discord API.",
+                            description="Bot has been inactive in the voice channel for too long and has been disconnected to avoid excessive bandwidth usage and requests to the Discord API.",
                             color=0x00AEFF,
                         )
                     )
