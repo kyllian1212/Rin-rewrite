@@ -28,9 +28,6 @@ class ReactionsCog(commands.Cog):
 
         if log_channel_id is None and payload.emoji.name == "🚫":
             channel = await self.bot.fetch_channel(payload.channel_id)
-            reacted_message: discord.Message = await channel.fetch_message(
-                payload.message_id
-            )
             await channel.send(
                 embed=discord.Embed(
                     title="There are no log channel set for this server",
@@ -40,6 +37,10 @@ class ReactionsCog(commands.Cog):
                 delete_after=10,
             )
         elif payload.member.bot == False == False and payload.emoji.name == "🚫":
+            channel = await self.bot.fetch_channel(payload.channel_id)
+            reacted_message: discord.Message = await channel.fetch_message(
+                payload.message_id
+            )
             if (
                 payload.member.guild_permissions.administrator is True
                 or payload.member.guild_permissions.manage_messages is True
