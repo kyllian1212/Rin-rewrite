@@ -27,7 +27,7 @@ class RebuildDatabaseCog(commands.Cog):
         name="rebuild_database",
         description="Deletes the entire database and rebuilds it",
     )
-    @app_commands.checks.has_permissions(administrator=True)
+    @app_commands.default_permissions(administrator=True)
     async def rebuild_database(self, interaction: discord.Interaction):
         """Deletes database and rebuilds
 

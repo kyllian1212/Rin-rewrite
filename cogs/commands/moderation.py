@@ -30,7 +30,7 @@ class ModerationCog(commands.Cog):
         name="toggle_moderation_log",
         description="Toggles bans and timeouts showing up in the log channel.",
     )
-    @app_commands.checks.has_permissions(administrator=True)
+    @app_commands.default_permissions(administrator=True)
     async def toggle_moderation_log(self, interaction: discord.Interaction):
         """Toggles bans and timeouts showing up in the log channel.
 
@@ -85,7 +85,7 @@ class ModerationCog(commands.Cog):
         reason="The reason why the member has been timed out (no reason by default)",
         dm="Sets if the user will be DM'd about the timeout or not (No by default)",
     )
-    @app_commands.checks.has_permissions(moderate_members=True)
+    @app_commands.default_permissions(moderate_members=True)
     async def timeout(
         self,
         interaction: discord.Interaction,
@@ -205,7 +205,7 @@ class ModerationCog(commands.Cog):
         reason="The reason why the member has been kicked (no reason by default)",
         dm="Sets if the user will be DM'd about the kick or not (No by default)",
     )
-    @app_commands.checks.has_permissions(kick_members=True)
+    @app_commands.default_permissions(kick_members=True)
     async def kick(
         self,
         interaction: discord.Interaction,
@@ -302,7 +302,7 @@ class ModerationCog(commands.Cog):
         dm="Sets if the user will be DM'd about the ban or not (No by default)",
         delete_message_days="Sets that messages less than x days will be deleted (by default 0 (none), max 7)",
     )
-    @app_commands.checks.has_permissions(ban_members=True)
+    @app_commands.default_permissions(ban_members=True)
     async def ban(
         self,
         interaction: discord.Interaction,
@@ -414,7 +414,7 @@ class ModerationCog(commands.Cog):
         text_channel="The channel you want to rename",
         channel_name="The new channel name",
     )
-    @app_commands.checks.has_permissions(manage_channels=True)
+    @app_commands.default_permissions(manage_channels=True)
     async def rename_channel(
         self,
         interaction: discord.Interaction,

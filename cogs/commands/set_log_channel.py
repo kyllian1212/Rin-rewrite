@@ -25,7 +25,7 @@ class SetLogChannelCog(commands.Cog):
         description="Sets the channel in which reported messages will go to",
     )
     @app_commands.describe(channel="The channel in which reported messages will go to")
-    @app_commands.checks.has_permissions(administrator=True)
+    @app_commands.default_permissions(administrator=True)
     async def set_log_channel(
         self, interaction: discord.Interaction, channel: discord.TextChannel
     ):

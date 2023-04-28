@@ -25,7 +25,7 @@ class SetArchiveRoleCog(commands.Cog):
         description="Sets the role for which members will be able to see archived channels",
     )
     @app_commands.describe(role="The role for archived channels")
-    @app_commands.checks.has_permissions(administrator=True)
+    @app_commands.default_permissions(administrator=True)
     async def set_archive_role(
         self, interaction: discord.Interaction, role: discord.Role
     ):

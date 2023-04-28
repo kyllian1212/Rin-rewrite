@@ -956,7 +956,7 @@ class VcCog(commands.Cog):
     @app_commands.describe(
         channel="The channel in which the tracklists will be sent"
     )
-    @app_commands.checks.has_permissions(administrator=True)
+    @app_commands.default_permissions(administrator=True)
     async def set_tracklist_channel(
         self,
         interaction: discord.Interaction,

@@ -27,7 +27,7 @@ class ArchiveCog(commands.Cog):
     @app_commands.describe(
         category="The category in which the channel will be moved to"
     )
-    @app_commands.checks.has_permissions(administrator=True, manage_channels=True)
+    @app_commands.default_permissions(administrator=True, manage_channels=True)
     async def archive(
         self, interaction: discord.Interaction, category: discord.CategoryChannel
     ):
@@ -115,7 +115,7 @@ class ArchiveCog(commands.Cog):
     @app_commands.describe(
         category="The category in which the channel will be moved to"
     )
-    @app_commands.checks.has_permissions(administrator=True, manage_channels=True)
+    @app_commands.default_permissions(administrator=True, manage_channels=True)
     async def unarchive(
         self, interaction: discord.Interaction, category: discord.CategoryChannel
     ):

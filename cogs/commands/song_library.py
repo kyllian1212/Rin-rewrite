@@ -21,7 +21,7 @@ class SongLibraryCog(commands.Cog):
         name="rebuild_song_library", 
         description="Deletes the entire song library and rebuilds it"
     )
-    @app_commands.checks.has_permissions(administrator=True)
+    @app_commands.default_permissions(administrator=True)
     async def rebuild_song_library(self, interaction: discord.Interaction):
         try:
             await interaction.response.defer(ephemeral=True)
@@ -111,7 +111,7 @@ class SongLibraryCog(commands.Cog):
         description="Displays the queued songs for display on presence"
     )
     @app_commands.describe(archive="Shows the list of songs that were already played by the bot (False by default)")
-    @app_commands.checks.has_permissions(administrator=True)
+    @app_commands.default_permissions(administrator=True)
     async def check_presence_queue(
         self, interaction: discord.Interaction, archive: bool = False
     ):
@@ -147,7 +147,7 @@ class SongLibraryCog(commands.Cog):
         description="Removes a song from the queue"
     )
     @app_commands.describe(id="Song ID to be removed (the song number when you do /check_presence_queue)")
-    @app_commands.checks.has_permissions(administrator=True)
+    @app_commands.default_permissions(administrator=True)
     async def delete_song_from_presence_queue(
         self, interaction: discord.Interaction, id: int
     ):
@@ -162,7 +162,7 @@ class SongLibraryCog(commands.Cog):
         name="interrupt_current_song", 
         description="Temporarily stops the currently playing song"
     )
-    @app_commands.checks.has_permissions(administrator=True)
+    @app_commands.default_permissions(administrator=True)
     async def interrupt_current_song(self, interaction: discord.Interaction):
         try:
             await interaction.response.defer(ephemeral=True)
