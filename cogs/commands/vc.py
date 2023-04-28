@@ -112,7 +112,6 @@ class VcCog(commands.Cog):
             # tasks
             self.vc_check_task.start(interaction)
             self.tracklisting.start()
-            await self.bot.change_presence(activity=None)
 
             # check if bot is in a stage channel instead of a voice channel and if so, let it speak
             if (voice_channel.type.name == "stage_voice" and bot_member.voice.suppress is True):
@@ -380,7 +379,6 @@ class VcCog(commands.Cog):
                         # tasks
                         self.vc_check_task.start(interaction)
                         self.tracklisting.start()
-                        await self.bot.change_presence(activity=None)
                     else:
                         if (not position) or (position > len(self.song_queue)):
                             self.song_queue.append(qbuild)
@@ -1041,7 +1039,7 @@ class VcCog(commands.Cog):
                     await bot_voice_client.disconnect()
                     await self.bot.get_channel(self.last_channel_interaction).send(
                         embed=discord.Embed(
-                            description="Bot has been connected to the voice channel for too long and has been disconnected to avoid excessive bandwidth usage and requests to the Discord API.",
+                            description="Bot has been inactive in the voice channel for too long and has been disconnected to avoid excessive bandwidth usage and requests to the Discord API.",
                             color=0x00AEFF,
                         )
                     )

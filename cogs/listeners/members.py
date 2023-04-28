@@ -56,7 +56,12 @@ class MembersCog(commands.Cog):
                     banned_embed.add_field(
                         name="Username when banned:", value=f"{user.name}#{user.discriminator}"
                     )
-                    banned_embed.set_thumbnail(url=user.avatar.url)
+                    if user.avatar is None:
+                        banned_embed.set_thumbnail(
+                            url="https://cdn.discordapp.com/embed/avatars/0.png"
+                        )
+                    else:
+                        banned_embed.set_thumbnail(url=user.avatar.url)
                     banned_embed.set_footer(text=f"User ID: {str(user.id)}  •  {now}")
 
                     await log_channel.send(embed=banned_embed)
@@ -91,7 +96,12 @@ class MembersCog(commands.Cog):
                         name="Username when unbanned:",
                         value=f"{user.name}#{user.discriminator}",
                     )
-                    unbanned_embed.set_thumbnail(url=user.avatar.url)
+                    if user.avatar is None:
+                        unbanned_embed.set_thumbnail(
+                            url="https://cdn.discordapp.com/embed/avatars/0.png"
+                        )
+                    else:
+                        unbanned_embed.set_thumbnail(url=user.avatar.url)
                     unbanned_embed.set_footer(text=f"User ID: {str(user.id)}  •  {now}")
 
                     await log_channel.send(embed=unbanned_embed)
@@ -153,7 +163,12 @@ class MembersCog(commands.Cog):
                         value=f"<t:{int(after.timed_out_until.timestamp())}:D> - <t:{int(after.timed_out_until.timestamp())}:T>",
                         inline=False,
                     )
-                    timeout_embed.set_thumbnail(url=after.avatar.url)
+                    if after.avatar is None:
+                        timeout_embed.set_thumbnail(
+                            url="https://cdn.discordapp.com/embed/avatars/0.png"
+                        )
+                    else:
+                        timeout_embed.set_thumbnail(url=after.avatar.url)
                     timeout_embed.set_footer(text=f"User ID: {str(after.id)}  •  {now}")
 
                     await log_channel.send(embed=timeout_embed)

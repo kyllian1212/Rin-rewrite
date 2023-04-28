@@ -19,10 +19,6 @@ class ReactionsCog(commands.Cog):
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
         """Handler for raw reactions"""
-        channel = await self.bot.fetch_channel(payload.channel_id)
-        reacted_message: discord.Message = await channel.fetch_message(
-            payload.message_id
-        )
         log_channel_id = db.fetchone_singlecolumn(
             0,
             "SELECT log_channel_id FROM bot_log_channel WHERE guild_id = ?",
@@ -31,6 +27,7 @@ class ReactionsCog(commands.Cog):
         description = ""
 
         if log_channel_id is None and payload.emoji.name == "🚫":
+            channel = await self.bot.fetch_channel(payload.channel_id)
             await channel.send(
                 embed=discord.Embed(
                     title="There are no log channel set for this server",
@@ -40,6 +37,10 @@ class ReactionsCog(commands.Cog):
                 delete_after=10,
             )
         elif payload.member.bot == False == False and payload.emoji.name == "🚫":
+            channel = await self.bot.fetch_channel(payload.channel_id)
+            reacted_message: discord.Message = await channel.fetch_message(
+                payload.message_id
+            )
             if (
                 payload.member.guild_permissions.administrator is True
                 or payload.member.guild_permissions.manage_messages is True
