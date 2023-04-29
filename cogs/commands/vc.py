@@ -1093,6 +1093,7 @@ class VcCog(commands.Cog):
                                 await self.bot.get_channel(self.tracklist_channel_id).send(embed=discord.Embed(title = title, description=desc, color = color))
                                 #await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{track.get('artist')} - {track.get('title')}"))
         except:
+            print("the tracklist.json may be missing read & write perms! tracklisting will not work")
             raise
 
 
