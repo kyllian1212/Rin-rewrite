@@ -280,7 +280,13 @@ class VcCog(commands.Cog):
                     f'ffprobe -i {file} -show_entries format=duration -of csv="p=0" > time.txt'
                 )
                 if ffmpeg_check == 1:
-                    raise FileNotFoundError
+                    await interaction.followup.send(
+                    embed=discord.Embed(
+                        description="ffmpeg is not installed on the bot's server, please install it (or ask your admin to install it) to be able to play files.", 
+                        color=0xFF0000
+                        )
+                    )
+                    raise NotImplementedError
                 with open(
                     "time.txt",
                     "r",
@@ -434,6 +440,8 @@ class VcCog(commands.Cog):
                     color=0xFF0000
                 )
             )
+            raise
+        except NotImplementedError:
             raise
         except:
             await embeds.error_executing_command(interaction)
