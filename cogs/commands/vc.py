@@ -89,6 +89,7 @@ class VcCog(commands.Cog):
         self.loop_setting = 0
         self.tracklist_channel_id = None
         self.played_tracks = []
+        self.current_voice_channel: discord.VoiceChannel = None
 
     @app_commands.command(
         name="connect",
@@ -102,31 +103,33 @@ class VcCog(commands.Cog):
         """
         try:
             await interaction.response.defer()
-            voice_channel = interaction.user.voice.channel
+            if self.current_voice_channel != None and interaction.user.voice.channel != self.current_voice_channel:
+                raise AttributeError
+            self.current_voice_channel = interaction.user.voice.channel
             self.last_channel_interaction = interaction.channel_id
-            guild = self.bot.get_guild(voice_channel.guild.id)
+            guild = self.bot.get_guild(self.current_voice_channel.guild.id)
             bot_member = await guild.fetch_member(BOT_ID)
 
-            await voice_channel.connect()
+            await self.current_voice_channel.connect()
 
             # tasks
             self.vc_check_task.start(interaction)
             self.tracklisting.start()
 
             # check if bot is in a stage channel instead of a voice channel and if so, let it speak
-            if (voice_channel.type.name == "stage_voice" and bot_member.voice.suppress is True):
+            if (self.current_voice_channel.type.name == "stage_voice" and bot_member.voice.suppress is True):
                 await bot_member.edit(suppress=False)
 
             await interaction.followup.send(
                 embed=discord.Embed(
-                    description=f"Successfully connected to <#{str(voice_channel.id)}>!",
+                    description=f"Successfully connected to <#{str(self.current_voice_channel.id)}>!",
                     color=0x00AEFF,
                 )
             )
         except AttributeError:
             await interaction.followup.send(
                 embed=discord.Embed(
-                    description="You are not connected to a voice channel!",
+                    description="You are not connected to a voice channel or to the same voice channel as the bot!",
                     color=0xFF0000,
                 )
             )
@@ -147,6 +150,8 @@ class VcCog(commands.Cog):
         """
         try:
             await interaction.response.defer()
+            if self.current_voice_channel != None and interaction.user.voice.channel != self.current_voice_channel:
+                raise AttributeError
             bot_voice_client = discord.utils.get(
                 self.bot.voice_clients, guild=interaction.guild
             )
@@ -173,7 +178,7 @@ class VcCog(commands.Cog):
         except AttributeError:
             await interaction.followup.send(
                 embed=discord.Embed(
-                    description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!",
+                    description="You are not connected to a voice channel, or to the same voice channel as the bot, or the bot currently isn't connected to a voice channel!",
                     color=0xFF0000,
                 )
             )
@@ -219,13 +224,14 @@ class VcCog(commands.Cog):
         """
         try:
             await interaction.response.defer()  # avoids the "The application did not respond" message if the command takes too long to respond
-
-            voice_channel = interaction.user.voice.channel
+            if self.current_voice_channel != None and interaction.user.voice.channel != self.current_voice_channel:
+                raise AttributeError
+            self.current_voice_channel = interaction.user.voice.channel
             bot_voice_client = discord.utils.get(
                 self.bot.voice_clients, guild=interaction.guild
             )
             self.last_channel_interaction = interaction.channel_id
-            guild = self.bot.get_guild(voice_channel.guild.id)
+            guild = self.bot.get_guild(self.current_voice_channel.guild.id)
             bot_member = await guild.fetch_member(BOT_ID)
 
             # check if only one file/attachment is attached and if that file/attachment is correct
@@ -366,12 +372,12 @@ class VcCog(commands.Cog):
                 # actually play stuff
                 if bot_voice_client is None or (bot_voice_client.is_paused() is False and bot_voice_client.is_playing() is False):
                     if bot_voice_client is None:
-                        vc = await voice_channel.connect()
+                        vc = await self.current_voice_channel.connect()
                         self.song_queue.append(qbuild)
 
                         # check if bot is in a stage channel instead of a voice channel and if so, let it speak
                         if (
-                            voice_channel.type.name == "stage_voice"
+                            self.current_voice_channel.type.name == "stage_voice"
                             and bot_member.voice.suppress is True
                         ):
                             await bot_member.edit(suppress=False)
@@ -391,7 +397,7 @@ class VcCog(commands.Cog):
                         else:
                             self.song_queue.insert(position, qbuild)
                         # check if bot is in a stage channel instead of a voice channel and if so, let it speak
-                        if (voice_channel.type.name == "stage_voice" and bot_member.voice.suppress is True):
+                        if (self.current_voice_channel.type.name == "stage_voice" and bot_member.voice.suppress is True):
                             await bot_member.edit(suppress=False)
                         bot_voice_client.play(
                             discord.FFmpegOpusAudio(
@@ -428,7 +434,7 @@ class VcCog(commands.Cog):
         except AttributeError:
             await interaction.followup.send(
                 embed=discord.Embed(
-                    description="You are not connected to a voice channel!",
+                    description="You are not connected to a voice channel, or to the same voice channel as the bot!",
                     color=0xFF0000,
                 )
             )
@@ -461,7 +467,8 @@ class VcCog(commands.Cog):
         """
         try:
             await interaction.response.defer()
-            voice_channel = interaction.user.voice.channel #not inherently used, but serves as a way to check if user is in voice channel
+            if self.current_voice_channel != None and interaction.user.voice.channel != self.current_voice_channel:
+                raise AttributeError
             bot_voice_client = discord.utils.get(
                 self.bot.voice_clients, guild=interaction.guild
             )
@@ -487,7 +494,7 @@ class VcCog(commands.Cog):
         except AttributeError:
             await interaction.followup.send(
                 embed=discord.Embed(
-                    description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!",
+                    description="You are not connected to a voice channel, or to the same voice channel as the bot, or the bot currently isn't connected to a voice channel!",
                     color=0xFF0000,
                 )
             )
@@ -510,7 +517,8 @@ class VcCog(commands.Cog):
         """
         try:
             await interaction.response.defer()
-            voice_channel = interaction.user.voice.channel #not inherently used, but serves as a way to check if user is in voice channel
+            if self.current_voice_channel != None and interaction.user.voice.channel != self.current_voice_channel:
+                raise AttributeError
             bot_voice_client = discord.utils.get(
                 self.bot.voice_clients, guild=interaction.guild
             )
@@ -543,7 +551,7 @@ class VcCog(commands.Cog):
         except AttributeError:
             await interaction.followup.send(
                 embed=discord.Embed(
-                    description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!",
+                    description="You are not connected to a voice channel, or to the same voice channel as the bot, or the bot currently isn't connected to a voice channel!",
                     color=0xFF0000,
                 )
             )
@@ -564,6 +572,8 @@ class VcCog(commands.Cog):
         """
         try:
             await interaction.response.defer()
+            if self.current_voice_channel != None and interaction.user.voice.channel != self.current_voice_channel:
+                raise AttributeError
             bot_voice_client = discord.utils.get(
                 self.bot.voice_clients, guild=interaction.guild
             )
@@ -577,7 +587,7 @@ class VcCog(commands.Cog):
         except AttributeError:
             await interaction.followup.send(
                 embed=discord.Embed(
-                    description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!",
+                    description="You are not connected to a voice channel, or to the same voice channel as the bot, or the bot currently isn't connected to a voice channel!",
                     color=0xFF0000,
                 )
             )
@@ -598,6 +608,8 @@ class VcCog(commands.Cog):
         """
         try:
             await interaction.response.defer()
+            if self.current_voice_channel != None and interaction.user.voice.channel != self.current_voice_channel:
+                raise AttributeError
             bot_voice_client = discord.utils.get(
                 self.bot.voice_clients, guild=interaction.guild
             )
@@ -611,7 +623,7 @@ class VcCog(commands.Cog):
         except AttributeError:
             await interaction.followup.send(
                 embed=discord.Embed(
-                    description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!",
+                    description="You are not connected to a voice channel, or to the same voice channel as the bot, or the bot currently isn't connected to a voice channel!",
                     color=0xFF0000,
                 )
             )
@@ -632,6 +644,8 @@ class VcCog(commands.Cog):
         """
         try:
             await interaction.response.defer()
+            if self.current_voice_channel != None and interaction.user.voice.channel != self.current_voice_channel:
+                raise AttributeError
             bot_voice_client = discord.utils.get(
                 self.bot.voice_clients, guild=interaction.guild
             )
@@ -645,7 +659,7 @@ class VcCog(commands.Cog):
         except AttributeError:
             await interaction.followup.send(
                 embed=discord.Embed(
-                    description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!",
+                    description="You are not connected to a voice channel, or to the same voice channel as the bot, or the bot currently isn't connected to a voice channel!",
                     color=0xFF0000,
                 )
             )
@@ -666,6 +680,8 @@ class VcCog(commands.Cog):
         """
         try:
             await interaction.response.defer()
+            if self.current_voice_channel != None and interaction.user.voice.channel != self.current_voice_channel:
+                raise AttributeError
             bot_voice_client = discord.utils.get(
                 self.bot.voice_clients, guild=interaction.guild
             )
@@ -680,7 +696,7 @@ class VcCog(commands.Cog):
         except AttributeError:
             await interaction.followup.send(
                 embed=discord.Embed(
-                    description="You are not connected to a voice channel, or the bot currently isn't connected to a voice channel!",
+                    description="You are not connected to a voice channel, or to the same voice channel as the bot, or the bot currently isn't connected to a voice channel!",
                     color=0xFF0000,
                 )
             )
@@ -853,6 +869,8 @@ class VcCog(commands.Cog):
         """
         try:
             await interaction.response.defer()
+            if self.current_voice_channel != None and interaction.user.voice.channel != self.current_voice_channel:
+                raise AttributeError
 
             if (queue_setting.value == 'disabled'):
                 self.loop_setting = 0
@@ -867,6 +885,14 @@ class VcCog(commands.Cog):
                     color=0x00AEFF
                 )
             )
+        except AttributeError:
+            await interaction.followup.send(
+                embed=discord.Embed(
+                    description="You are not connected to a voice channel, or to the same voice channel as the bot, or the bot currently isn't connected to a voice channel!",
+                    color=0xFF0000,
+                )
+            )
+            raise
         except:
             await embeds.error_executing_command(interaction)
             raise
@@ -888,6 +914,8 @@ class VcCog(commands.Cog):
         """
         try:
             await interaction.response.defer()
+            if self.current_voice_channel != None and interaction.user.voice.channel != self.current_voice_channel:
+                raise AttributeError
 
             queue_to_shuffle = self.song_queue[1:]
             random.shuffle(queue_to_shuffle)
@@ -899,6 +927,14 @@ class VcCog(commands.Cog):
                     color=0x00AEFF
                 )
             )
+        except AttributeError:
+            await interaction.followup.send(
+                embed=discord.Embed(
+                    description="You are not connected to a voice channel, or to the same voice channel as the bot, or the bot currently isn't connected to a voice channel!",
+                    color=0xFF0000,
+                )
+            )
+            raise
         except:
             await embeds.error_executing_command(interaction)
             raise
@@ -911,7 +947,7 @@ class VcCog(commands.Cog):
         song_position_before="Song you want to move",
         song_position_after="Where in the queue you want to move that song"
     )
-    async def shuffle(
+    async def move(
         self,
         interaction: discord.Interaction,
         song_position_before: int,
@@ -926,6 +962,8 @@ class VcCog(commands.Cog):
         """
         try:
             await interaction.response.defer()
+            if self.current_voice_channel != None and interaction.user.voice.channel != self.current_voice_channel:
+                raise AttributeError
             
             if song_position_before == 0:
                 await interaction.followup.send(
@@ -953,6 +991,14 @@ class VcCog(commands.Cog):
                         color=0x00AEFF
                     )
                 )
+        except AttributeError:
+            await interaction.followup.send(
+                embed=discord.Embed(
+                    description="You are not connected to a voice channel, or to the same voice channel as the bot, or the bot currently isn't connected to a voice channel!",
+                    color=0xFF0000,
+                )
+            )
+            raise
         except:
             await embeds.error_executing_command(interaction)
             raise
@@ -999,7 +1045,6 @@ class VcCog(commands.Cog):
             interaction (discord.Interaction): Discord interaction. Occurs when user does notifiable action (e.g. slash commands)
         """
         try:
-            voice_channel = interaction.user.voice.channel
             bot_voice_client = discord.utils.get(
                 self.bot.voice_clients, guild=interaction.guild
             )
@@ -1007,7 +1052,7 @@ class VcCog(commands.Cog):
             if bot_voice_client.is_paused():
                 pass
             elif (bot_voice_client.source is None or bot_voice_client.is_playing() is False):
-                guild = self.bot.get_guild(voice_channel.guild.id)
+                guild = self.bot.get_guild(self.current_voice_channel.guild.id)
                 bot_member = await guild.fetch_member(BOT_ID)
 
                 self.current_song_timestamp = 0
@@ -1024,7 +1069,7 @@ class VcCog(commands.Cog):
                             
 
                     # check if bot is in a stage channel instead of a voice channel and if so, let it speak
-                    if (voice_channel.type.name == "stage_voice" and bot_member.voice.suppress is True):
+                    if (self.current_voice_channel.type.name == "stage_voice" and bot_member.voice.suppress is True):
                         await bot_member.edit(suppress=False)
 
                     bot_voice_client.play(
