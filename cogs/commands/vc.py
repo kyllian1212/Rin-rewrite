@@ -427,8 +427,8 @@ class VcCog(commands.Cog):
                             description=desc,
                             color=0x00AEFF,
                         ).set_footer(
-                            text=f"Requested by {self.song_queue[0].get('user')}",
-                            icon_url=self.song_queue[0].get("user").avatar.url,
+                            text=f"Requested by {qbuild.get('user')}",
+                            icon_url=qbuild.get("user").avatar.url,
                         )
                     )
         except AttributeError:
