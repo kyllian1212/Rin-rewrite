@@ -269,10 +269,10 @@ class VcCog(commands.Cog):
             if file_check == 0:
                 for file_format in self.supported_file_formats:
                     file_check = 3
-                    if file.endswith(f".{file_format}"):
+                    if file.rsplit("?", 1)[0].endswith(f".{file_format}"):
                         file_check = 0
                         break
-
+            
             if file_check == 3:
                 await interaction.followup.send(
                     embed=discord.Embed(
@@ -283,7 +283,7 @@ class VcCog(commands.Cog):
             elif file_check == 0:
                 # get song len
                 ffmpeg_check = os.system(
-                    f'ffprobe -i {file} -show_entries format=duration -of csv="p=0" > time.txt'
+                    f'ffprobe -i "{file}" -show_entries format=duration -of csv="p=0" > time.txt'
                 )
                 if ffmpeg_check == 1:
                     raise FileNotFoundError
@@ -296,7 +296,7 @@ class VcCog(commands.Cog):
 
                 print(f"song is {time_sec} secs long")
                 # get metadata
-                os.system(f"ffmpeg -y -i {file} -f ffmetadata metadata.txt")
+                os.system(f'ffmpeg -y -i "{file}" -f ffmetadata metadata.txt')
                 await asyncio.sleep(
                     2
                 )  # limit the "catch-up" effect as much as possible
