@@ -41,13 +41,6 @@ class ReactionsCog(commands.Cog):
             reacted_message: discord.Message = await channel.fetch_message(
                 payload.message_id
             )
-            if (
-                payload.member.guild_permissions.administrator is True
-                or payload.member.guild_permissions.manage_messages is True
-                or payload.user_id == reacted_message.author.id
-            ):
-                await reacted_message.delete()
-                description = "*The message has been deleted as it has been reported by an admin.*"
 
             if (
                 not payload.user_id == reacted_message.author.id
@@ -210,6 +203,14 @@ class ReactionsCog(commands.Cog):
                 await log_channel.send(embed=reported_message_embed, files=files)
                 if long_message is True:
                     await log_channel.send(embed=reported_message_part2_embed)
+            
+            if (
+                payload.member.guild_permissions.administrator is True
+                or payload.member.guild_permissions.manage_messages is True
+                or payload.user_id == reacted_message.author.id
+            ):
+                await reacted_message.delete()
+                description = "*The message has been deleted as it has been reported by an admin.*"
 
 
 async def setup(bot):
