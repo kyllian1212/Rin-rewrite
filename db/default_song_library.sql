@@ -53,14 +53,20 @@ INSERT INTO bot_default_song_library (artist, song_title, album, length_in_secon
 -- nurture live edit bc i love it so much
 ("Porter Robinson", "Musician (Part 2)", "Nurture Live (Secret Sky 2021)", 157),
 ("Porter Robinson", "EZ Sea of Voices", "Nurture Live (Secret Sky 2021)", 232),
--- post-nurture
+-- pre-smile
 ("Porter Robinson & League of Legends", "Everything Goes On", "Everything Goes On", 202),
+-- smile
+("Porter Robinson", "Cheerleader", "SMILE! :D", 237),
+("Porter Robinson", "KNOCK YOURSELF OUT XD", "SMILE! :D", 168),
+("Porter Robinson", "Russian Roulette", "SMILE! :D", 388),
 /* skrillex, porter robinson & bibi bourelly*/
 -- still here
 ("Skrillex, Porter Robinson & Bibi Bourelly", "Still Here (with the ones that I came with)", "Quest For Fire", 312),
 /* porter robinson & madeon */
 -- shelter
 ("Porter Robinson & Madeon", "Shelter", "Shelter", 219),
+/* po-uta */
+("Po-uta", "Humansongs", "Humansongs", 216)
 /* madeon */
 -- pre-adventure
 ("Madeon", "For You", "For You", 196),
@@ -101,4 +107,7 @@ INSERT INTO bot_default_song_library (artist, song_title, album, length_in_secon
 ("Madeon", "Borealis", "Good Faith", 285),
 ("Madeon", "The Prince", "The Prince", 222),
 ("Madeon", "Love You Back", "Love You Back", 214),
-("Madeon", "Gonna Be Good", "Gonna Be Good (Length to fix at release)", 295);
+("Madeon", "Gonna Be Good", "Gonna Be Good", 172),
+("Madeon", "Gonna Be Good (Live Edit)", "Gonna Be Good (Live Edit)", 271);
+-- all ur luv
+("Wavedash, Madeon & Toro Y Moi", "All Ur Luv", "Tempo", 161)
