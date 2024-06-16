@@ -66,7 +66,7 @@ INSERT INTO bot_default_song_library (artist, song_title, album, length_in_secon
 -- shelter
 ("Porter Robinson & Madeon", "Shelter", "Shelter", 219),
 /* po-uta */
-("Po-uta", "Humansongs", "Humansongs", 216)
+("Po-uta", "Humansongs", "Humansongs", 216),
 /* madeon */
 -- pre-adventure
 ("Madeon", "For You", "For You", 196),
@@ -108,6 +108,6 @@ INSERT INTO bot_default_song_library (artist, song_title, album, length_in_secon
 ("Madeon", "The Prince", "The Prince", 222),
 ("Madeon", "Love You Back", "Love You Back", 214),
 ("Madeon", "Gonna Be Good", "Gonna Be Good", 172),
-("Madeon", "Gonna Be Good (Live Edit)", "Gonna Be Good (Live Edit)", 271);
+("Madeon", "Gonna Be Good (Live Edit)", "Gonna Be Good (Live Edit)", 271),
 -- all ur luv
-("Wavedash, Madeon & Toro Y Moi", "All Ur Luv", "Tempo", 161)
+("Wavedash, Madeon & Toro Y Moi", "All Ur Luv", "Tempo", 161);
