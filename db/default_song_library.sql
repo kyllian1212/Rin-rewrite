@@ -56,9 +56,13 @@ INSERT INTO bot_default_song_library (artist, song_title, album, length_in_secon
 -- pre-smile
 ("Porter Robinson & League of Legends", "Everything Goes On", "Everything Goes On", 202),
 -- smile
+("Porter Robinson", "Knock Yourself Out XD", "SMILE! :D", 168),
 ("Porter Robinson", "Cheerleader", "SMILE! :D", 237),
-("Porter Robinson", "KNOCK YOURSELF OUT XD", "SMILE! :D", 168),
 ("Porter Robinson", "Russian Roulette", "SMILE! :D", 388),
+    -- track 4 & 5
+("Porter Robinson", "Kitsune Maison Freestyle", "SMILE! :D", 234),
+--("Porter Robinson", "Is There Really No Happiness?", "SMILE! :D", unknown),
+  
 /* skrillex, porter robinson & bibi bourelly*/
 -- still here
 ("Skrillex, Porter Robinson & Bibi Bourelly", "Still Here (with the ones that I came with)", "Quest For Fire", 312),
@@ -110,4 +114,6 @@ INSERT INTO bot_default_song_library (artist, song_title, album, length_in_secon
 ("Madeon", "Gonna Be Good", "Gonna Be Good", 172),
 ("Madeon", "Gonna Be Good (Live Edit)", "Gonna Be Good (Live Edit)", 271),
 -- all ur luv
-("Wavedash, Madeon & Toro Y Moi", "All Ur Luv", "Tempo", 161);
+("Wavedash, Madeon & Toro Y Moi", "All Ur Luv", "Tempo", 161),
+-- believe it (album unknown)
+("Louis The Child, Madeon", "Believe It", "Believe It", 150);
