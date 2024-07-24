@@ -59,9 +59,13 @@ INSERT INTO bot_default_song_library (artist, song_title, album, length_in_secon
 ("Porter Robinson", "Knock Yourself Out XD", "SMILE! :D", 168),
 ("Porter Robinson", "Cheerleader", "SMILE! :D", 237),
 ("Porter Robinson", "Russian Roulette", "SMILE! :D", 388),
-    -- track 4 & 5
+("Porter Robinson", "Perfect Pinterest Garden", "SMILE! :D", 148),
+("Porter Robinson", "Year of the Cup", "SMILE! :D", 262),
 ("Porter Robinson", "Kitsune Maison Freestyle", "SMILE! :D", 234),
---("Porter Robinson", "Is There Really No Happiness?", "SMILE! :D", unknown),
+("Porter Robinson", "Easier to Love You", "SMILE! :D", 250),
+("Porter Robinson", "Mona Lisa", "SMILE! :D", 225),
+("Porter Robinson", "Is There Really No Happiness?", "SMILE! :D", 199),
+("Porter Robinson", "Everything To Me", "SMILE! :D", 292),
   
 /* skrillex, porter robinson & bibi bourelly*/
 -- still here
