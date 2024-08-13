@@ -25,6 +25,7 @@ INSERT INTO bot_default_song_library (artist, song_title, album, length_in_secon
 ("Porter Robinson", "Sea of Voices", "Worlds", 299),
 ("Porter Robinson", "Fellow Feeling", "Worlds", 349),
 ("Porter Robinson", "Goodbye to a World", "Worlds", 328),
+("Porter Robinson","Hollowheart (ft. Amy Millan)", "Worlds 10th Anniversary Edition", 229),
 -- shepherdess
 ("Porter Robinson", "Shepherdess", "Lionhearted Vinyl", 436),
 -- virtual self
