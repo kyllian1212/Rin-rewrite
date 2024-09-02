@@ -8,3 +8,6 @@ discord.log
 metadata.txt
 time.txt
 tracklist.json
+google_credentials.json
+google_token.json
+**.pickle
