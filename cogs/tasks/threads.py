@@ -34,7 +34,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 # If modifying these scopes, delete the file token.json.
-SCOPES = ["https://www.googleapis.com/auth/drive"]
+SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
 # The ID and range of a sample spreadsheet.
 sheet_name = "shows!"
@@ -216,7 +216,7 @@ class ThreadsCog(commands.Cog):
             except:
                 cell = sheet_name + "L" + str(show["row"])
                 
-                updates.append({"range": cell, "values": [[f'=HYPERLINK("{show["thread"]}","Link")']]})
+                updates.append({"range": cell, "values": [[f'=HYPERLINK("{show["thread"]}",IMAGE("https://i.postimg.cc/J4GqBT05/discord-long-2.png"))']]})
                 show["thread"]= show["thread"].split("/")[-1]
             print( datetime.now(), role_name)
             if count != 0 and count % 10 == 0:
@@ -309,15 +309,15 @@ class ThreadsCog(commands.Cog):
                 show["support"] = ""
 
             show["version"] = setrow(v, 6, "formattedValue")
-            show["age"] = setrow(v, 7, "formattedValue")
-            show["notes"] = setrow(v, 8, "formattedValue")
-            show["status"] = setrow(v, 9, "formattedValue")
+            show["status"] = setrow(v, 7, "formattedValue")
+            show["age"] = setrow(v, 8, "formattedValue")
+            show["time"] = setrow(v, 9, "formattedValue")
             show["tickets"] = setrow(v, 10, "hyperlink")
             if setrow(v, 11, "hyperlink") != None:
                 show["thread"] = int(setrow(v, 11, "hyperlink").split("/")[-1])
             else:
                 show["thread"] = None
-            show["time"] = setrow(v, 12, "formattedValue")
+            show["notes"] = setrow(v, 12, "formattedValue")
             show["role"] = int(setrow(v, 13, "formattedValue")) if setrow(v, 13, "formattedValue") != None else None
 
             datesplit = show["date"].split("-")
@@ -370,7 +370,7 @@ class ThreadsCog(commands.Cog):
                     pass
                 #change upcoming to past
                 show["status"] = show["status"].replace("UPCOMING", "PAST")
-                cell = sheet_name+"J" + str(show["row"])
+                cell = sheet_name+"H" + str(show["row"])
                 updates.append({"range": cell, "values": [[str(show["status"])]]})
             # if more than 3 weeks old stop getting shows
 
