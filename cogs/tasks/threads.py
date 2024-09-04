@@ -139,7 +139,7 @@ class ThreadsCog(commands.Cog):
     async def updatesheet(self, server_id, sheet, updates, Format):
         body = {"valueInputOption": Format , "data": updates}
         result = sheet.values().batchUpdate(spreadsheetId=sdict[str(server_id)]["sheet"], body=body).execute()
-        print(f"{(result.get('totalUpdatedCells'))} cells updated.")
+        print(f'{(result.get("totalUpdatedCells"))} cells updated.')
         return result
     
 
@@ -161,7 +161,7 @@ class ThreadsCog(commands.Cog):
             countdown = show["datetimes"][0] + start
 
             #update role name
-            role_name = f"{show['city']} | {show['date']}"
+            role_name = f'{show["city"]} | {show["date"]}'
             await server.get_role(show["role"]).edit(name=role_name)
 
             
@@ -176,9 +176,9 @@ class ThreadsCog(commands.Cog):
 
 
             #update the body
-            body = f"Countdown: <t:{round(countdown.timestamp())}:R>\n"
+            body = f'Countdown: <t:{round(countdown.timestamp())}:R>\n'
             if show["support"]:
-                body += f"Support: {show['support']}\n"
+                body += f'Support: {show["support"]}\n'
             body += f"Location: {show['venue']}\n"
             body += f"Type: {show['type']}\n"
             if show["time"]:
@@ -205,7 +205,7 @@ class ThreadsCog(commands.Cog):
                         show["thread"]
                     ).edit(content=body)
                 except:
-                    print(f"couldn't edit body of {show["thread"]}")
+                    print(f"couldn't edit body of {show['thread']}")
                     thr = server.get_channel_or_thread(show["thread"])
                     await thr.send(f"{thr.owner.mention}, if possible please set the starting message to ```\n{body}```")
             #add role and thread id to sheet, delete row id
@@ -437,7 +437,7 @@ class ThreadsCog(commands.Cog):
                     print("finished with changed shows")  
         for key, change in changedict.items():
                 updates, count = await self.update(shows[key], server_id, server, sheet, updates, count, msg)
-                print(f"{shows[key]["thread"]} <@&{key}> {change}")
+                print(f"{shows[key]['thread']} <@&{key}> {change}")
                 await server.get_channel_or_thread(shows[key]["thread"]).send(content=f"<@&{key}> {change}")
         if len(updates) > 0:
             await self.updatesheet(server_id, sheet, updates, "USER_ENTERED")
