@@ -24,6 +24,8 @@ from typing import Optional
 import dictdiffer
 import os.path
 import pickle
+from dotenv import load_dotenv
+
 
 # https://developers.google.com/sheets/api/quickstart/python
 # https://googleapis.github.io/google-api-python-client/docs/dyn/sheets_v4.spreadsheets.html#get
@@ -32,6 +34,8 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+
+IP = os.getenv("IP")
 
 # If modifying these scopes, delete the file google_auth_tokens.json
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
@@ -118,7 +122,7 @@ class ThreadsCog(commands.Cog):
                 flow = InstalledAppFlow.from_client_secrets_file(
                     "google_client_secret.json", SCOPES
                 )
-                creds = flow.run_local_server(port=4041)
+                creds = flow.run_local_server(host=IP, port=4041)
             # Save the credentials for the next run
         with open("google_auth_tokens.json", "w") as token:
             token.write(creds.to_json())
