@@ -118,7 +118,7 @@ class ThreadsCog(commands.Cog):
                 flow = InstalledAppFlow.from_client_secrets_file(
                     "google_client_secret.json", SCOPES
                 )
-                creds = flow.run_console()
+                creds = flow.run_local_server(port=4041)
             # Save the credentials for the next run
         with open("google_auth_tokens.json", "w") as token:
             token.write(creds.to_json())
