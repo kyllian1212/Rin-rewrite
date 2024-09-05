@@ -46,9 +46,9 @@ sheet_range = sheet_name+"A3:Z"
 
 # dict of server ids and their forum/sheets
 sdict = {
-    "1280232968023048192": {  # testing server
-        "forum": 1280233098180562984,
-        "sheet": "10M3FRfDYWAj95O6eGvQ1y6kRRRfES0jpHIhBje9Uf78",
+    "1280169949767405651": {  # testing server
+        "forum": 1281341776057339914,
+        "sheet": "1jXR207pgnwobPjave6fM78gg8z-TGkkxzgO66GhFoYM",
     },
         "1059727841937334313": {  # hmm
         "forum": 1276933222604996650,
@@ -122,7 +122,7 @@ class ThreadsCog(commands.Cog):
                 flow = InstalledAppFlow.from_client_secrets_file(
                     "google_client_secret.json", SCOPES
                 )
-                creds = flow.run_local_server(host=IP, port=4041)
+                creds = flow.run_local_server(port=4041)
             # Save the credentials for the next run
         with open("google_auth_tokens.json", "w") as token:
             token.write(creds.to_json())
@@ -177,7 +177,8 @@ class ThreadsCog(commands.Cog):
             else:
                 status = ""
             title = f'{status} {show["date"]} | {show["city"]} | {show["country"]} | {show["venue"]}'
-
+            if len(title) > 100:
+                title = title[0:95] + "[…]"
 
             #update the body
             body = f'Countdown: <t:{round(countdown.timestamp())}:R>\n'
@@ -284,7 +285,7 @@ class ThreadsCog(commands.Cog):
                 elif content in v[column]:
                     return clean(v[column][content])
             else:
-                return ""
+                return None
         #the starting row
         row_num = 3
         
