@@ -2,7 +2,6 @@
 Threads Module
 """
 
-
 # TODO:
 # add/remove role buttons
 # tags - need to figure out how to get continents from loc
@@ -42,7 +41,7 @@ SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
 # The ID and range of a sample spreadsheet.
 sheet_name = "shows!"
-sheet_range = sheet_name+"A3:Z"
+sheet_range = sheet_name + "A3:Z"
 
 # dict of server ids and their forum/sheets
 sdict = {
@@ -50,14 +49,14 @@ sdict = {
         "forum": 1281341776057339914,
         "sheet": "1jXR207pgnwobPjave6fM78gg8z-TGkkxzgO66GhFoYM",
     },
-        "1059727841937334313": {  # hmm
+    "1059727841937334313": {  # hmm
         "forum": 1276933222604996650,
         "sheet": "10M3FRfDYWAj95O6eGvQ1y6kRRRfES0jpHIhBje9Uf78",
     },
     "250710137671516161": {  # madeon
         "forum": 1047182249361145886,
         "sheet": "1-IQNkChiKwopuxCwMZEXIqWMpTieGZiVcxGIj2aC_Ac",
-    } #,
+    },  # ,
     # "186610204023062528": {  # porter
     #     "forum": 997913478608199890,
     #     "sheet": "1Mv027gksrVJhriB8fxmio6uW2RK1LSWgi8oJ2Ns8J2U",
@@ -79,22 +78,28 @@ class ThreadsCog(commands.Cog):
 
     # if i want to convert to buttons: https://gist.github.com/lykn/bac99b06d45ff8eed34c2220d86b6bf4
 
-#react add/remove
+    # react add/remove
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, reaction):
         if (
-            reaction.message_id == reaction.channel_id and reaction.emoji.name == self.emote
+            reaction.message_id == reaction.channel_id
+            and reaction.emoji.name == self.emote
         ):
             channel = await self.bot.fetch_channel(reaction.channel_id)
             reacted_message: discord.Message = await channel.fetch_message(
                 reaction.message_id
             )
-            await reaction.member.add_roles(reacted_message.role_mentions[0])
+
+            role = reacted_message.role_mentions[0]
+            if not role.permissions.manage_messages:
+                await reaction.member.add_roles(reacted_message.role_mentions[0])
+
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, reaction):
         if (
-            reaction.message_id == reaction.channel_id and reaction.emoji.name == self.emote
+            reaction.message_id == reaction.channel_id
+            and reaction.emoji.name == self.emote
         ):
             channel = await self.bot.fetch_channel(reaction.channel_id)
             reacted_message: discord.Message = await channel.fetch_message(
@@ -103,9 +108,7 @@ class ThreadsCog(commands.Cog):
             j = await reacted_message.guild.fetch_member(reaction.user_id)
             await j.remove_roles(reacted_message.role_mentions[0])
 
-
-# import google sheet
-
+    # import google sheet
 
     async def getsheet(self, server_id):
         creds = None
@@ -113,7 +116,9 @@ class ThreadsCog(commands.Cog):
         # created automatically when the authorization flow completes for the first
         # time.
         if os.path.exists("google_auth_tokens.json"):
-            creds = Credentials.from_authorized_user_file("google_auth_tokens.json", SCOPES)
+            creds = Credentials.from_authorized_user_file(
+                "google_auth_tokens.json", SCOPES
+            )
         # If there are no (valid) credentials available, let the user log in.
         if not creds or not creds.valid:
             if creds and creds.expired and creds.refresh_token:
@@ -131,120 +136,126 @@ class ThreadsCog(commands.Cog):
 
             # Call the Sheets API
             sheet = service.spreadsheets()
-            result = sheet.get(spreadsheetId=sdict[str(server_id)]["sheet"],
+            result = sheet.get(
+                spreadsheetId=sdict[str(server_id)]["sheet"],
                 includeGridData=True,
                 ranges=[sheet_range],
             ).execute()
             return sheet, result
         except HttpError as err:
             raise (err)
-    
-    #warning: lowercase format is a function
+
+    # warning: lowercase format is a function
     async def updatesheet(self, server_id, sheet, updates, Format):
-        body = {"valueInputOption": Format , "data": updates}
-        result = sheet.values().batchUpdate(spreadsheetId=sdict[str(server_id)]["sheet"], body=body).execute()
+        body = {"valueInputOption": Format, "data": updates}
+        result = (
+            sheet.values()
+            .batchUpdate(spreadsheetId=sdict[str(server_id)]["sheet"], body=body)
+            .execute()
+        )
         print(f'{(result.get("totalUpdatedCells"))} cells updated.')
         return result
-    
 
-
-
-# update the shows
+    # update the shows
 
     async def update(self, show, server_id, server, sheet, updates, count, msg):
-        
-            # if there is a start time convert it to a unix time, otherwise assume the start time is 20:00 (8pm)
+
+        # if there is a start time convert it to a unix time, otherwise assume the start time is 20:00 (8pm)
+        try:
+            start = datetime.strptime(show["time"], "%-I:%m %p")
+        except:
+            start = timedelta(hours=20)
+
+        # set the countdown to be the first day listed plus the start time
+        countdown = show["datetimes"][0] + start
+
+        # update role name
+        role_name = f'{show["city"]} | {show["date"]}'
+        await server.get_role(show["role"]).edit(name=role_name)
+
+        # set the title
+        if "sold" in show["status"].lower():
+            status = "[SOLD OUT] |"
+        elif "cancel" in show["status"].lower():
+            status = "[CANCELED] |"
+        else:
+            status = ""
+        title = f'{status} {show["date"]} | {show["city"]} | {show["country"]} | {show["venue"]}'
+        if len(title) > 100:
+            title = title[0:95] + "[…]"
+
+        # update the body
+        body = f"Countdown: <t:{round(countdown.timestamp())}:R>\n"
+        if show["support"]:
+            body += f'Support: {show["support"]}\n'
+        body += f"Location: {show['venue']}\n"
+        body += f"Type: {show['type']}\n"
+        if show["time"]:
+            body += f"Start time: {show['time']} (doors may be earlier)\n"
+        if show["age"]:
+            body += f"Ages: {show['age']}\n"
+        if show["tickets"]:
+            body += f"[Tickets](<{show['tickets']}>)\n"
+        if show["notes"]:
+            body += f"Notes: {show['notes']}\n"
+        body += f"if you would like a message pinned please ask a mod\n"
+        body += f"react with {self.emote} to add or remove the <@&{show['role']}> role (can only be pinged in this thread by using `/pingthread`)"
+
+        # creates/edits thread and message
+        if not show["thread"]:
+            if not self.bot.is_ws_ratelimited():
+                thread = await server.get_channel(
+                    sdict[str(server_id)]["forum"]
+                ).create_thread(name=title, content=body)
+                show["thread"] = thread.thread.jump_url
+
+        else:
+            await server.get_channel_or_thread(show["thread"]).edit(name=title)
             try:
-                start = datetime.strptime(show["time"], "%-I:%m %p")
+                await server.get_channel_or_thread(show["thread"]).get_partial_message(
+                    show["thread"]
+                ).edit(content=body)
             except:
-                start = timedelta(
-                    hours=20
+                print(f"couldn't edit body of {show['thread']}")
+                thr = server.get_channel_or_thread(show["thread"])
+                await thr.send(
+                    f"{thr.owner.mention}, if possible please set the starting message to ```\n{body}```"
                 )
-                
-            #set the countdown to be the first day listed plus the start time
-            countdown = show["datetimes"][0] + start
+        # add role and thread id to sheet, delete row id
+        # https://developers.google.com/sheets/api/guides/values#write_multiple_ranges
 
-            #update role name
-            role_name = f'{show["city"]} | {show["date"]}'
-            await server.get_role(show["role"]).edit(name=role_name)
+        try:
+            int(show["thread"])
+        except:
+            cell = sheet_name + "L" + str(show["row"])
 
-            
-            #set the title
-            if "sold" in show["status"].lower():
-                status = "[SOLD OUT] |"
-            elif "cancel" in show["status"].lower():
-                status = "[CANCELED] |"
-            else:
-                status = ""
-            title = f'{status} {show["date"]} | {show["city"]} | {show["country"]} | {show["venue"]}'
-            if len(title) > 100:
-                title = title[0:95] + "[…]"
+            updates.append(
+                {
+                    "range": cell,
+                    "values": [
+                        [
+                            f'=HYPERLINK("{show["thread"]}",IMAGE("https://i.postimg.cc/J4GqBT05/discord-long-2.png"))'
+                        ]
+                    ],
+                }
+            )
+            show["thread"] = show["thread"].split("/")[-1]
+        print(datetime.now(), role_name)
+        if count != 0 and count % 10 == 0:
+            print("updating and sleeping")
 
-            #update the body
-            body = f'Countdown: <t:{round(countdown.timestamp())}:R>\n'
-            if show["support"]:
-                body += f'Support: {show["support"]}\n'
-            body += f"Location: {show['venue']}\n"
-            body += f"Type: {show['type']}\n"
-            if show["time"]:
-                body += f"Start time: {show['time']} (doors may be earlier)\n"
-            if show["age"]:
-                body += f"Ages: {show['age']}\n"
-            if show["tickets"]:
-                body += f"[Tickets](<{show['tickets']}>)\n"
-            if show["notes"]:
-                body += f"Notes: {show['notes']}\n"
-            body += f"if you would like a message pinned please ask a mod\n"
-            body += f"react with {self.emote} to add or remove the <@&{show['role']}> role (can only be pinged in this thread by using `/pingthread`)"
+            await self.updatesheet(server_id, sheet, updates, "USER_ENTERED")
+            updates = []
+            c2 = 1
+            while c2 < 11:
+                print(c2)
+                c2 += 1
+                await asyncio.sleep(1)
+        count += 1
 
-            # creates/edits thread and message
-            if not show["thread"]:
-                if not self.bot.is_ws_ratelimited():
-                    thread = await server.get_channel(sdict[str(server_id)]["forum"]).create_thread(name=title, content=body)
-                    show["thread"] = thread.thread.jump_url
-                
-            else:
-                await server.get_channel_or_thread(show["thread"]).edit(name=title)
-                try:
-                    await server.get_channel_or_thread(show["thread"]).get_partial_message(
-                        show["thread"]
-                    ).edit(content=body)
-                except:
-                    print(f"couldn't edit body of {show['thread']}")
-                    thr = server.get_channel_or_thread(show["thread"])
-                    await thr.send(f"{thr.owner.mention}, if possible please set the starting message to ```\n{body}```")
-            #add role and thread id to sheet, delete row id
-            #https://developers.google.com/sheets/api/guides/values#write_multiple_ranges
-            
-            try:
-                int(show["thread"]) 
-            except:
-                cell = sheet_name + "L" + str(show["row"])
-                
-                updates.append({"range": cell, "values": [[f'=HYPERLINK("{show["thread"]}",IMAGE("https://i.postimg.cc/J4GqBT05/discord-long-2.png"))']]})
-                show["thread"]= show["thread"].split("/")[-1]
-            print( datetime.now(), role_name)
-            if count != 0 and count % 10 == 0:
-                print("updating and sleeping")
-                
-                await self.updatesheet(server_id, sheet, updates, "USER_ENTERED")
-                updates = []
-                c2 = 1
-                while c2 < 11:
-                    print(c2)
-                    c2 += 1
-                    await asyncio.sleep(1)
-            count += 1
-            
-            return (updates, count)
+        return (updates, count)
 
-
-
-
-
-
-
-    #the main function to sync the threads
+    # the main function to sync the threads
     async def sheets_sync(self, server_id, msg=None):
         server = discord.Client.get_guild(self.bot, server_id)
         print(server)
@@ -273,7 +284,8 @@ class ThreadsCog(commands.Cog):
         shows = {}
         updates = []
         raw_updates = []
-        #function to remove whitespace
+
+        # function to remove whitespace
         def clean(input):
             return " ".join(input.split())
 
@@ -281,14 +293,15 @@ class ThreadsCog(commands.Cog):
             if column < len(v):
                 if content == "userEnteredValue":
                     return int(v[column][content]["numberValue"])
-                
+
                 elif content in v[column]:
                     return clean(v[column][content])
             else:
                 return None
-        #the starting row
+
+        # the starting row
         row_num = 3
-        
+
         for row in rows:
             show = {}
             v = row["values"]
@@ -301,13 +314,17 @@ class ThreadsCog(commands.Cog):
             show["city"] = setrow(v, 3, "formattedValue")
             show["country"] = setrow(v, 4, "formattedValue")
             testin = setrow(v, 4, "formattedValue")
-            #support
+            # support
             if "formattedValue" in v[5]:
                 if "note" in v[5]:
-                    if clean(v[5]["formattedValue"]) == ("Check lineup in attached note"):
+                    if clean(v[5]["formattedValue"]) == (
+                        "Check lineup in attached note"
+                    ):
                         show["support"] = clean(v[5]["note"])
                     else:
-                        show["support"] = (f'{clean(v[5]["formattedValue"])} \n-# ({clean(v[5]["note"])})')
+                        show["support"] = (
+                            f'{clean(v[5]["formattedValue"])} \n-# ({clean(v[5]["note"])})'
+                        )
                 else:
                     show["support"] = clean(v[5]["formattedValue"])
             else:
@@ -323,7 +340,11 @@ class ThreadsCog(commands.Cog):
             else:
                 show["thread"] = None
             show["notes"] = setrow(v, 12, "formattedValue")
-            show["role"] = int(setrow(v, 13, "formattedValue")) if setrow(v, 13, "formattedValue") != None else None
+            show["role"] = (
+                int(setrow(v, 13, "formattedValue"))
+                if setrow(v, 13, "formattedValue") != None
+                else None
+            )
 
             datesplit = show["date"].split("-")
             if len(datesplit) == 2:  # if there are two days
@@ -373,124 +394,135 @@ class ThreadsCog(commands.Cog):
                     await server.get_channel_or_thread(show["thread"]).edit(locked=True)
                 except:
                     pass
-                #change upcoming to past
+                # change upcoming to past
                 show["status"] = show["status"].replace("UPCOMING", "PAST")
-                cell = sheet_name+"H" + str(show["row"])
+                cell = sheet_name + "H" + str(show["row"])
                 updates.append({"range": cell, "values": [[str(show["status"])]]})
             # if more than 3 weeks old stop getting shows
 
             # if this bot hasnt been run in a while shows longer than 3 weeks may not be locked/deleted
             if dates_datetimes[-1] < datetime.now(ZoneInfo("UTC")) - timedelta(weeks=3):
-                print("breaking", show["city"], datetime.now(ZoneInfo("UTC")) - timedelta(weeks=3))
+                print(
+                    "breaking",
+                    show["city"],
+                    datetime.now(ZoneInfo("UTC")) - timedelta(weeks=3),
+                )
                 break
-            
+
             show["datetimes"] = dates_datetimes
-            
-            
+
             # creates role
             if not show["role"]:
                 role_name = f"{show['city']} | {show['date']}"
                 role = await server.create_role(name=role_name, mentionable=False)
                 show["role"] = role.id
-                cell = sheet_name+"N" + str(show["row"])
+                cell = sheet_name + "N" + str(show["row"])
                 updates.append({"range": cell, "values": [[str(show["role"])]]})
             # the role id is also the key
             shows[show["role"]] = show
             print(show["row"] - 2, show["date"], show["role"])
         if msg:
             await msg.edit("finished importing sheet")
-        
-        #after creating all the roles, add them to the sheet
+
+        # after creating all the roles, add them to the sheet
         await self.updatesheet(server_id, sheet, updates, "RAW")
         updates = []
-        
-        #compare current sheet to previous update if it exists
+
+        # compare current sheet to previous update if it exists
         if not os.path.exists(f"{server_id}.pickle"):
-                old = {}
-                print("pickle does not exist")
+            old = {}
+            print("pickle does not exist")
         else:
             with open(f"{server_id}.pickle", "rb") as handle:
                 old = pickle.load(handle)
         changedict = {}
         count = 0
         diff = list(dictdiffer.diff(old, shows))
-        
+
         print(diff)
         for i in diff:
-            #the added shows
+            # the added shows
             if i[0] == "add":
                 for l in i[2]:
-                    updates, count = await self.update(shows[l[0]], server_id, server, sheet, updates, count, msg)
+                    updates, count = await self.update(
+                        shows[l[0]], server_id, server, sheet, updates, count, msg
+                    )
                 print("finished with added shows")
             # the changed shows
             if i[0] == "change":
                 print(i)
-                id, key = i[1][0],i[1][1]
+                id, key = i[1][0], i[1][1]
                 print(id, key)
-                if key != "datetimes" and key!="thread":
+                if key != "datetimes" and key != "thread":
                     if i[2][0] == None:
                         change = f"{key}: {i[2][1]} added\n"
                     elif i[2][1] == None:
                         change = f"{key}: {i[2][1]} removed\n"
                     else:
                         change = f"{key}: {i[2][0]} changed to {i[2][1]}\n"
-                    #add changes to the channel
+                    # add changes to the channel
                     if id in changedict:
                         changedict[id] += change
                     else:
                         changedict[id] = change
-                    print("finished with changed shows")  
+                    print("finished with changed shows")
         for key, change in changedict.items():
-                updates, count = await self.update(shows[key], server_id, server, sheet, updates, count, msg)
-                print(f"{shows[key]['thread']} <@&{key}> {change}")
-                await server.get_channel_or_thread(shows[key]["thread"]).send(content=f"<@&{key}> {change}")
+            updates, count = await self.update(
+                shows[key], server_id, server, sheet, updates, count, msg
+            )
+            print(f"{shows[key]['thread']} <@&{key}> {change}")
+            await server.get_channel_or_thread(shows[key]["thread"]).send(
+                content=f"<@&{key}> {change}"
+            )
         if len(updates) > 0:
             await self.updatesheet(server_id, sheet, updates, "USER_ENTERED")
-        #save the new db
+        # save the new db
         with open(f"{server_id}.pickle", "wb") as handle:
             pickle.dump(shows, handle, protocol=pickle.HIGHEST_PROTOCOL)
-            
-            
-
-
-
-
-
-
-
 
     @app_commands.command(name="pingthread")
-    @app_commands.checks.cooldown(1, 120) #command can only be used once per 2 min per user
+    @app_commands.checks.cooldown(
+        1, 120
+    )  # command can only be used once per 2 min per user
     async def pingthread(self, interaction: discord.Interaction, message: str):
         try:
-            thread = await interaction.channel.fetch_message(interaction.channel_id) #.role_mentions[0]
+            thread = await interaction.channel.fetch_message(
+                interaction.channel_id
+            )  # .role_mentions[0]
             threadrole = thread.role_mentions[0]
             if threadrole in interaction.user.roles:
                 await interaction.response.send_message(
                     content=f"{threadrole.mention}\n{interaction.user.mention} says: \n>>> {message}"
                 )
             else:
-                await interaction.response.send_message(content=f"You do not have <@{threadrole.mention}>", ephemeral=True)
+                await interaction.response.send_message(
+                    content=f"You do not have <@{threadrole.mention}>", ephemeral=True
+                )
 
         except:
-            await interaction.response.send_message(content="no role found, make sure you are in a thread and the first message mentions a role", ephemeral=True)
-    
+            await interaction.response.send_message(
+                content="no role found, make sure you are in a thread and the first message mentions a role",
+                ephemeral=True,
+            )
+
     @pingthread.error
-    async def on_pingthread_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
+    async def on_pingthread_error(
+        self, interaction: discord.Interaction, error: app_commands.AppCommandError
+    ):
         if isinstance(error, app_commands.CommandOnCooldown):
             await interaction.response.send_message(str(error), ephemeral=True)
 
     @app_commands.command(name="threadsync")
     async def threadsync(self, interaction: discord.Interaction):
-        msg = await interaction.response.send_message(content=f"attempting to sync", ephemeral=True)
-        await self.sheets_sync(interaction.guild.id, msg = msg)
+        msg = await interaction.response.send_message(
+            content=f"attempting to sync", ephemeral=True
+        )
+        await self.sheets_sync(interaction.guild.id, msg=msg)
         await interaction.followup.send(content="ended sync", ephemeral=True)
 
-    
     @app_commands.command(name="togglethreadsync")
     async def togglethreadsync(self, interaction: discord.Interaction, toggle: bool):
         self.autosync = toggle
-
 
     looptime = time(hour=3, tzinfo=ZoneInfo("America/Los_Angeles"))
 
@@ -501,6 +533,7 @@ class ThreadsCog(commands.Cog):
                 await self.sheets_sync(key)
         else:
             print("auto sync is off")
+
 
 async def setup(bot: commands.Bot):
     """initializes the Thread cog
