@@ -96,7 +96,7 @@ class ThreadsCog(commands.Cog):
                 if not role.permissions.manage_messages:
                     await reaction.member.add_roles(reacted_message.role_mentions[0])
             except Exception:
-                with open(datetime.now, "w") as file:
+                with open(f"{datetime.now}.debug", "w") as file:
                     file.write(Exception)
                     file.write("\n")
                     file.write(reaction)
@@ -187,7 +187,7 @@ class ThreadsCog(commands.Cog):
         else:
             status = ""
         title = f'{status} {show["date"]} | {show["city"]} | {show["country"]} | {show["venue"]}'
-        if len(title) > 100:
+        if len(title) > 95:
             title = title[0:95] + "[…]"
 
         # update the body
@@ -208,7 +208,7 @@ class ThreadsCog(commands.Cog):
         body += f"react with {self.emote} to add or remove the <@&{show['role']}> role (can only be pinged in this thread by using `/pingthread`)"
 
         # creates/edits thread and message
-        if not show["thread"]:
+        if show["thread"] == None:
             if not "past" in show["status"].lower():
                 thread = await server.get_channel(
                     sdict[str(server_id)]["forum"]
@@ -482,7 +482,7 @@ class ThreadsCog(commands.Cog):
                     content=f"<@&{key}> {change}"
                 )
             except:
-                print(f"couldn't notify {shows[key]['date']}")
+                print(f"couldn't notify {shows[key]["date"]}")
         if len(updates) > 0:
             await self.updatesheet(server_id, sheet, updates, "USER_ENTERED")
         # save the new db
