@@ -86,14 +86,20 @@ class ThreadsCog(commands.Cog):
             reaction.message_id == reaction.channel_id
             and reaction.emoji.name == self.emote
         ):
-            channel = await self.bot.fetch_channel(reaction.channel_id)
-            reacted_message: discord.Message = await channel.fetch_message(
-                reaction.message_id
-            )
+            try:
+                channel = await self.bot.fetch_channel(reaction.channel_id)
+                reacted_message: discord.Message = await channel.fetch_message(
+                    reaction.message_id
+                )
 
-            role = reacted_message.role_mentions[0]
-            if not role.permissions.manage_messages:
-                await reaction.member.add_roles(reacted_message.role_mentions[0])
+                role = reacted_message.role_mentions[0]
+                if not role.permissions.manage_messages:
+                    await reaction.member.add_roles(reacted_message.role_mentions[0])
+            except Exception:
+                with open(datetime.now, "w") as file:
+                    file.write(Exception)
+                    file.write("\n")
+                    file.write(reaction)
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, reaction):
@@ -203,7 +209,7 @@ class ThreadsCog(commands.Cog):
 
         # creates/edits thread and message
         if not show["thread"]:
-            if not self.bot.is_ws_ratelimited():
+            if not "past" in show["status"].lower():
                 thread = await server.get_channel(
                     sdict[str(server_id)]["forum"]
                 ).create_thread(name=title, content=body)
@@ -223,23 +229,24 @@ class ThreadsCog(commands.Cog):
                 )
         # add role and thread id to sheet, delete row id
         # https://developers.google.com/sheets/api/guides/values#write_multiple_ranges
+        if not "past" in show["status"].lower():
+            try:
+                int(show["thread"])
+            except:
+                cell = sheet_name + "L" + str(show["row"])
 
-        try:
-            int(show["thread"])
-        except:
-            cell = sheet_name + "L" + str(show["row"])
+                updates.append(
+                    {
+                        "range": cell,
+                        "values": [
+                            [
+                                f'=HYPERLINK("{show["thread"]}",IMAGE("https://i.postimg.cc/J4GqBT05/discord-long-2.png"))'
+                            ]
+                        ],
+                    }
+                )
+                show["thread"] = show["thread"].split("/")[-1]
 
-            updates.append(
-                {
-                    "range": cell,
-                    "values": [
-                        [
-                            f'=HYPERLINK("{show["thread"]}",IMAGE("https://i.postimg.cc/J4GqBT05/discord-long-2.png"))'
-                        ]
-                    ],
-                }
-            )
-            show["thread"] = show["thread"].split("/")[-1]
         print(datetime.now(), role_name)
         if count != 0 and count % 10 == 0:
             print("updating and sleeping")
@@ -453,7 +460,7 @@ class ThreadsCog(commands.Cog):
                 print(i)
                 id, key = i[1][0], i[1][1]
                 print(id, key)
-                if key != "datetimes" and key != "thread":
+                if key != "datetimes" and key != "thread" and key != "row":
                     if i[2][0] == None:
                         change = f"{key}: {i[2][1]} added\n"
                     elif i[2][1] == None:
@@ -470,10 +477,12 @@ class ThreadsCog(commands.Cog):
             updates, count = await self.update(
                 shows[key], server_id, server, sheet, updates, count, msg
             )
-            print(f"{shows[key]['thread']} <@&{key}> {change}")
-            await server.get_channel_or_thread(shows[key]["thread"]).send(
-                content=f"<@&{key}> {change}"
-            )
+            try:
+                await server.get_channel_or_thread(shows[key]["thread"]).send(
+                    content=f"<@&{key}> {change}"
+                )
+            except:
+                print(f"couldn't notify {shows[key]['date']}")
         if len(updates) > 0:
             await self.updatesheet(server_id, sheet, updates, "USER_ENTERED")
         # save the new db
