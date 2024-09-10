@@ -131,9 +131,24 @@ class ThreadsCog(commands.Cog):
                 creds.refresh(Request())
             else:
                 flow = InstalledAppFlow.from_client_secrets_file(
-                    "google_client_secret.json", SCOPES
+                    "google_client_secret.json", SCOPES, redirect_uri='urn:ietf:wg:oauth:2.0:oob'
                 )
-                creds = flow.run_local_server(port=4041)
+                # creds = flow.run_local_server(port=4041)
+
+                # Tell the user to go to the authorization URL.
+                auth_url, _ = flow.authorization_url()
+
+                print('Please go to this URL: {}'.format(auth_url))
+
+                # The user will get an authorization code. This code is used to get the
+                # access token.
+                code = input('Enter the authorization code: ')
+                flow.fetch_token(code=code)
+
+                # You can use flow.credentials, or you can just get a requests session
+                # using flow.authorized_session.
+                creds = flow.credentials
+                
             # Save the credentials for the next run
         with open("google_auth_tokens.json", "w") as token:
             token.write(creds.to_json())
