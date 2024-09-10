@@ -342,9 +342,12 @@ class ThreadsCog(commands.Cog):
             show["age"] = setrow(v, 8, "formattedValue")
             show["time"] = setrow(v, 9, "formattedValue")
             show["tickets"] = setrow(v, 10, "hyperlink")
-            if setrow(v, 11, "hyperlink") != None:
-                show["thread"] = int(setrow(v, 11, "hyperlink").split("/")[-1])
-            else:
+            try:
+                if setrow(v, 11, "hyperlink") != None:
+                        show["thread"] = int(setrow(v, 11, "hyperlink").split("/")[-1])
+                else:
+                    show["thread"] = None
+            except:
                 show["thread"] = None
             show["notes"] = setrow(v, 12, "formattedValue")
             show["role"] = (
