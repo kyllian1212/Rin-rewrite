@@ -485,7 +485,7 @@ class ThreadsCog(commands.Cog):
                     content=f"<@&{key}> {change}"
                 )
             except:
-                print(f"couldn't notify {shows[key]["date"]}")
+                print(f"couldn't notify {shows[key]['date']}")
         if len(updates) > 0:
             await self.updatesheet(server_id, sheet, updates, "USER_ENTERED")
         # save the new db
