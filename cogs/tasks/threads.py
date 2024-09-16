@@ -34,6 +34,7 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+from google.oauth2 import service_account
 
 IP = os.getenv("IP")
 
@@ -97,7 +98,7 @@ class ThreadsCog(commands.Cog):
                 if not role.permissions.manage_messages:
                     await reaction.member.add_roles(reacted_message.role_mentions[0])
             except Exception:
-                with open(f"{datetime.now}.debug", "w") as file:
+                with open(f"{datetime.now()}.debug", "w") as file:
                     file.write(Exception)
                     file.write("\n")
                     file.write(reaction)
@@ -118,9 +119,51 @@ class ThreadsCog(commands.Cog):
     # import google sheet
 
     async def getsheet(self, server_id):
-        credentials, project = google.auth.default(scopes=SCOPES)
+        
+
+        creds = None
+        # The file google_auth_tokens.json stores the user's access and refresh tokens, and is
+        # created automatically when the authorization flow completes for the first
+        # time.
+        if os.path.exists("google_auth_tokens.json"):
+            creds = Credentials.from_authorized_user_file(
+                "google_auth_tokens.json", SCOPES
+            )
+        # If there are no (valid) credentials available, let the user log in.
+        print(creds.valid, creds.expiry)
+        if not creds or not creds.valid:
+            if creds and creds.expired and creds.refresh_token:
+                try:
+                    creds.refresh(Request())
+                    print("refreshed token")
+                except Exception:
+                    print("Refresh Request failed")
+                    print(repr(Exception))
+            else:
+                flow = InstalledAppFlow.from_client_secrets_file(
+                    "google_client_secret.json", SCOPES, redirect_uri='urn:ietf:wg:oauth:2.0:oob'
+                )
+                # creds = flow.run_local_server(port=4041)
+
+                # Tell the user to go to the authorization URL.
+                auth_url, _ = flow.authorization_url(access_type='offline', include_granted_scopes='true')
+
+                print('Generating new token, please go to this URL: {}'.format(auth_url))
+
+                # The user will get an authorization code. This code is used to get the
+                # access token.
+                code = input('Enter the authorization code: ')
+                flow.fetch_token(code=code)
+
+                # You can use flow.credentials, or you can just get a requests session
+                # using flow.authorized_session.
+                creds = flow.credentials
+
+            # Save the credentials for the next run
+        with open("google_auth_tokens.json", "w") as token:
+            token.write(creds.to_json())
         try:
-            service = build("sheets", "v4", credentials=credentials)
+            service = build("sheets", "v4", credentials=creds)
         
             # Call the Sheets API
             sheet = service.spreadsheets()
@@ -129,7 +172,7 @@ class ThreadsCog(commands.Cog):
                 includeGridData=True,
                 ranges=[sheet_range],
             ).execute()
-            print("creds valid, sheet data: ", repr(result))
+            print("creds valid")
             return sheet, result
         except HttpError as err:
             raise (err)
