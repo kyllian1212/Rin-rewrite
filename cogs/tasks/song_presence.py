@@ -1,6 +1,9 @@
 """
 Song Presence task
 """
+__version__ = "1.0.0"
+__author__ = "kyllian1212"
+
 
 import discord
 import asyncio

@@ -1,4 +1,7 @@
 .env
+venv/
+.venv/
+service_account.json
 .cache
 allimports.py
 __pycache__

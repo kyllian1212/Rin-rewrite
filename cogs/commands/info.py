@@ -1,6 +1,9 @@
 """
 Info Module
 """
+__version__ = "1.0.0"
+__author__ = "kyllian1212, Toxin_X"
+
 
 from datetime import datetime
 import discord
@@ -39,10 +42,56 @@ class InfoCog(commands.Cog):
             kyllian_user = self.bot.get_user(171000921927581696)
             info_message_embed = discord.Embed(
                 title="Rin • Bot by "
-                + str(kyllian_user.name)
-                + "#"
-                + str(kyllian_user.discriminator),
+                + str(kyllian_user.name),
                 description="**bot version:** *" + VERSION + "*",
+                url="https://github.com/kyllian1212/Rin-rewrite",
+                color=0x00AEFF,
+            )
+            info_message_embed.set_thumbnail(url=kyllian_user.avatar.url)
+            info_message_embed.set_footer(
+                text=now + "  •  source code available by clicking the link above",
+                icon_url=self.bot.user.avatar.url,
+            )
+            await interaction.followup.send(embed=info_message_embed)
+        except:
+            await embeds.error_executing_command(interaction)
+            raise
+
+
+
+
+
+
+    @app_commands.command(
+        name="longinfo", 
+        description="Makes bot info appear"
+    )
+    async def longinfo(self, interaction: discord.Interaction):
+        """displays the bot's metadata
+
+        Args:
+            interaction (discord.Interaction): Discord interaction. Occurs when user does notifiable action (e.g. slash commands)
+        """
+        try:
+            await interaction.response.defer()
+            output = "**Extentions:**\n"
+            extentions = self.bot.extensions
+            
+            for i in extentions:
+                extention = extentions[i]
+                output = output + f'-# **Name:** `{extention.__doc__.replace("\n", "")}`, **Path:** `{extention.__name__}`, **Author**: `{extention.__author__}` **Version:** `{extention.__version__}`\n'
+                
+            
+            
+            
+            now = str(
+                datetime.now().astimezone().strftime("%d/%m/%Y - %H:%M:%S (UTC%z)")
+            )
+            kyllian_user = self.bot.get_user(171000921927581696)
+            info_message_embed = discord.Embed(
+                title="Rin • Bot by "
+                + str(kyllian_user.name),
+                description="**bot version:** *" + VERSION + "*\n" + output,
                 url="https://github.com/kyllian1212/Rin-rewrite",
                 color=0x00AEFF,
             )

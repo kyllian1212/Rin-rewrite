@@ -1,15 +1,9 @@
-"""_summary_
-
-Raises:
-    FileNotFoundError: _description_
-
-Returns:
-    _type_: _description_
 """
+VC Module
+"""
+__version__ = "1.0.0"
+__author__ = "kyllian1212, Toxin_X"
 
-"""
-Vc Module
-"""
 
 import asyncio
 import os

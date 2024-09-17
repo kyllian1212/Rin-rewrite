@@ -1,6 +1,9 @@
 """
 Fun Module
 """
+__version__ = "1.0.0"
+__author__ = "kyllian1212"
+
 
 import random
 import discord
@@ -9,7 +12,7 @@ from discord.ext import commands
 import templates.embeds as embeds
 
 
-class FunCog(commands.Cog):
+class FunCog(commands.GroupCog, group_name="fun"):
     """Cog for all fun commands
 
     Args:

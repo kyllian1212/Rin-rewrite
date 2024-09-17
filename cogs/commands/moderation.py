@@ -1,6 +1,9 @@
 """
 Moderation Module
 """
+__version__ = "1.0.0"
+__author__ = "kyllian1212"
+
 
 from datetime import timedelta
 import string

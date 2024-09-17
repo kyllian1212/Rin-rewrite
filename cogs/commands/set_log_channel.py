@@ -1,6 +1,9 @@
 """
 Log Channel Module
 """
+__version__ = "1.0.0"
+__author__ = "kyllian1212"
+
 
 import discord
 from discord import app_commands
