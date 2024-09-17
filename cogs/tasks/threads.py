@@ -1,6 +1,9 @@
 """
 Threads Module
 """
+__version__ = "beta-1"
+__author__ = "Toxin_X"
+
 
 # TODO:
 # add/remove role buttons
@@ -35,8 +38,6 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from google.oauth2 import service_account
-
-IP = os.getenv("IP")
 
 # If modifying these scopes, delete the file google_auth_tokens.json
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]

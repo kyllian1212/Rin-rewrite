@@ -1,11 +1,16 @@
 """
 Help module
 """
+__version__ = "1.0.0"
+__author__ = "kyllian1212"
+
 
 import discord
 from discord import app_commands
 from discord.ext import commands
 import templates.embeds as embeds
+import pathlib
+
 
 
 class HelpCog(commands.Cog):
