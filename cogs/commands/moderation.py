@@ -100,11 +100,12 @@ class ModerationCog(commands.Cog):
         """
         try:
             await interaction.response.defer(ephemeral=True)
+            dm_block = False
             try:
                 title = ""
                 description = ""
                 title = (
-                    "You have been timed out from "
+                    "You have been warned from "
                     + interaction.guild.name
                     + " for the following reason:"
                 )
