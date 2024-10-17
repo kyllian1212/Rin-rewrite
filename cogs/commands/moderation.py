@@ -74,6 +74,84 @@ class ModerationCog(commands.Cog):
                 interaction, title_detail="toggling the moderation log."
             )
             raise
+    
+    # warning
+    @app_commands.command(
+        name="rin_warning",
+        description="Warns a user via DMs",
+    )
+    @app_commands.describe(
+        member="The member that will be warned",
+        reason="The reason why the member has been warned",
+    )
+    @app_commands.checks.has_permissions(administrator=True)
+    async def warning(
+        self,
+        interaction: discord.Interaction,
+        member: discord.Member,
+        reason: str,
+    ):
+        """Warns a member and DMs them
+
+        Args:
+            interaction (discord.Interaction): Discord interaction. Occurs when user does notifiable action (e.g. slash commands)
+            member (discord.Member): the Discord Member info
+            reason (str): reason for warning.
+        """
+        try:
+            await interaction.response.defer(ephemeral=True)
+            try:
+                title = ""
+                description = ""
+                title = (
+                    "You have been timed out from "
+                    + interaction.guild.name
+                    + " for the following reason:"
+                )
+                description = (
+                    "```"
+                    + reason
+                    + "```\nPlease make sure to follow the server rules to not get another warning (or further action)."
+                )
+                await member.send(
+                        embed=discord.Embed(
+                            title=title, description=description, color=0xFF0000
+                        )
+                    )
+            except discord.errors.Forbidden:
+                extra = ""
+                extra = (
+                    "\n\nIf you want to DM manually, here's the reason that was given: ```"
+                    + reason
+                    + "```"
+                )
+                self.interaction_webhook = await interaction.followup.send(
+                    embed=discord.Embed(
+                        title="This member cannot be DM'd",
+                        description="This member either has DMs disabled for unknown people, or has the bot blocked (less likely)."
+                        + extra,
+                        color=0xFF0000,
+                    ),
+                    wait=True,
+                )
+                dm_block = True
+
+            if dm_block is False:
+                await interaction.followup.send(
+                    embed=discord.Embed(
+                        description="<@"
+                        + str(member.id)
+                        + "> successfully warned!",
+                        color=0x00AEFF,
+                    )
+                )
+        except:
+            await embeds.error_executing_command(
+                interaction,
+                title_detail="warning the person.",
+                extra_error_detail=f"(Maybe the Rin role is under a role that the user you want to warn has?)",
+            )
+            raise
 
     # timeout
     @app_commands.command(
