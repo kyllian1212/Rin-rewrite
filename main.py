@@ -10,13 +10,13 @@ import sqlite3
 import sys
 import traceback
 from datetime import datetime
-
+import typing
 import discord
 import spotipy
 from discord import app_commands
 from discord.ext import commands
 from discord.ext.commands import bot
-from dotenv import load_dotenv
+from dotenv import load_dotenv, set_key
 from spotipy.oauth2 import SpotifyClientCredentials
 
 import cogs.tasks.song_presence as songp
@@ -41,6 +41,18 @@ sp = spotipy.Spotify(auth_manager=auth_manager)
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix=COMMAND_PREFIX, intents=intents, max_messages=10000, help_command=None)
 
+async def get_cogs():
+    #get py files in in (current workinh directory)/cogs/
+    cogs = pathlib.Path.cwd().joinpath("cogs")
+    cogslist=[]
+    parentslen = len(cogs.parts)-1
+    glob = list(cogs.rglob("*.py"))
+    for i in glob:
+        dotpath = '.'.join(i.with_suffix('').parts[parentslen:])
+        cogslist.append(dotpath)
+    return cogslist
+
+
 class MainCog(commands.Cog):
     """Cog for managing bot and other cogs 
 
@@ -56,39 +68,47 @@ class MainCog(commands.Cog):
     async def resync(self, interaction: discord.Interaction):
         if interaction.user.id == OWNER_ID:
                 await bot.tree.sync(guild = discord.Object(id = TEST_ID)) #remove guild value for global slash command (takes longer to synchronize)
-                bot.tree.copy_global_to(guild = discord.Object(id = MADEON_ID))
+                await bot.tree.copy_global_to(guild = discord.Object(id = MADEON_ID))
         else:
-            discord.interaction.response.send_message(embed=discord.Embed(description="you can't use this command", color=0x00aeff), ephemeral=True)
+            await discord.interaction.response.send_message(embed=discord.Embed(description="you can't use this command", color=0x00aeff), ephemeral=True)
     
     @app_commands.command(name="load_extention")
     async def load_extention(self, interaction: discord.Interaction, extention:str):
         await interaction.response.defer()
         try:
-            bot.load_extension(name=extention)
-            interaction.followup.send("loaded `" +extention+"`")
+            await bot.load_extension(name=extention)
+            await interaction.followup.send("loaded `" +extention+"`")
         except:
-            interaction.followup.send("failed to load `"+extention+"`")   
+            await interaction.followup.send("failed to load `"+extention+"`")   
     
     @app_commands.command(name="reload_extention")
     async def reload_extention(self, interaction: discord.Interaction, extention:str):
         await interaction.response.defer()
         try:
-            bot.reload_extension(name=extention)
-            interaction.followup.send("reloaded `" +extention+"`")
+            await bot.reload_extension(name=extention)
+            await interaction.followup.send("reloaded `" +extention+"`")
         except:
-            interaction.followup.send("failed to reload `"+extention+"`")      
+            await interaction.followup.send("failed to reload `"+extention+"`")      
     
     
     @app_commands.command(name="unload_extention")
     async def unload_extention(self, interaction: discord.Interaction, extention:str):
         await interaction.response.defer()
         try:
-            bot.unload_extension(name=extention)
-            interaction.followup.send("unloaded `" +extention+"`")
+            await bot.unload_extension(name=extention)
+            
         except:
-            interaction.followup.send("failed to unload `"+extention+"`") 
-
-
+            await interaction.followup.send("failed to unload `"+extention+"`")
+    
+    
+    @app_commands.command(name="set_version")
+    async def set_version(self, interaction: discord.Interaction, version:str):
+                await interaction.response.defer()
+                set_key(".env", "VERSION", version)
+                os.environ['VERSION'] = version
+                VERSION = os.getenv('VERSION')
+                await bot.user.edit(username="Rin | " + VERSION) 
+                await interaction.followup.send(f" set version to {VERSION}")
 
 @bot.event
 async def on_ready():
@@ -108,17 +128,10 @@ async def on_ready():
     
     #load main cog
     await bot.add_cog(MainCog(bot))
-    
-    
-    #get py files in in (current workinh directory)/cogs/
-    cogs = pathlib.Path.cwd().joinpath("cogs")
-    parentslen = len(cogs.parts)-1
-    glob = list(cogs.rglob("*.py"))
-    for i in glob:
-        dotpath = '.'.join(i.with_suffix('').parts[parentslen:])
-        await bot.load_extension(dotpath)
-        print("loaded "+ dotpath)
-    
+    cogs = await get_cogs()
+    for i in (cogs):
+        await bot.load_extension(i)
+        print("loaded "+ i)
     
     
     if not bot.synced:
@@ -136,3 +149,13 @@ if __name__ == "__main__":
         bot.run(TOKEN, reconnect=True)
     except:
         raise
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

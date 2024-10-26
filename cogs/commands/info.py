@@ -12,7 +12,7 @@ from discord.ext import commands
 import templates.embeds as embeds
 
 from main import VERSION
-
+from main import get_cogs
 
 class InfoCog(commands.Cog):
     """Cog for bot info
@@ -58,10 +58,6 @@ class InfoCog(commands.Cog):
             raise
 
 
-
-
-
-
     @app_commands.command(
         name="longinfo", 
         description="Makes bot info appear"
@@ -76,7 +72,6 @@ class InfoCog(commands.Cog):
             await interaction.response.defer()
             output = "**Extentions:**\n"
             extentions = self.bot.extensions
-            
             for i in extentions:
                 extention = extentions[i]
                 output = output + f'-# **Name:** `{extention.__doc__.replace("\n", "")}`, **Path:** `{extention.__name__}`, **Author**: `{extention.__author__}` **Version:** `{extention.__version__}`\n'
@@ -105,7 +100,26 @@ class InfoCog(commands.Cog):
             await embeds.error_executing_command(interaction)
             raise
 
+    @app_commands.command(name="detect_extentions", description="detects extentions (part of the info cog)")
+    async def detect_extentions(self, interaction: discord.Interaction):
+        extentions = self.bot.extensions
+        msg= ""
+        k = "❌"
+        cogs = await get_cogs()
+        for i in cogs:
+            if i in extentions:
+                k = "✅"
+            else:
+                k = "❌"
+            msg += f"`{i}`{k}\n"
+        await interaction.response.defer()
+        try:
 
+            
+            await interaction.followup.send(f"detected extentions:\n{msg}")
+        except:
+            await interaction.followup.send("failed to detect extentions") 
+                
 async def setup(bot: commands.Bot):
     """initialize cog
 

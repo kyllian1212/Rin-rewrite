@@ -1,7 +1,7 @@
 """
 Threads Module
 """
-__version__ = "beta-1"
+__version__ = "beta-2"
 __author__ = "Toxin_X"
 
 
@@ -13,7 +13,7 @@ __author__ = "Toxin_X"
 
 # location and time stuff
 from functools import lru_cache
-from datetime import datetime, timedelta, time
+from datetime import datetime, timedelta, time, date
 from zoneinfo import ZoneInfo
 from geopy.geocoders import Nominatim
 from geopy.extra.rate_limiter import RateLimiter
@@ -66,6 +66,9 @@ sdict = {
     # },
 }
 
+#when to autosync, its stupid to put this here but decorators cant access self sooooooo
+looptime = time(hour=3, tzinfo=ZoneInfo("America/Los_Angeles")) 
+
 
 class ThreadsCog(commands.Cog):
     """Members cog
@@ -78,7 +81,6 @@ class ThreadsCog(commands.Cog):
         self.bot = bot
         self.emote = "🎫"
         self.autosync = True
-
     # if i want to convert to buttons: https://gist.github.com/lykn/bac99b06d45ff8eed34c2220d86b6bf4
 
     # react add/remove
@@ -519,7 +521,7 @@ class ThreadsCog(commands.Cog):
         with open(f"{server_id}.pickle", "wb") as handle:
             pickle.dump(shows, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-    @app_commands.command(name="pingthread")
+    @app_commands.command(name="ping_thread")
     @app_commands.checks.cooldown(
         1, 120
     )  # command can only be used once per 2 min per user
@@ -551,19 +553,28 @@ class ThreadsCog(commands.Cog):
         if isinstance(error, app_commands.CommandOnCooldown):
             await interaction.response.send_message(str(error), ephemeral=True)
 
-    @app_commands.command(name="threadsync")
+    @app_commands.command(name="sync_thread")
     async def threadsync(self, interaction: discord.Interaction):
         msg = await interaction.response.send_message(
             content=f"attempting to sync", ephemeral=True
         )
         await self.sheets_sync(interaction.guild.id, msg=msg)
         await interaction.followup.send(content="ended sync", ephemeral=True)
+    
 
-    @app_commands.command(name="togglethreadsync")
+
+    @app_commands.command(name="toggle_auto_sync")
     async def togglethreadsync(self, interaction: discord.Interaction, toggle: bool):
         self.autosync = toggle
+        msg = await interaction.response.send_message(
+        content=f"autosync is now {self.autosync}\nsyncs at <t:{round(looptime.timestamp())}:t>", ephemeral=True
+    )
+    @app_commands.command(name="auto_sync_status")
+    async def threadsync(self, interaction: discord.Interaction):
+        msg = await interaction.response.send_message(
+            content=f"autosync is {self.autosync}\nsyncs at <t:{round(looptime.timestamp())}:t>", ephemeral=True
+        )
 
-    looptime = time(hour=3, tzinfo=ZoneInfo("America/Los_Angeles"))
 
     @tasks.loop(time=looptime)
     async def refresh_task(self):
