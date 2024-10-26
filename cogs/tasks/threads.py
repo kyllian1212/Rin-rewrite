@@ -132,8 +132,9 @@ class ThreadsCog(commands.Cog):
             creds = Credentials.from_authorized_user_file(
                 "google_auth_tokens.json", SCOPES
             )
+            print(creds.valid, creds.expiry)
         # If there are no (valid) credentials available, let the user log in.
-        print(creds.valid, creds.expiry)
+        
         if not creds or not creds.valid:
             if creds and creds.expired and creds.refresh_token:
                 try:
