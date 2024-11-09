@@ -124,15 +124,15 @@ class ReactionsCog(commands.Cog):
                     inline=True,
                 )
                 # if the message is too long
-                if len(reacted_message.content) >= 1000:
+                if len(reacted_message.content) >= 900:
                     long_message = True
                     message_length = len(reacted_message.content)
 
                     reacted_message_content_part2 = reacted_message.content[
-                        999:message_length
+                        899:message_length
                     ]
 
-                    reacted_message_content_part1 = reacted_message.content[0:999]
+                    reacted_message_content_part1 = reacted_message.content[0:899]
 
                     reported_message_embed.add_field(
                         name="Message",
@@ -141,13 +141,21 @@ class ReactionsCog(commands.Cog):
                     )
 
                     reported_message_part2_embed = discord.Embed(
-                        description="*The message is over 1000 characters, so it has been split into 2 Discord embeds.*",
+                        description="*The message is too long for a single Discord embed, so it has been split into 2 Discord embeds.*",
                         color=0xFF0000,
+                    )
+
+                    reacted_message_content_part2_with_jump_to = (
+                        reacted_message_content_part2
+                        + "\n"
+                        + "[Jump to context]("
+                        + reacted_message.jump_url
+                        + ")"
                     )
 
                     reported_message_part2_embed.add_field(
                         name="Message (part 2)",
-                        value=reacted_message_content_part2,
+                        value=reacted_message_content_part2_with_jump_to,
                         inline=False,
                     )
 
