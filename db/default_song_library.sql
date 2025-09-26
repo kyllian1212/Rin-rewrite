@@ -124,7 +124,10 @@ INSERT INTO bot_default_song_library (artist, song_title, album, length_in_secon
 -- all ur luv
 ("Wavedash, Madeon & Toro Y Moi", "All Ur Luv", "Tempo", 161),
 -- believe it
-("Louis The Child, Madeon", "Believe It", "The Sun Comes Up", 150);
+("Louis The Child, Madeon", "Believe It", "The Sun Comes Up", 150),
+
+-- ???????
+("Madeon", "Hi!", "???????",142);
 /*
 -- Credited but not featured
 ("keshi", "Kiss Me Right", "Requiem (Bonus Edition)", 162),
