@@ -104,7 +104,7 @@ INSERT INTO bot_default_song_library (artist, song_title, album, length_in_secon
 ("Madeon", "Only Way Out (ft. Vancouver Sleep Clinic)", "Adventure (Deluxe)", 226),
 -- adventure live
 ("Madeon", "Albatros", "Adventure Live", 114),
-("Madeon", "Together", "Pixel Empire Live", 150),
+("Madeon", "Together", "Pixel Empire Live/Adventure Deluxe Vinyl", 155),
 -- good faith era
 ("Madeon", "Dream Dream Dream", "Good Faith", 234),
 ("Madeon", "All My Friends", "Good Faith", 204),
@@ -126,9 +126,25 @@ INSERT INTO bot_default_song_library (artist, song_title, album, length_in_secon
 -- believe it
 ("Louis The Child, Madeon", "Believe It", "The Sun Comes Up", 150),
 
--- ???????
-("Madeon", "Hi!", "???????",142);
+-- Victory
+("Madeon", "Hi!", "Victory",142),
+("Madeon", "Car Crash Baby", "Victory", 198);
 /*
+-- Currently unreleased Victory songs
+("Madeon", "Super Platinum", "Victory", ???),
+("Madeon", "Chaos Magic", "Victory", ???),
+("Madeon", "Revolution", "Victory", ???),
+("Madeon", "Hugo 2", "Victory", ???),
+("Madeon", "Fire Away", "Victory", ???),
+("Madeon", "Enjoy", "Victory", ???),
+("Madeon", "Boys", "Victory", ???),
+
+
+
+
+
+
+
 -- Credited but not featured
 ("keshi", "Kiss Me Right", "Requiem (Bonus Edition)", 162),
 ("Petit Biscuit", "Cruel Heart", "Discipline", 213),
