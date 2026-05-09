@@ -68,6 +68,9 @@ INSERT INTO bot_default_song_library (artist, song_title, album, length_in_secon
 ("Porter Robinson", "Is There Really No Happiness?", "SMILE! :D", 199),
 ("Porter Robinson", "Everything To Me", "SMILE! :D", 292),
 
+/* ("Porter Robinson & Ninajirachi, "WannaCry", "???", 0),*/
+
+
 /* skrillex, porter robinson & bibi bourelly*/
 -- still here
 ("Skrillex, Porter Robinson & Bibi Bourelly", "Still Here (with the ones that I came with)", "Quest For Fire", 312),
@@ -131,20 +134,22 @@ INSERT INTO bot_default_song_library (artist, song_title, album, length_in_secon
 ("Madeon", "Car Crash Baby", "Victory", 198);
 /*
 -- Currently unreleased Victory songs
-("Madeon", "Super Platinum", "Victory", ???),
-("Madeon", "Chaos Magic", "Victory", ???),
-("Madeon", "Revolution", "Victory", ???),
-("Madeon", "Hugo 2", "Victory", ???),
-("Madeon", "Fire Away", "Victory", ???),
-("Madeon", "Enjoy", "Victory", ???),
-("Madeon", "Boys", "Victory", ???),
+("Madeon & Erick the Architect", "Super Platinum (feat. Erick the Architect)", "Victory", 151),
+("Madeon", "Dancing On Your Grave", "Victory", 239), 
+("Madeon", "Somebody Else", "Victory", 193),*/
+("Madeon & Slayyyter", "Fire Away (feat. Slayyyter)", "Victory", 207),
+/*
+("Madeon", "Chaos Magic", "Victory", 196),
+("Madeon", "Enjoy", "Victory", 180),
+("Madeon & Sam Gellaitry", "Red Jacket (feat. Sam Gellaitry)", "Victory", 177),
+("Madeon", "Lonely Space Age", "Victory", 230),
+*/
 
 
 
 
 
-
-
+/*
 -- Credited but not featured
 ("keshi", "Kiss Me Right", "Requiem (Bonus Edition)", 162),
 ("Petit Biscuit", "Cruel Heart", "Discipline", 213),
