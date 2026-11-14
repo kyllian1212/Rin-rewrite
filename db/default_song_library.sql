@@ -67,10 +67,12 @@ INSERT INTO bot_default_song_library (artist, song_title, album, length_in_secon
 ("Porter Robinson", "Mona Lisa", "SMILE! :D", 225),
 ("Porter Robinson", "Is There Really No Happiness?", "SMILE! :D", 199),
 ("Porter Robinson", "Everything To Me", "SMILE! :D", 292),
-  
+
 /* skrillex, porter robinson & bibi bourelly*/
 -- still here
 ("Skrillex, Porter Robinson & Bibi Bourelly", "Still Here (with the ones that I came with)", "Quest For Fire", 312),
+/* Michael Clifford & Porter Robinson */
+("Michael Clifford & Porter Robinson", "kill me for always", "SIDEQUEST", 187),
 /* porter robinson & madeon */
 -- shelter
 ("Porter Robinson & Madeon", "Shelter", "Shelter", 219),
@@ -102,7 +104,7 @@ INSERT INTO bot_default_song_library (artist, song_title, album, length_in_secon
 ("Madeon", "Only Way Out (ft. Vancouver Sleep Clinic)", "Adventure (Deluxe)", 226),
 -- adventure live
 ("Madeon", "Albatros", "Adventure Live", 114),
-("Madeon", "Together", "Pixel Empire Live", 150),
+("Madeon", "Together", "Pixel Empire Live/Adventure Deluxe Vinyl", 155),
 -- good faith era
 ("Madeon", "Dream Dream Dream", "Good Faith", 234),
 ("Madeon", "All My Friends", "Good Faith", 204),
@@ -118,7 +120,33 @@ INSERT INTO bot_default_song_library (artist, song_title, album, length_in_secon
 ("Madeon", "Love You Back", "Love You Back", 214),
 ("Madeon", "Gonna Be Good", "Gonna Be Good", 172),
 ("Madeon", "Gonna Be Good (Live Edit)", "Gonna Be Good (Live Edit)", 271),
+-- GAP YEAR
 -- all ur luv
 ("Wavedash, Madeon & Toro Y Moi", "All Ur Luv", "Tempo", 161),
--- believe it (album unknown)
-("Louis The Child, Madeon", "Believe It", "Believe It", 150);
+-- believe it
+("Louis The Child, Madeon", "Believe It", "The Sun Comes Up", 150),
+
+-- Victory
+("Madeon", "Hi!", "Victory",142),
+("Madeon", "Car Crash Baby", "Victory", 198);
+/*
+-- Currently unreleased Victory songs
+("Madeon", "Super Platinum", "Victory", ???),
+("Madeon", "Chaos Magic", "Victory", ???),
+("Madeon", "Revolution", "Victory", ???),
+("Madeon", "Hugo 2", "Victory", ???),
+("Madeon", "Fire Away", "Victory", ???),
+("Madeon", "Enjoy", "Victory", ???),
+("Madeon", "Boys", "Victory", ???),
+
+
+
+
+
+
+
+-- Credited but not featured
+("keshi", "Kiss Me Right", "Requiem (Bonus Edition)", 162),
+("Petit Biscuit", "Cruel Heart", "Discipline", 213),
+("chromeo", "Friendsnlovers", "Adult Contemporary", 155);
+*/
