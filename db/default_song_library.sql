@@ -11,7 +11,7 @@ INSERT INTO bot_default_song_library (artist, song_title, album, length_in_secon
 ("Porter Robinson", "The Seconds (ft. Jano)", "Spitfire", 343),
 -- language + easy
 ("Porter Robinson", "Language", "Language", 368),
-("Mat Zo & Porter Robinson", "Easy", "Easy", 396),
+("Mat Zo, Porter Robinson", "Easy", "Easy", 396),
 -- worlds
 ("Porter Robinson", "Divinity (ft. Amy Millan)", "Worlds", 368),
 ("Porter Robinson", "Sad Machine", "Worlds", 350),
@@ -48,14 +48,14 @@ INSERT INTO bot_default_song_library (artist, song_title, album, length_in_secon
 ("Porter Robinson", "Mirror", "Nurture", 307),
 ("Porter Robinson", "Something Comforting", "Nurture", 282),
 ("Porter Robinson", "Blossom", "Nurture", 226),
-("Porter Robinson & Totally Enormous Extinct Dinosaurs", "Unfold", "Nurture", 286),
+("Porter Robinson, Totally Enormous Extinct Dinosaurs", "Unfold", "Nurture", 286),
 ("Porter Robinson", "Trying to Feel Alive", "Nurture", 284),
-("Porter Robinson & Wednesday Campanella", "fullmoon lullaby", "Nurture", 243),
+("Porter Robinson, Wednesday Campanella", "fullmoon lullaby", "Nurture", 243),
 -- nurture live edit bc i love it so much
 ("Porter Robinson", "Musician (Part 2)", "Nurture Live (Secret Sky 2021)", 157),
 ("Porter Robinson", "EZ Sea of Voices", "Nurture Live (Secret Sky 2021)", 232),
 -- pre-smile
-("Porter Robinson & League of Legends", "Everything Goes On", "Everything Goes On", 202),
+("Porter Robinson, League of Legends", "Everything Goes On", "Everything Goes On", 202),
 -- smile
 ("Porter Robinson", "Knock Yourself Out XD", "SMILE! :D", 168),
 ("Porter Robinson", "Cheerleader", "SMILE! :D", 237),
@@ -64,18 +64,21 @@ INSERT INTO bot_default_song_library (artist, song_title, album, length_in_secon
 ("Porter Robinson", "Year of the Cup", "SMILE! :D", 262),
 ("Porter Robinson", "Kitsune Maison Freestyle", "SMILE! :D", 234),
 ("Porter Robinson", "Easier to Love You", "SMILE! :D", 250),
-("Porter Robinson", "Mona Lisa", "SMILE! :D", 225),
+("Porter Robinson, Frost Children", "Mona Lisa", "SMILE! :D", 225),
 ("Porter Robinson", "Is There Really No Happiness?", "SMILE! :D", 199),
 ("Porter Robinson", "Everything To Me", "SMILE! :D", 292),
 
+/* ("Porter Robinson & Ninajirachi, "WannaCry", "???", 0),*/
+
+
 /* skrillex, porter robinson & bibi bourelly*/
 -- still here
-("Skrillex, Porter Robinson & Bibi Bourelly", "Still Here (with the ones that I came with)", "Quest For Fire", 312),
+("Skrillex, Porter Robinson, Bibi Bourelly", "Still Here (with the ones that I came with)", "Quest For Fire", 312),
 /* Michael Clifford & Porter Robinson */
-("Michael Clifford & Porter Robinson", "kill me for always", "SIDEQUEST", 187),
+("Michael Clifford, Porter Robinson", "kill me for always", "SIDEQUEST", 187),
 /* porter robinson & madeon */
 -- shelter
-("Porter Robinson & Madeon", "Shelter", "Shelter", 219),
+("Porter Robinson, Madeon", "Shelter", "Shelter", 219),
 /* po-uta */
 ("Po-uta", "Humansongs", "Humansongs", 216),
 /* madeon */
@@ -120,33 +123,48 @@ INSERT INTO bot_default_song_library (artist, song_title, album, length_in_secon
 ("Madeon", "Love You Back", "Love You Back", 214),
 ("Madeon", "Gonna Be Good", "Gonna Be Good", 172),
 ("Madeon", "Gonna Be Good (Live Edit)", "Gonna Be Good (Live Edit)", 271),
+-- GFL
+("Madeon", "Menthol", "Good Faith Live", 68),
+("Madeon", "Destination", "Good Faith Forever", 121),
+("Madeon", "Magma", "Good Faith Forever", 84),
+
+
+-- 12122017
+("Madeon", "HEIR", "12122017", 208),
+("Madeon", "HOMICIDE", "12122017", 154),
+("Madeon", "TURBO MEGA FAST", "12122017", 160),
+("Madeon", "CELINE", "12122017", 197),
+("Madeon", "POMME", "12122017", 111),
+("Madeon", "HEIR", "12122017", 82),
+
 -- GAP YEAR
 -- all ur luv
-("Wavedash, Madeon & Toro Y Moi", "All Ur Luv", "Tempo", 161),
+("Wavedash, Madeon", "All Ur Luv (feat. Toro y Moi)", "Tempo", 161),
 -- believe it
 ("Louis The Child, Madeon", "Believe It", "The Sun Comes Up", 150),
+/*
+-- Credited but not featured
+("Keshi", "Kiss Me Right", "Requiem (Bonus Edition)", 162),
+("Petit Biscuit", "Cruel Heart", "Discipline", 213),
+("Chromeo", "Friendsnlovers", "Adult Contemporary", 155);
+*/
 
 -- Victory
 ("Madeon", "Hi!", "Victory",142),
-("Madeon", "Car Crash Baby", "Victory", 198);
+("Madeon", "Car Crash Baby", "Victory", 198),
 /*
--- Currently unreleased Victory songs
-("Madeon", "Super Platinum", "Victory", ???),
-("Madeon", "Chaos Magic", "Victory", ???),
-("Madeon", "Revolution", "Victory", ???),
-("Madeon", "Hugo 2", "Victory", ???),
-("Madeon", "Fire Away", "Victory", ???),
-("Madeon", "Enjoy", "Victory", ???),
-("Madeon", "Boys", "Victory", ???),
-
-
-
-
-
-
-
--- Credited but not featured
-("keshi", "Kiss Me Right", "Requiem (Bonus Edition)", 162),
-("Petit Biscuit", "Cruel Heart", "Discipline", 213),
-("chromeo", "Friendsnlovers", "Adult Contemporary", 155);
+("Madeon", "Super Platinum (feat. Erick the Architect)", "Victory", 151),
+("Madeon", "Dancing On Your Grave", "Victory", 239), 
+("Madeon", "Somebody Else", "Victory", 193),*/
+("Madeon", "Fire Away (feat. Slayyyter)", "Victory", 207),
+/*
+("Madeon", "Chaos Magic", "Victory", 196),
+("Madeon", "Enjoy", "Victory", 180),
+("Madeon", "Red Jacket (feat. Sam Gellaitry)", "Victory", 177),
+("Madeon", "Lonely Space Age", "Victory", 230),
 */
+
+-- victory live
+
+("Madeon", "Revolution", "Victory Live", 128),
+("Madeon", "Hugo 2", "Victory Live", 222);
