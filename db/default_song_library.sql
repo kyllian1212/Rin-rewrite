@@ -68,8 +68,26 @@ INSERT INTO bot_default_song_library (artist, song_title, album, length_in_secon
 ("Porter Robinson", "Is There Really No Happiness?", "SMILE! :D", 199),
 ("Porter Robinson", "Everything To Me", "SMILE! :D", 292),
 
-/* ("Porter Robinson & Ninajirachi, "WannaCry", "???", 0),*/
+-- wannacry
+("Porter Robinson, Ninajirachi", "WannaCry", "WannaCry", 220),
 
+-- smile! :D plus+
+("Porter Robinson, DJ Not Porter Robinson, Ashelyy", "Knock Yourself Out XD - DJ NOT PORTER ROBINSON & Ashelyy Remix", "SMILE! :D plus+", 193),
+("Porter Robinson, Nitepunk", "Cheerleader - Nitepunk Remix", "SMILE! :D plus+", 220),
+("Porter Robinson, G Jones", "Russian Roulette - G Jones Remix", "SMILE! :D plus+", 307),
+("Porter Robinson, Ninajirachi, underscores", "Perfect Pinterest Garden - Ninajirachi & underscores Remix", "SMILE! :D plus+", 170),
+("Porter Robinson, EJEAN", "Year of the Cup - EJEAN Remix", "SMILE! :D plus+", 220),
+("Porter Robinson, Leon Valley", "Kitsune Maison Freestyle - Leon Valley Remix", "SMILE! :D plus+", 188),
+("Porter Robinson, Vertile", "Easier to Love You - Vertile Remix", "SMILE! :D plus+", 193),
+("Porter Robinson, Frost Children, G Jones", "Mona Lisa - Maybe Mashup", "SMILE! :D plus+", 258),
+("Porter Robinson, Frost Children", "Is There Really No Happiness? - Frost Children Remix", "SMILE! :D plus+", 376),
+("Porter Robinson, jamesjamesjames", "Everything To Me - jamesjamesjames Remix", "SMILE! :D plus+", 450),
+("Porter Robinson, DJ Not Porter Robinson", "Cheerleader - DJ NOT PORTER ROBINSON Remix", "SMILE! :D plus+", 160),
+("Porter Robinson, Jamie Paige, Hatsune Miku", "Cheerleader (feat. Hatsune Miku)", "SMILE! :D plus+", 239),
+("Porter Robinson, Control Freak", "Cheerleader - Control Freak Remix", "SMILE! :D plus+", 183),
+("Porter Robinson, Galileo Galilei", "Easier to Love You - Galileo Galilei Cover", "SMILE! :D plus+", 274),
+("Porter Robinson, Atura", "Is There Really No Happiness? - Atura Remix", "SMILE! :D plus+", 206),
+("Porter Robinson, Joey Valence", "Is There Really No Happiness? - Joey Valence Remix", "SMILE! :D plus+", 235),
 
 /* skrillex, porter robinson & bibi bourelly*/
 -- still here
@@ -149,22 +167,28 @@ INSERT INTO bot_default_song_library (artist, song_title, album, length_in_secon
 ("Chromeo", "Friendsnlovers", "Adult Contemporary", 155);
 */
 
--- Victory
+-- victory era
 ("Madeon", "Hi!", "Victory",142),
 ("Madeon", "Car Crash Baby", "Victory", 198),
-/*
-("Madeon", "Super Platinum (feat. Erick the Architect)", "Victory", 151),
+("Madeon, Erick the Architect", "Super Platinum (feat. Erick the Architect)", "Victory", 151),
 ("Madeon", "Dancing On Your Grave", "Victory", 239), 
-("Madeon", "Somebody Else", "Victory", 193),*/
-("Madeon", "Fire Away (feat. Slayyyter)", "Victory", 207),
-/*
+("Madeon", "Somebody Else", "Victory", 193),
+("Madeon, Slayyyter", "Fire Away (feat. Slayyyter)", "Victory", 207),
 ("Madeon", "Chaos Magic", "Victory", 196),
 ("Madeon", "Enjoy", "Victory", 180),
-("Madeon", "Red Jacket (feat. Sam Gellaitry)", "Victory", 177),
+("Madeon, Sam Gellaitry", "Red Jacket (feat. Sam Gellaitry)", "Victory", 177),
 ("Madeon", "Lonely Space Age", "Victory", 230),
-*/
+
+-- victory remixes
+("Madeon, Slayyyter, Frost Children", "Fire Away (feat. Slayyyter) - Frost Children Remix", "Victory", 196),
+("Madeon, MGNA Crrrta", "Dancing On Your Grave - MGNA Crrta Remix", "Victory", 191),
 
 -- victory live
-
 ("Madeon", "Revolution", "Victory Live", 128),
-("Madeon", "Hugo 2", "Victory Live", 222);
+("Madeon", "Hugo 2", "Victory Live", 222),
+
+-- ipod touch remix
+("Ninajirachi, Madeon", "iPod Touch - Madeon Remix", "iPod Touch (Madeon Remix)", 214),
+
+-- molly talk
+("ISOxo, Madeon", "Molly Talk", "HARDCORE DIVA", 188);
