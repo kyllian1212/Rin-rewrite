@@ -40,8 +40,7 @@ auth_manager = SpotifyClientCredentials(client_id=SPOTIPY_CLIENT_ID, client_secr
 sp = spotipy.Spotify(auth_manager=auth_manager)
 
 # intents = discord.Intents.all()
-# intents = discord.Intents.members = True
-intents = discord.Intents.none()
+intents = discord.Intents.default()
 bot = commands.Bot(command_prefix=COMMAND_PREFIX, intents=intents, max_messages=10000, help_command=None)
 
 @app_commands.command(name="resync", description="resync slash commands")

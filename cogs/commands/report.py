@@ -12,6 +12,7 @@ from main import db
 
 """
 figure it out later lol
+FIX THE CODE BECAUSE OF THE FETCHES INSTEAD OF GET MEMBERS
 class ModalTest(discord.ui.Modal, title="Report this message"):
     delete = discord.ui.Label(
         text="Delete this message?",
@@ -264,11 +265,14 @@ class ReportCog(commands.Cog):
                     ),
                 )
             elif interaction.user.bot == False:
-                channel = await self.bot.fetch_channel(interaction.channel.id)
+                #channel = await self.bot.fetch_channel(interaction.channel.id)
+                guild = self.bot.get_guild(interaction.guild.id)
                 reacted_message = message
+                interaction_member = await guild.fetch_member(interaction.user.id)
+                reacted_message_author = await guild.fetch_member(reacted_message.author.id)
 
                 if (
-                    not interaction.user.id == reacted_message.author.id
+                    not interaction_member.id == reacted_message_author.id
                 ):
                     log_channel = await self.bot.fetch_channel(log_channel_id)
                     now = str(
@@ -278,15 +282,14 @@ class ReportCog(commands.Cog):
                     reacted_message_author_roles = None
                     long_message = False
                     is_member = True
-                    guild = self.bot.get_guild(interaction.guild.id)
 
                     # check if user is a member of the server or not
-                    if guild.get_member(reacted_message.author.id) is None:
+                    if await guild.fetch_member(reacted_message_author.id) is None:
                         is_member = False
                         description += "\n*This user is currently not on the server.*"
 
                     if is_member is True:
-                        for role in reacted_message.author.roles:
+                        for role in reacted_message_author.roles:
                             if role.name != "@everyone":
                                 if reacted_message_author_roles is None:
                                     reacted_message_author_roles = str(role.mention)
@@ -303,27 +306,27 @@ class ReportCog(commands.Cog):
                         color=0xFF0000,
                     )
 
-                    if reacted_message.author.avatar is None:
+                    if reacted_message_author.avatar is None:
                         reported_message_embed.set_thumbnail(
                             url="https://cdn.discordapp.com/embed/avatars/0.png"
                         )
                     else:
                         reported_message_embed.set_thumbnail(
-                            url=reacted_message.author.avatar.url
+                            url=reacted_message_author.avatar.url
                         )
 
                     reported_message_embed.add_field(
-                        name="Username", value=reacted_message.author.name, inline=True
+                        name="Username", value=reacted_message_author.name, inline=True
                     )
 
                     if is_member is True:
                         reported_message_embed.add_field(
-                            name="Nickname", value=reacted_message.author.nick, inline=True
+                            name="Nickname", value=reacted_message_author.nick, inline=True
                         )
 
                     reported_message_embed.add_field(
                         name="User ID",
-                        value="<@" + str(reacted_message.author.id) + ">",
+                        value="<@" + str(reacted_message_author.id) + ">",
                         inline=True,
                     )
                     reported_message_embed.add_field(
@@ -385,10 +388,10 @@ class ReportCog(commands.Cog):
 
                         reported_message_part2_embed.set_footer(
                             text="Reported by "
-                            + str(interaction.user.name)
+                            + str(interaction_member.name)
                             + "  •  "
                             + now,
-                            icon_url=interaction.user.avatar.url,
+                            icon_url=interaction_member.avatar.url,
                         )
                     else:
                         # even if message is deleted, you can still jump to the context with jump_url
@@ -406,10 +409,10 @@ class ReportCog(commands.Cog):
 
                         reported_message_embed.set_footer(
                             text="Reported by "
-                            + str(interaction.user.name)
+                            + str(interaction_member.name)
                             + "  •  "
                             + now,
-                            icon_url=interaction.user.avatar.url,
+                            icon_url=interaction_member.avatar.url,
                         )
 
                     files = []
@@ -429,9 +432,9 @@ class ReportCog(commands.Cog):
                         )
 
                     if (
-                        interaction.user.guild_permissions.administrator is True
-                        or interaction.user.guild_permissions.manage_messages is True
-                        or interaction.user.id == reacted_message.author.id
+                        interaction_member.guild_permissions.administrator is True
+                        or interaction_member.guild_permissions.manage_messages is True
+                        or interaction_member.id == reacted_message_author.id
                     ):
                         await reacted_message.delete()
                         reported_message_embed.description = "*The message has been deleted as it has been reported by an admin.*"
