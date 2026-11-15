@@ -39,9 +39,7 @@ class InfoCog(commands.Cog):
             kyllian_user = self.bot.get_user(171000921927581696)
             info_message_embed = discord.Embed(
                 title="Rin • Bot by "
-                + str(kyllian_user.name)
-                + "#"
-                + str(kyllian_user.discriminator),
+                + str(kyllian_user.name),
                 description="**bot version:** *" + VERSION + "*",
                 url="https://github.com/kyllian1212/Rin-rewrite",
                 color=0x00AEFF,

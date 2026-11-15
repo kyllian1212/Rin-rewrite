@@ -54,7 +54,7 @@ class MembersCog(commands.Cog):
                     )
                     banned_embed.add_field(name="User tag:", value=f"<@{user.id}>")
                     banned_embed.add_field(
-                        name="Username when banned:", value=f"{user.name}#{user.discriminator}"
+                        name="Username when banned:", value=f"{user.name}"
                     )
                     if user.avatar is None:
                         banned_embed.set_thumbnail(
@@ -94,7 +94,7 @@ class MembersCog(commands.Cog):
                     unbanned_embed.add_field(name="User tag:", value=f"<@{user.id}>")
                     unbanned_embed.add_field(
                         name="Username when unbanned:",
-                        value=f"{user.name}#{user.discriminator}",
+                        value=f"{user.name}",
                     )
                     if user.avatar is None:
                         unbanned_embed.set_thumbnail(
@@ -156,7 +156,7 @@ class MembersCog(commands.Cog):
                     timeout_embed.add_field(name="User tag:", value=f"<@{after.id}>")
                     timeout_embed.add_field(
                         name="Username when timed out:",
-                        value=f"{after.name}#{after.discriminator}",
+                        value=f"{after.name}",
                     )
                     timeout_embed.add_field(
                         name="Timed out until:",
